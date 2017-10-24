@@ -1,0 +1,5 @@
+numpy
+tensorflow
+pillow
+tflearn
+opencv-python
