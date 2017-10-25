@@ -27,5 +27,9 @@ class ImageTestCase(unittest.TestCase):
         self.img.crop_to_subject(box)
         self.assertEqual(self.img.pill.size, (100, 100))
 
+    def test_gray_contrast(self):
+        self.img.gray_contrast()
+        self.assertTrue(isinstance(self.img.gray_con, Image.Image))
+
 if __name__ == '__main__':
     unittest.main()

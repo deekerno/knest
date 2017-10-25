@@ -3,7 +3,7 @@
 
 from PIL import ExifTags
 from PIL import Image
-import exifread
+from PIL import ImageOps
 import os
 import time
 
@@ -15,11 +15,11 @@ class Pill(object):
     transformations.
     """
     def __init__(self, arg):
-        #super(Image, self).__init__()
         self.pill = Image.open(arg)
         self.path = self.pill.filename
         self.file_obj = open(self.path)
         self.exif_tags = self.pill._getexif()
+        self.gray_con = None
 
     def crop_to_subject(self, box):
         """
@@ -28,3 +28,12 @@ class Pill(object):
         will be cropped. Note that (0,0) is the upper left corner.
         """
         self.pill = self.pill.crop(box)
+
+    def gray_contrast(self):
+        """
+        Experimental method that first converts the image to grayscale
+        and then maximizes image contrast. The darkest pixel in the
+        image becomes black and the lightest pixel becomes white. This
+        should help with eye detection.
+        """
+        self.gray_con = ImageOps.autocontrast(ImageOps.grayscale(self.pill))
