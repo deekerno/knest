@@ -4,16 +4,15 @@
 from model_base import BaseModel
 import tflearn
 
+# Labels: bird/not_bird
 NUM_LABELS = 2
 
 
-class TestModel(BaseModel):
+class Model(BaseModel):
     """
         Test Model:
         Testing the feasibility of the object-oriented version of our model
     """
-    # Labels: bird, not bird
-    NUM_LABELS = 2
 
     def __init__(self, model_name, output_folder=None, hp_content=None):
         """

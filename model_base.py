@@ -61,10 +61,11 @@ class BaseModel(object):
 
         # Load hyperparameter content
         if hp_content is None:
-            self.hp_json = json.loads(self.hyparam_path)
+            self.hp_json = json.load(self.hyparam_path)
         else:
             # This should be called if an already deserialzed JSON is passed
             self.hp_json = hp_content
+
         self.hp = Hyperparameters()
         self.hp.set_hp(self.hp_json)
         self._set_hyperparameters_name()
@@ -86,13 +87,6 @@ class BaseModel(object):
                 maxpool_ksize:  (Vector)  max pooling filter size
                 maxpool_stride: (Vector)  how much the max pooling kernel travels
         """
-
-        # Attach the (padded?) convolutional layer to the rest of the model
-        # print("incoming shape: ", incoming.get_shape().as_list())
-        # conv_layer = tflearn.layers.conv.conv_2d(incoming, nb_filter,
-        #                                         filter_size, strides, padding,
-        #                                         bias)
-        # print("conv_layer shape: ", conv_layer.get_shape().as_list())
 
         # Add activation and/or max-pooling
         if activation is None:

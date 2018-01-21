@@ -1,0 +1,11 @@
+{
+	"batch_size": 96,
+    "conv_1_size": 3,
+    "conv_1_nb": 32,
+    "conv_2_size": 3,
+    "conv_2_nb": 64,
+    "dropout": 0.4,
+    "fc_1_size": 512,
+    "learning_rate": 0.001,
+    "num_epochs": 50
+}
