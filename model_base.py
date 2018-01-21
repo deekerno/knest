@@ -51,6 +51,7 @@ class BaseModel(object):
         self.output_dir = os.path.join(self.current_dir, OUTPUT_DIR)
 
         self.checkpoint_dir = os.path.join(self.output_dir, CHECKPOINT_DIR)
+        makedirs(self.checkpoint_dir, exist_ok=True)
 
         # The config folder will hold any specific model configurations
         self.config_dir = os.path.join(self.current_dir, CONFIG_DIR)
