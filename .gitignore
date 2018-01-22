@@ -99,3 +99,13 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# dataset
+bird_dataset
+*.pkl
+
+# tensorflow output/checkpoints
+output/
+
+# capsule stuff
+capslayer/

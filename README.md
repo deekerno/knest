@@ -1,5 +1,5 @@
-# [insert cool app name here]
-Senior Design
+# Bird's Eye View
+UCF Senior Design 2017-18
 
-## Installation/Requirements
-This project requires Python 3+ and makes use of several frameworks. It assumes you are using a Unix-based system. To setup your environment, please make a new virtualenv using `python -m venv venv` and then activate it by using `source venv/bin/activate`. Then, run `pip install -r requirements.txt`. Note that you may need to have numpy installed first, as one of the packages' dependencies requires it; you can do that by running `pip install numpy` first.
+## Description
+Take a folder that contains photos of birds and other stuff, get a folder of just birds, no other stuff.
