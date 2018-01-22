@@ -51,7 +51,7 @@ class BaseModel(object):
         self.output_dir = os.path.join(self.current_dir, OUTPUT_DIR)
 
         self.checkpoint_dir = os.path.join(self.output_dir, CHECKPOINT_DIR)
-        makedirs(self.checkpoint_dir, exist_ok=True)
+        os.makedirs(self.checkpoint_dir, exist_ok=True)
 
         # The config folder will hold any specific model configurations
         self.config_dir = os.path.join(self.current_dir, CONFIG_DIR)
@@ -133,7 +133,7 @@ class BaseModel(object):
 
     def _fully_connected_layer(self, incoming, n_units, activation='relu', bias=True):
         """
-            Create a fully connected layer w/ optional activation and/or softmax
+            Create a fully connected layer w/ optional activation
                 incoming:       (Tensor)  incoming model layers
                 n_units:        (Integer) size of input
                 activation:     (String)  set the activation function (default: relu)
