@@ -3,3 +3,5 @@ tensorflow
 pillow
 tflearn
 opencv-python
+Cython==0.26.1
+kivy
