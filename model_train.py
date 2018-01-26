@@ -34,5 +34,5 @@ model.fit(X, Y, n_epoch=test.hp.num_epochs, shuffle=True,
           show_metric=True, batch_size=test.hp.batch_size,
           run_id='bird-classifier')
 
-# Save the model
-model.save("bird-classifier.tfl")
+# Save the model, update # every new run to store all of our results
+model.save("saved/train1/bird-classifier1.tfl")
