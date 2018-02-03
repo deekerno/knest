@@ -2,11 +2,13 @@
 # Group 38
 
 from kivy.app import App
+from kivy.lang import Builder
 from kivy.factory import Factory
 from kivy.properties import ObjectProperty
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.popup import Popup
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
+from kivy.clock import Clock
 import os
 
 
@@ -46,15 +48,23 @@ class FolderSelectScreen(Screen):
         self.ids.path.text = new_text
 
     # All classes must be passed at the end so Kivy can interpret them
-    pass
+
+
+class LandingScreen(Screen):
+    def __init__(self, **kwargs):
+        super(LandingScreen, self).__init__(**kwargs)
+        Clock.schedule_once(self.switch, 3)
+
+    def switch(self, dt):
+        self.manager.current = 'folder_select'
 
 
 class ProgressScreen(Screen):
-    pass
+    print("ProgressScreen")
 
 
 class EndScreen(Screen):
-    pass
+    print("EndScreen")
 
 
 class LoadDialog(FloatLayout):
@@ -62,8 +72,13 @@ class LoadDialog(FloatLayout):
     cancel = ObjectProperty(None)
 
 
-# Create the screen manager and add the screens to it
-sm = ScreenManager()
+# config.kv should not implement any screen manager stuff as it
+# overrides any definitions in this file, and cause a lot of strife
+Builder.load_file("config.kv")
+
+# Create the screen manager
+sm = ScreenManager(transition=FadeTransition())
+sm.add_widget(LandingScreen(name='landing'))
 sm.add_widget(FolderSelectScreen(name='folder_select'))
 sm.add_widget(ProgressScreen(name='progress'))
 sm.add_widget(EndScreen(name='end'))
@@ -71,7 +86,8 @@ sm.add_widget(EndScreen(name='end'))
 
 # Pass it onto the kivy module
 class BirdApp(App):
-    pass
+    def build(self):
+        return sm
 
 
 Factory.register('LoadDialog', cls=LoadDialog)

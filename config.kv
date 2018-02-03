@@ -1,19 +1,15 @@
 #:kivy 1.10.1
+#:import Clock kivy.clock.Clock
 
-ScreenManager:
-	id: sm
-	FolderSelectScreen:
-		id: folder_select
-		name: 'folder_select'
-		manager: 'sm'
-	ProgressScreen:
-		id: progress
-		name: 'progress'
-		manager: 'sm'
-	EndScreen:
-		id: finish
-		name: 'finish'
-		manager: 'sm'
+<LandingScreen>:
+    canvas.before:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: "knest.png"
+    Button:
+        background_color: (0.0, 0.0, 0.0, 0.0)
+        on_release: app.root.current = 'folder_select'
 
 <FolderSelectScreen>:
     BoxLayout:
@@ -21,7 +17,7 @@ ScreenManager:
         Label:
         	id: title
             font_size: 100
-            text: "Bird's Eye View"
+            text: "Knest"
             top: root.height * 3 / 4
             center_x: root.width / 2
 
