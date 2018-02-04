@@ -44,10 +44,8 @@ class FolderSelectScreen(Screen):
         self.dismiss_popup()
 
     def update_path(self, dir_path):
-        new_text = "Path: " + dir_path
+        new_text = "Directory Path: " + dir_path
         self.ids.path.text = new_text
-
-    # All classes must be passed at the end so Kivy can interpret them
 
 
 class LandingScreen(Screen):

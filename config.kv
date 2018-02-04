@@ -17,13 +17,21 @@
         Label:
         	id: title
             font_size: 100
-            text: "Knest"
+            font_name: 'Montserrat-Regular'
+            text: "K N E S T"
             top: root.height * 3 / 4
             center_x: root.width / 2
+
+        Image:
+            center_x: root.width / 2
+            center_y: root.height * 1 / 1.5
+            size: self.size
+            source: 'color_bird.png'          
 
         Label:
         	id: path
         	font_size: 50
+            font_name: 'Montserrat-Regular'
         	text: 'Please choose a directory'
 
         BoxLayout:
@@ -32,12 +40,15 @@
             center_y: root.height * 1 / 3
             size: (400, 400)
             height: 100
+
             Button:
                 text: "Choose folder"
+                font_name: 'Montserrat-Regular'
                 on_release: root.show_load()
 
             Button:
                 text: "Start"
+                font_name: 'Montserrat-Regular'
                 on_release: app.root.current = 'progress'
 
 <ProgressScreen>:
@@ -46,6 +57,7 @@
 		Label:
 			id: progress
 			font_size: 60
+            font_name: 'Montserrat-Regular'
 			text: "Processing..."
 			top: root.height / 2
 			center_x: root.width / 2
@@ -55,7 +67,7 @@
 		size: root.size
         pos: root.pos
         orientation: 'vertical'
-        FileChooserListView:
+        FileChooserIconView:
             id: filechooser
             dirselect: True
 
@@ -64,8 +76,10 @@
             height: 70
             Button:
                 text: 'Cancel'
+                font_name: 'Montserrat-Regular'
                 on_release: root.cancel()
 
             Button:
                 text: 'Load'
+                font_name: 'Montserrat-Regular'
                 on_release: root.load(filechooser.path, filechooser.selection)
