@@ -128,5 +128,8 @@ checkpoint
 data.zip
 infer.py
 #figure this out later this is all the tensorflow object detection api stuff that is getting weird with git because of git submodules
-models
+models.zip
+faster_rcnn_nas_coco_2017_11_08.zip
 faster_rcnn_nas_coco_2017_11_08/
+models
+
