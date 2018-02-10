@@ -1,5 +1,5 @@
-mv data/ models/
-mv bird_images/ models/
-mv faster_rcnn_nas_coco_2017_11_08/ models/
+mv data/ models/research/object_detection
+mv bird_images/ models/research/object_detection
+mv faster_rcnn_nas_coco_2017_11_08/ models/research/object_detection
 mv faster_rcnn_nas_coco.config training/
-mv training/ models/
+mv training/ models/research/object_detection
