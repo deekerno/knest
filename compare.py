@@ -18,8 +18,10 @@ def make_hist(dir_path):
     for filename in os.listdir(dir_path):
         # ignore hidden files
         if not filename.startswith('.'):
+            # open the file in the directory
+            file = os.path.join(dir_path, filename)
             # convert to cv2 array, then convert colors
-            img = cv2.imread(filename)
+            img = cv2.imread(file)
             images[filename] = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
             # create a histogram for each image
@@ -68,3 +70,4 @@ def temp_test(img, images, histograms, des_path):
         if compare(histograms[img], hist):
             im = Image.fromarray(images[filename])
             im.save(os.path.join(des_path, filename))
+
