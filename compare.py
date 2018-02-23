@@ -28,6 +28,8 @@ def make_hist(dir_path):
             hist = cv2.normalize(hist, hist).flatten()
             histograms[filename] = hist
 
+    return images, histograms
+
 
 
 """
