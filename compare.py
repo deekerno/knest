@@ -4,15 +4,15 @@ import os
 
 # similarity threshold, set at 55%
 SIM_INDEX = .55
-# dictionaries to hold relevant info
-images = {}
-histograms = {}
 
 """
 Creates a histogram for every image in the given directory
     dir_path: (String) path to the directory of images
 """
 def make_hist(dir_path):
+    # dictionaries to hold relevant info
+    images = {}
+    histograms = {}
 
     # loop through all images in directory
     for filename in os.listdir(dir_path):
@@ -53,3 +53,18 @@ def compare(hist1, hist2):
             return False
 
     return False  
+
+"""
+Test function: compares a directory of images to a single image. All similar images will be added to a separate folder.
+    img: (String) the name of the image being compared to. MUST be included in the folder with rest of images
+    images: a dictionary that holds array forms of a number of images
+    histograms: said images' histograms
+    des_path: path to a folder that will hold all similar images to 'img'
+"""
+def temp_test(img, images, histograms, des_path):
+
+    for (filename, hist) in histograms.items():
+        # if the image is similar to 'img', add to destination folder
+        if compare(histograms[img], hist):
+            im = Image.fromarray(images[filename])
+            im.save(os.path.join(des_path, filename))
