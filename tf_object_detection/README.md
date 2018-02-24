@@ -51,3 +51,21 @@ python object_detection/builders/model_builder_test.py
 # from knest/tf_object_detection/models/research/object_detection
 python3 train.py --logtostderr --train_dir=training/ --pipeline_config_path=training/faster_rcnn_nas_coco.config
 ```
+
+### Inference - exporting the inference graph
+```bash
+# from knest/tf_object_detection/models/research/object_detection
+python3 export_inference_graph.py \
+    --input_type image_tensor \
+    --pipeline_config_path training/faster_rcnn_nas_coco.config \
+    --trained_checkpoint_prefix training/INPUT_LATEST_CHECKPOINT_MODEL \
+    --output_directory bird_graph
+```
+
+### Run the Inference
+refactor object_detection_tutorial.ipynb into a .py file
+```bash
+# from knest/tf_object_detection/models/research/object_detection
+python3 FILE_NAME.py
+```
+
