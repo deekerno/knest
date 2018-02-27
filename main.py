@@ -9,8 +9,13 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from kivy.clock import Clock
+from kivy.uix.image import Image
+from kivy.animation import Animation
 import os
 
+# global variable
+dir_path = ""
+num_files = 0
 
 # Define behavior specific to a particular screen
 class FolderSelectScreen(Screen):
@@ -28,16 +33,10 @@ class FolderSelectScreen(Screen):
 
     # Store the path in a variable to send to the backend
     def load(self, path, filename):
-        numFiles = 0
-
-        for i in os.listdir(path):
-            if not i.startswith('.'):
-                numFiles += 1
-                print(i)
-
-        print("number of files: ", numFiles)
-
+        global dir_path, num_files
+        
         dir_path = path
+        num_files = len([f for f in os.listdir(dir_path) if not f.startswith('.')])
 
         self.update_path(dir_path)
 
@@ -47,8 +46,15 @@ class FolderSelectScreen(Screen):
         new_text = "Directory Path: " + dir_path
         self.ids.path.text = new_text
 
+    def check_path(self):
+        if not dir_path == "":
+            self.manager.current = 'progress'
+        else:
+            self.ids.path.text = "No directory path given"
+
 
 class LandingScreen(Screen):
+
     def __init__(self, **kwargs):
         super(LandingScreen, self).__init__(**kwargs)
         Clock.schedule_once(self.switch, 3)
@@ -59,6 +65,12 @@ class LandingScreen(Screen):
 
 class ProgressScreen(Screen):
     print("ProgressScreen")
+
+    # def display_images(self):
+    #     for filename in os.listdir(dir_path):
+    #         if not filename.startswith('.'):
+    #             self.ids.image.source = filename
+
 
 
 class EndScreen(Screen):
@@ -84,6 +96,7 @@ sm.add_widget(EndScreen(name='end'))
 
 # Pass it onto the kivy module
 class BirdApp(App):
+
     def build(self):
         return sm
 
