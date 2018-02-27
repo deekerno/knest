@@ -11,8 +11,8 @@ import yaml
 
 class FasterRCNN(object):
     def __init__(self, config, name='FasterRCNN'):
-        self.classifier, self.bounding_boxes = self._build_network()
         self.config = self._read_config(config)
+        self.classifier, self.bounding_boxes = self._build_network()
 
     def _build_network():
         """
