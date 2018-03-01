@@ -13,6 +13,7 @@ from kivy.uix.image import Image
 from kivy.animation import Animation
 import os
 from functools import partial
+import blur
 
 # global variables
 dir_path = ""
@@ -87,19 +88,42 @@ class BlackScreen2(Screen):
 class ProcessScreen(Screen):
 
     def update(self, dt):
+        # global references
         global dir_path, number, num_files
 
+        # preventative measure: avoid out of index error
         if number < num_files:
+            # avoid hidden files
             if not os.listdir(dir_path)[number].startswith('.'):
+                # remove image transparency
                 self.ids.image.color = (1, 1, 1, 1)
-                self.ids.image.source = os.path.join(
-                    dir_path, os.listdir(dir_path)[number])
+                # display working image
+                self.ids.image.source = os.path.join(dir_path, os.listdir(dir_path)[number])
+                # reset result
+                self.ids.result.color = (0, 0, 0, 0)
+                self.ids.result.source = ''
+                # call blur detection on image
+                Clock.schedule_once(partial(self.check_blur, self.ids.image.source), .5)
+
+            # move on to next image by updating number
             number += 1
+        # reached end of directory; reset all global variables and change screens
         else:
             number = 0
             num_files = 0
             dir_path = ""
             self.manager.current = 'black3'
+
+    # call blur detection and display results
+    def check_blur(self, img, dt):
+        # if image is not blurry, display green checkmark
+        if blur.check_sharpness(img):
+            self.ids.result.color = (1, 1, 1, 1)
+            self.ids.result.source = 'yes.png'
+        # otherwise, display red x
+        else:
+            self.ids.result.color = (1, 1, 1, 1)
+            self.ids.result.source = 'no.png'
 
 class BlackScreen3(Screen):
 
