@@ -12,6 +12,8 @@
         on_release: app.root.current = 'folder_select'
 
 <FolderSelectScreen>:
+    on_leave: self.ids.path.text = "Please choose a directory"
+
     BoxLayout:
         orientation: 'vertical'
         Label:
@@ -51,16 +53,66 @@
                 font_name: 'Montserrat-Regular'
                 on_release: root.check_path()
 
+<BlackScreen>:
+    on_enter: Clock.schedule_once(root.switch, 1.5)
+
 <ProgressScreen>:
-	BoxLayout:
-		orientation: 'vertical'
-		Label:
-			id: progress
-			font_size: 60
+    on_enter: Clock.schedule_once(root.switch, 3)
+
+    Image:
+        id: image
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        size_hint_y: None  # Tells the layout to ignore the size_hint in y dir
+        height: dp(200)  # The fixed height you want
+        source: 'color_bird.png'
+
+<BlackScreen2>:
+    on_enter: Clock.schedule_once(root.switch, 2)
+
+<ProcessScreen>:
+    on_enter: event = Clock.schedule_interval(root.update, 1)
+    on_leave: Clock.unschedule(root.update)
+    on_leave: self.ids.image.source = ''
+    on_leave: self.ids.image.color = (0.0, 0.0, 0.0, 0.0)
+
+    Image:
+        id: image
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        size_hint_y: None  # Tells the layout to ignore the size_hint in y dir
+        height: dp(300)  # The fixed height you want
+        color: (0.0, 0.0, 0.0, 0.0)
+        source: ''
+
+<BlackScreen3>:
+    on_enter: Clock.schedule_once(root.switch, 1)
+
+<EndScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+
+        Label:
+            id: message
+            font_size: 75
             font_name: 'Montserrat-Regular'
-			text: "Processing..."
-			top: root.height / 2
-			center_x: root.width / 2
+            text: 'P R O C E S S   C O M P L E T E'
+
+        Image:
+            id: image
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            size_hint_y: None  # Tells the layout to ignore the size_hint in y dir
+            height: dp(200)  # The fixed height you want
+            source: 'gray_bird.png'
+
+        Label:
+            id: continue
+            font_size: 45
+            font_name: 'Montserrat-Regular'
+            text: 'Click Anywhere to Continue'
+
+    Button:
+        background_color: (0.0, 0.0, 0.0, 0.0)
+        on_release: app.root.current = 'folder_select'
+
 
 <LoadDialog>:
     BoxLayout:
