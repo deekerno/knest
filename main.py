@@ -52,7 +52,7 @@ class FolderSelectScreen(Screen):
 
     def check_path(self):
         if not dir_path == "":
-            self.manager.current = 'black'
+            self.manager.current = 'black1'
         else:
             self.ids.path.text = "No directory path given"
 
@@ -67,7 +67,7 @@ class LandingScreen(Screen):
         self.manager.current = 'folder_select'
 
 
-class BlackScreen(Screen):
+class BlackScreen1(Screen):
 
     def switch(self, dt):
         self.manager.current = 'progress'
@@ -95,35 +95,53 @@ class ProcessScreen(Screen):
         if number < num_files:
             # avoid hidden files
             if not os.listdir(dir_path)[number].startswith('.'):
+                # update stage of processing
+                self.ids.message.text = 'B L U R   D E T E C T I O N'
                 # remove image transparency
                 self.ids.image.color = (1, 1, 1, 1)
                 # display working image
-                self.ids.image.source = os.path.join(dir_path, os.listdir(dir_path)[number])
+                self.ids.image.source = os.path.join(
+                    dir_path, os.listdir(dir_path)[number])
                 # reset result
                 self.ids.result.color = (0, 0, 0, 0)
                 self.ids.result.source = ''
                 # call blur detection on image
-                Clock.schedule_once(partial(self.check_blur, self.ids.image.source), .5)
+                result = self.check_blur(self.ids.image.source)
 
-            # move on to next image by updating number
-            number += 1
-        # reached end of directory; reset all global variables and change screens
+                # if blur detection produces a result,
+                # move on to next image by updating number
+                if result is True or result is False:
+                    number += 1
+
+            # indicates a hidden file, move on to next file
+            else:
+                number += 1
+
+        # reached end of directory; reset all global variables and change
+        # screens
         else:
             number = 0
             num_files = 0
             dir_path = ""
             self.manager.current = 'black3'
+            # unschedule kivy's Clock.schedule_interval() function
+            return False
 
     # call blur detection and display results
-    def check_blur(self, img, dt):
+    def check_blur(self, img):
         # if image is not blurry, display green checkmark
-        if blur.check_sharpness(img):
+        if blur.check_sharpness(img, 100):
             self.ids.result.color = (1, 1, 1, 1)
             self.ids.result.source = 'yes.png'
+            return True
         # otherwise, display red x
         else:
             self.ids.result.color = (1, 1, 1, 1)
             self.ids.result.source = 'no.png'
+            return False
+        # preventative measure: will never actually reach here
+        return None
+
 
 class BlackScreen3(Screen):
 
@@ -148,7 +166,7 @@ Builder.load_file("config.kv")
 sm = ScreenManager(transition=FadeTransition())
 sm.add_widget(LandingScreen(name='landing'))
 sm.add_widget(FolderSelectScreen(name='folder_select'))
-sm.add_widget(BlackScreen(name='black'))
+sm.add_widget(BlackScreen1(name='black1'))
 sm.add_widget(BlackScreen2(name='black2'))
 sm.add_widget(ProgressScreen(name='progress'))
 sm.add_widget(BlackScreen3(name='black3'))

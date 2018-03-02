@@ -53,7 +53,7 @@
                 font_name: 'Montserrat-Regular'
                 on_release: root.check_path()
 
-<BlackScreen>:
+<BlackScreen1>:
     on_enter: Clock.schedule_once(root.switch, 1.5)
 
 <ProgressScreen>:
@@ -70,12 +70,12 @@
     on_enter: Clock.schedule_once(root.switch, 2)
 
 <ProcessScreen>:
-    on_enter: Clock.schedule_interval(root.update, 1)
-    on_leave: Clock.unschedule(root.update)
+    on_enter: Clock.schedule_interval(root.update, 0)
     on_leave: self.ids.image.source = ''
     on_leave: self.ids.image.color = (0.0, 0.0, 0.0, 0.0)
     on_leave: self.ids.result.source = ''
     on_leave: self.ids.result.color = (0.0, 0.0, 0.0, 0.0)
+    on_leave: self.ids.message.text = ''
 
 
     Label:
@@ -83,13 +83,13 @@
         pos_hint: {'center_x': 0.5, 'center_y': 0.2}
         font_size: 50
         font_name: 'Montserrat-Regular'
-        text: 'Detecting Blur'
+        text: ''
 
     Image:
         id: image
         pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-        size_hint_y: None  # Tells the layout to ignore the size_hint in y dir
-        height: dp(300)  # The fixed height you want
+        size_hint_x: None  # Tells the layout to ignore the size_hint in y dir
+        width: dp(400) # The fixed height you want
         color: (0.0, 0.0, 0.0, 0.0)
         source: ''
 
@@ -97,7 +97,7 @@
         id: result
         pos_hint: {'center_x': 0.5, 'center_y': 0.5}
         size_hint_y: None  # Tells the layout to ignore the size_hint in y dir
-        height: dp(300)  # The fixed height you want
+        height: dp(200)  # The fixed height you want
         color: (0.0, 0.0, 0.0, 0.0)
         source: ''
 
