@@ -7,8 +7,6 @@ import numpy as np
 import pywt
 
 LAP_THRESHOLD = 100.0
-FFT_THRESHOLD = 150.0
-K_SIZE = 5
 
 
 def variance(image):
@@ -18,28 +16,36 @@ def variance(image):
         regions containing rapid intensity changes, meaning that there will
         be less of a spread of responses (low variance). Sharper images will
         have a higher spread of responses (high variance).
-            image_path:     (String) path to the image being tested
+            image:     (String) path to the image being tested
     """
-    #greyscale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     return cv2.Laplacian(image, cv2.CV_64F).var()
 
 
-def teng(image, k_size=K_SIZE):
-    #greyscale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+def teng(image):
+    """
+        Calculate the Tenegrad variance.
+            image:     (Array) Array (color/greyscale) representation of image
+    """
     gauss_x = cv2.Sobel(image, cv2.CV_64F, 1, 0)
     gauss_y = cv2.Sobel(image, cv2.CV_64F, 1, 0)
     return np.mean((gauss_x * gauss_x) + (gauss_y * gauss_y))
 
 
-def fft(image, threshold=FFT_THRESHOLD):
-    #greyscale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+def fft(image):
+    """
+        Calculate the mean of the fast fourier transform.
+            image:     (Array) Array (color/greyscale) representation of image
+    """
     fft = fp.rfft(fp.rfft(image, axis=0), axis=1)
     result = np.mean(fft)
-    return result, result > threshold
+    return result
 
 
 def lapm(image):
-    #greyscale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    """
+        Calculate the modified Laplacian variance.
+            image:     (Array) Array (color/greyscale) representation of image
+    """
     kernel = np.array([-1, 2, 1])
     lap_x = np.abs(cv2.filter2D(image, -1, kernel))
     lap_y = np.abs(cv2.filter2D(image, -1, kernel.T))
@@ -47,7 +53,11 @@ def lapm(image):
 
 
 def sum_wave(image):
-    coeffs = pywt.dwt2(image, 'haar')
+    """
+        Calculate the sum of coefficients given by the discrete wavelet transform.
+            image:     (Array) Array (color/greyscale) representation of image
+    """
+    coeffs = pywt.dwt2(image, 'db')
     cA, (cH, cV, cD) = coeffs
     total = np.sum(cA) + np.sum(cH) + np.sum(cV) + np.sum(cD)
     return total

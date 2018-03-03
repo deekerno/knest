@@ -2,7 +2,7 @@
 # Group 38
 
 import unittest
-import blur
+import utils.blur as blur
 
 TEST_PHOTO = 'tests/test_photo.jpg'
 
