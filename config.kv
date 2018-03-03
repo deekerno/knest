@@ -35,6 +35,9 @@
         	font_size: 50
             font_name: 'Montserrat-Regular'
         	text: 'Please choose a directory'
+            text_size: self.size
+            halign: 'center'
+            valign: 'middle'
 
         BoxLayout:
             orientation: 'vertical'
@@ -44,7 +47,7 @@
             height: 100
 
             Button:
-                text: "Choose folder"
+                text: "Choose Folder"
                 font_name: 'Montserrat-Regular'
                 on_release: root.show_load()
 
@@ -89,7 +92,9 @@
         id: image
         pos_hint: {'center_x': 0.5, 'center_y': 0.5}
         size_hint_x: None  # Tells the layout to ignore the size_hint in y dir
-        width: dp(400) # The fixed height you want
+        size_hint_y: None
+        width: dp(400) # The fixed width you want
+        height: dp(300)
         color: (0.0, 0.0, 0.0, 0.0)
         source: ''
 
