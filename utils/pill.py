@@ -4,8 +4,6 @@
 from PIL import ExifTags
 from PIL import Image
 from PIL import ImageOps
-import os
-import time
 
 class Pill(object):
     """

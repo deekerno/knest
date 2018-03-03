@@ -110,10 +110,16 @@ output/
 # capsule stuff
 capslayer/
 
+# image stuff
 images/
-
 leavens/
-
 CUB_200_2011\.tar
 
+# log spam
 saved/
+
+# Mac stuff
+.DS_Store
+
+# Goo Test
+goo_test/

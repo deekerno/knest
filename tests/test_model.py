@@ -2,7 +2,7 @@
 # Group 38
 
 import unittest
-from model import Model
+from models.bobo.model import Model
 import json
 
 TEST_HYPERPARAMETERS = 'tests/test_hp.json'

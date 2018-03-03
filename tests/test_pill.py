@@ -3,7 +3,7 @@
 
 import unittest
 from PIL import Image
-from pill import Pill
+from utils.pill import Pill
 
 TEST_PHOTO = 'tests/test_photo.jpg'
 
