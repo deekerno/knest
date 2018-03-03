@@ -18,6 +18,7 @@ def variance(image):
         have a higher spread of responses (high variance).
             image:     (String) path to the image being tested
     """
+    image = cv2.imread(image)
     return cv2.Laplacian(image, cv2.CV_64F).var()
 
 
