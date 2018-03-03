@@ -2,17 +2,16 @@
 # Group 38
 
 from kivy.app import App
-from kivy.lang import Builder
+from kivy.clock import Clock
 from kivy.factory import Factory
+from kivy.lang import Builder
 from kivy.properties import ObjectProperty
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
-from kivy.clock import Clock
-import os
-from functools import partial
-import blur
 from PIL import Image
+import blur
+import os
 
 # global variables
 dir_path = ""
@@ -146,12 +145,12 @@ class ProcessScreen(Screen):
         # if image is not blurry, display green checkmark
         if blur.check_sharpness(img, 100):
             self.ids.result.color = (1, 1, 1, 1)
-            self.ids.result.source = 'yes.png'
+            self.ids.result.source = 'assets/yes.png'
             return True
         # otherwise, display red x
         else:
             self.ids.result.color = (1, 1, 1, 1)
-            self.ids.result.source = 'no.png'
+            self.ids.result.source = 'assets/no.png'
             return False
         # preventive measure: will never actually reach here
         return None

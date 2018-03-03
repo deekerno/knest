@@ -6,7 +6,7 @@
         Rectangle:
             pos: self.pos
             size: self.size
-            source: "knest.png"
+            source: "assets/knest.png"
     Button:
         background_color: (0.0, 0.0, 0.0, 0.0)
         on_release: app.root.current = 'folder_select'
@@ -28,7 +28,7 @@
             center_x: root.width / 2
             center_y: root.height * 1 / 1.5
             size: self.size
-            source: 'color_bird.png'          
+            source: 'assets/color_bird.png'          
 
         Label:
         	id: path
@@ -67,7 +67,7 @@
         pos_hint: {'center_x': 0.5, 'center_y': 0.5}
         size_hint_y: None  # Tells the layout to ignore the size_hint in y dir
         height: dp(200)  # The fixed height you want
-        source: 'color_bird.png'
+        source: 'assets/color_bird.png'
 
 <BlackScreen2>:
     on_enter: Clock.schedule_once(root.switch, 2)
@@ -124,7 +124,7 @@
             pos_hint: {'center_x': 0.5, 'center_y': 0.5}
             size_hint_y: None  # Tells the layout to ignore the size_hint in y dir
             height: dp(200)  # The fixed height you want
-            source: 'gray_bird.png'
+            source: 'assets/gray_bird.png'
 
         Label:
             id: continue
