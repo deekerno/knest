@@ -49,7 +49,7 @@ category_index = label_map_util.create_category_index(categories)
 # image2.jpg
 # If you want to test the code with your images, just add path to the images to the TEST_IMAGE_PATHS.
 PATH_TO_TEST_IMAGES_DIR = 'test_images'
-TEST_IMAGE_PATHS = [ os.path.join(PATH_TO_TEST_IMAGES_DIR, 'image{}.jpg'.format(i)) for i in range(1, 3) ]
+TEST_IMAGE_PATHS = [ os.path.join(PATH_TO_TEST_IMAGES_DIR, 'image{}.jpg'.format(i)) for i in range(1, 8) ]
 
 # Size, in inches, of the output images.
 IMAGE_SIZE = (12, 8)
@@ -119,6 +119,8 @@ for image_path in TEST_IMAGE_PATHS:
 		instance_masks=output_dict.get('detection_masks'),
 		use_normalized_coordinates=True,
 		line_thickness=8)
+	np.savetxt("BBtest.txt", output_dict['detection_boxes'])
 	plt.figure(figsize=IMAGE_SIZE)
 	plt.imshow(image_np)
 	plt.savefig('test', format='png')
+	plt.show()
