@@ -43,10 +43,6 @@ label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
 categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
 category_index = label_map_util.create_category_index(categories)
 
-# For the sake of simplicity we will use only 2 images:
-# image1.jpg
-# image2.jpg
-# If you want to test the code with your images, just add path to the images to the TEST_IMAGE_PATHS.
 PATH_TO_TEST_IMAGES_DIR = 'test_images'
 TEST_IMAGE_PATHS = [ os.path.join(PATH_TO_TEST_IMAGES_DIR, 'image{}.jpg'.format(i)) for i in range(1, 2) ]
 
@@ -140,7 +136,7 @@ for image_path in TEST_IMAGE_PATHS:
 	  xmin = xmin.astype('int64')
 	  ymax = ymax.astype('int64')
 	  xmax = xmax.astype('int64')
-	  # Crop the image 
+	  # Crop the image
 	  cropped_image = tf.image.crop_to_bounding_box(image, ymin, xmin, ymax - ymin, xmax - xmin)
 	  # Start a tf session to parse the image data
 	  sess = tf.Session()
@@ -153,7 +149,7 @@ for image_path in TEST_IMAGE_PATHS:
 	  plt.savefig("cropped_bboxes/" + file_name.format(count), format='jpg')
 	  plt.clf()
 	  count += 1
-	  
+
 	# Below is for bounding box stuff
 	# Create figure
 	#plt.figure(figsize=IMAGE_SIZE)
