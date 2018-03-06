@@ -1,10 +1,5 @@
 # farewell song 2.0
 Tensorflow object detection with faster rcnn nas
-### Get Tensorflow object detection models
-``` bash
-# from knest/tf_object_detection
-git clone https://github.com/tensorflow/models
-```
 
 ### Setup object detection dependencies on your machine
 ``` bash
@@ -21,7 +16,7 @@ https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc
 ### Configure the directories to link with the object detection API
 ``` bash
 # assuming you have all the required files you can run my handy dandy script
-# data/, bird_images/, faster_rcnn_nas_coco_2017_11_08/, training/, faster_rcnn_nas_coco.config
+# data/, bird_images/, faster_rcnn_nas_coco_*/, training/, faster_rcnn_nas_coco.config
 # you might have to merge with the data folder already in models/research/object_detection
 source organize_model.sh
 ```
