@@ -1,5 +1,6 @@
 #:kivy 1.10.1
 #:import Clock kivy.clock.Clock
+#:import Utils kivy.utils
 
 <LandingScreen>:
     canvas.before:
@@ -14,12 +15,30 @@
 <FolderSelectScreen>:
     on_leave: self.ids.path.text = "Please choose a directory"
 
+    Label:
+        id: caption
+        text: "SIMILARITY\nCHECK"
+        halign: 'center'
+        valign: 'middle'
+        font_name: 'assets/Montserrat-Regular'
+        pos_hint: {'center_x': .85, 'center_y': .91}
+
+    Switch:
+        id: choice
+        size_hint_x: None
+        size_hint_y: None
+        size_x: 83
+        size_y: 32
+        pos_hint: {'center_x': .85, 'center_y': .85}
+        on_active: root.update_toggle()
+
     BoxLayout:
         orientation: 'vertical'
+
         Label:
         	id: title
             font_size: 100
-            font_name: 'Montserrat-Regular'
+            font_name: 'assets/Montserrat-Regular'
             text: "K N E S T"
             top: root.height * 3 / 4
             center_x: root.width / 2
@@ -33,7 +52,7 @@
         Label:
         	id: path
         	font_size: 50
-            font_name: 'Montserrat-Regular'
+            font_name: 'assets/Montserrat-Regular'
         	text: 'Please choose a directory'
             text_size: self.size
             halign: 'center'
@@ -48,12 +67,16 @@
 
             Button:
                 text: "Choose Folder"
-                font_name: 'Montserrat-Regular'
+                #background_normal: ''
+                #background_color: Utils.get_color_from_hex('106644')
+                font_name: 'assets/Montserrat-Regular'
                 on_release: root.show_load()
 
             Button:
                 text: "Start"
-                font_name: 'Montserrat-Regular'
+                #background_normal: ''
+                #background_color: Utils.get_color_from_hex('106644')
+                font_name: 'assets/Montserrat-Regular'
                 on_release: root.check_path()
 
 <BlackScreen1>:
@@ -85,7 +108,7 @@
         id: message
         pos_hint: {'center_x': 0.5, 'center_y': 0.2}
         font_size: 50
-        font_name: 'Montserrat-Regular'
+        font_name: 'assets/Montserrat-Regular'
         text: ''
 
     Image:
@@ -116,7 +139,7 @@
         Label:
             id: message
             font_size: 75
-            font_name: 'Montserrat-Regular'
+            font_name: 'assets/Montserrat-Regular'
             text: 'P R O C E S S   C O M P L E T E'
 
         Image:
@@ -129,7 +152,7 @@
         Label:
             id: continue
             font_size: 45
-            font_name: 'Montserrat-Regular'
+            font_name: 'assets/Montserrat-Regular'
             text: 'Click Anywhere to Continue'
 
     Button:
@@ -151,10 +174,10 @@
             height: 70
             Button:
                 text: 'Cancel'
-                font_name: 'Montserrat-Regular'
+                font_name: 'assets/Montserrat-Regular'
                 on_release: root.cancel()
 
             Button:
                 text: 'Load'
-                font_name: 'Montserrat-Regular'
+                font_name: 'assets/Montserrat-Regular'
                 on_release: root.load(filechooser.path, filechooser.selection)

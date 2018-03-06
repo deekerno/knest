@@ -18,6 +18,9 @@ dir_path = ""
 num_files = 0
 index = 0
 
+# global variables for image comparison
+compare = 0
+
 
 def img_handler(img_path):
     try:
@@ -67,6 +70,14 @@ class FolderSelectScreen(Screen):
         else:
             self.ids.path.text = "No directory path given"
 
+    def update_toggle(self):
+        global compare
+
+        if self.ids.choice.active:
+            compare = 1
+        else:
+            compare = 0
+
 
 class LandingScreen(Screen):
 
@@ -101,6 +112,7 @@ class ProcessScreen(Screen):
     def update(self, dt):
         # global references
         global dir_path, index, num_files
+        global compare
 
         # preventive measure: avoid out of index error
         if index < num_files:
@@ -191,6 +203,7 @@ sm.add_widget(EndScreen(name='end'))
 class BirdApp(App):
 
     def build(self):
+        self.title = ''
         return sm
 
 
