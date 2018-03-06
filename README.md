@@ -1,7 +1,6 @@
-![Vector Bird Logo](https://i.imgur.com/hnx8fkF.png)
-
-# Knest
-UCF Senior Design 2017-18
+<p align="center">
+  <img src="https://i.imgur.com/hnx8fkF.png" alt="Vector Bird Logo">
+</p>
 
 ## Description
 Take a folder that contains photos of birds and other stuff, get a folder of just birds, no other stuff.
