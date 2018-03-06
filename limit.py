@@ -1,5 +1,5 @@
 from PIL import Image
-import img_cmp
+import compare
 import os
 
 DIFF_THRES = 20
@@ -43,7 +43,7 @@ def limit(dir_path, des_path):
                 # set standard info
                 std = img_path
                 std_name = filename
-                std_hash = img_cmp.calc_hash(std)
+                std_hash = compare.calc_hash(std)
                 count = 0
 
                 # save the standard to the directory
@@ -54,9 +54,9 @@ def limit(dir_path, des_path):
 
             else:
                 # calcuate hash for comparing image
-                cmp_hash = img_cmp.calc_hash(img_path)
+                cmp_hash = compare.calc_hash(img_path)
                 # compare to standard image
-                diff = img_cmp.compare(std_hash, cmp_hash)
+                diff = compare.compare(std_hash, cmp_hash)
                 # image is similar to standard
                 if diff <= DIFF_THRES:
                         # add to destination folder if there are <= 3 similar
@@ -83,7 +83,7 @@ def limit(dir_path, des_path):
                         # update new standard info
                     std = img_path
                     std_name = filename
-                    std_hash = img_cmp.calc_hash(std)
+                    std_hash = compare.calc_hash(std)
                     count = 0
 
                     # save the standard to the directory
@@ -92,7 +92,3 @@ def limit(dir_path, des_path):
 
                     print("Found a nonsimilar image with difference ", diff)
                     print("Current standard for comparison: ", filename)
-
-
-if __name__ == '__main__':
-	limit('/users/ayylmao/downloads/test2/', 'results/')
