@@ -2,7 +2,7 @@ from PIL import Image
 import img_cmp
 import os
 
-DIFF_THRES = 18
+DIFF_THRES = 20
 LIMIT = 2
 
 # this function uses PIL to handles image formats
@@ -27,7 +27,7 @@ def img_handler(img_path):
 # dir_path is the path of the images given
 # des_path is the path where all the accepted images will be saved
 def limit(dir_path, des_path):
-        # initialized variables
+    # initialized variables
     std = ''
     count = 0
 
@@ -92,3 +92,7 @@ def limit(dir_path, des_path):
 
                     print("Found a nonsimilar image with difference ", diff)
                     print("Current standard for comparison: ", filename)
+
+
+if __name__ == '__main__':
+	limit('/users/ayylmao/downloads/test2/', 'results/')
