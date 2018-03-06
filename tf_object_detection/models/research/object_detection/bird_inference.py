@@ -6,6 +6,9 @@ import tarfile
 import tensorflow as tf
 import zipfile
 
+import matplotlib
+matplotlib.use('Agg')
+
 from collections import defaultdict
 from io import StringIO
 from matplotlib import pyplot as plt
@@ -26,7 +29,7 @@ PATH_TO_CKPT = MODEL_NAME + '/frozen_inference_graph.pb'
 # List of the strings that is used to add correct label for each box.
 PATH_TO_LABELS = os.path.join('training', 'bird_object_detection.pbtxt')
 
-NUM_CLASSES = 90
+NUM_CLASSES = 1
 
 detection_graph = tf.Graph()
 with detection_graph.as_default():
@@ -45,7 +48,7 @@ category_index = label_map_util.create_category_index(categories)
 # image2.jpg
 # If you want to test the code with your images, just add path to the images to the TEST_IMAGE_PATHS.
 PATH_TO_TEST_IMAGES_DIR = 'test_images'
-TEST_IMAGE_PATHS = [ os.path.join(PATH_TO_TEST_IMAGES_DIR, 'image{}.jpg'.format(i)) for i in range(1, 8) ]
+TEST_IMAGE_PATHS = [ os.path.join(PATH_TO_TEST_IMAGES_DIR, 'image{}.jpg'.format(i)) for i in range(1, 2) ]
 
 # Size, in inches, of the output images.
 IMAGE_SIZE = (12, 8)
@@ -96,16 +99,20 @@ def run_inference_for_single_image(image, graph):
         output_dict['detection_masks'] = output_dict['detection_masks'][0]
   return output_dict
 
+file_name = r'0{0:02d}.jpg'
+count = 0
+
 for image_path in TEST_IMAGE_PATHS:
 	image = Image.open(image_path)
-	# the array based representation of the image will be used later in order to prepare the
+	image_width, image_height = image.size
+	# The array based representation of the image will be used later in order to prepare the
 	# result image with boxes and labels on it.
 	image_np = load_image_into_numpy_array(image)
 	# Expand dimensions since the model expects images to have shape: [1, None, None, 3]
 	image_np_expanded = np.expand_dims(image_np, axis=0)
-	# Actual detection.
+	# Actual detection
 	output_dict = run_inference_for_single_image(image_np, detection_graph)
-	# Visualization of the results of a detection.
+	# Visualization of the results of a detection
 	vis_util.visualize_boxes_and_labels_on_image_array(
 		image_np,
 		output_dict['detection_boxes'],
@@ -115,8 +122,43 @@ for image_path in TEST_IMAGE_PATHS:
 		instance_masks=output_dict.get('detection_masks'),
 		use_normalized_coordinates=True,
 		line_thickness=8)
-	np.savetxt("BBtest.txt", output_dict['detection_boxes'])
-	plt.figure(figsize=IMAGE_SIZE)
-	plt.imshow(image_np)
-	plt.savefig('test', format='png')
-	plt.show()
+	# Get detection boxes as [N, 4]
+	boxes = np.squeeze(output_dict['detection_boxes'])
+	rows = boxes.shape[0]
+	# Iterate through bounding boxes
+	for i in range(0, rows):
+	  # If the coords are all 0 stop processing this ndarray
+	  if boxes[i,0] == 0 and boxes[i,1] == 0 and boxes[i,2] == 0 and boxes[i,3] == 0:
+	    break
+
+	  # Grab the normalized coordinates and convert them to coordinates that make sense for the entire image
+	  ymin = boxes[i,0] * image_height
+	  xmin = boxes[i,1] * image_width
+	  ymax = boxes[i,2] * image_height
+	  xmax = boxes[i,3] * image_width
+	  ymin = ymin.astype('int64')
+	  xmin = xmin.astype('int64')
+	  ymax = ymax.astype('int64')
+	  xmax = xmax.astype('int64')
+	  # Crop the image 
+	  cropped_image = tf.image.crop_to_bounding_box(image, ymin, xmin, ymax - ymin, xmax - xmin)
+	  # Start a tf session to parse the image data
+	  sess = tf.Session()
+	  cropped_image_data = sess.run(cropped_image)
+	  sess.close()
+	  # Create figure from the cropped image
+	  plt.figure(figsize=IMAGE_SIZE)
+	  plt.imshow(cropped_image_data)
+	  # Store the cropped image
+	  plt.savefig("cropped_bboxes/" + file_name.format(count), format='jpg')
+	  plt.clf()
+	  count += 1
+	  
+	# Below is for bounding box stuff
+	# Create figure
+	#plt.figure(figsize=IMAGE_SIZE)
+	#plt.imshow(image_np)
+	# Save the current figure
+	#plt.savefig("cropped_bboxes/" + "withregion.jpg")
+	# Clear the current figure for the next iteration
+	#plt.clf()
