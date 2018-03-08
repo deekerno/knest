@@ -3,15 +3,18 @@
 
 from kivy.app import App
 from kivy.clock import Clock
+from kivy.core.window import Window
 from kivy.factory import Factory
+from kivy.uix.button import Button
 from kivy.lang import Builder
 from kivy.properties import ObjectProperty
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from PIL import Image
-import utils.blur as blur
 import os
+import utils.blur as blur
 
 # global variables
 dir_path = ""
@@ -154,8 +157,11 @@ class ProcessScreen(Screen):
 
     # call blur detection and display results
     def check_blur(self, img):
+
+        sharpness, result = blur.check_sharpness(img, 100)
+
         # if image is not blurry, display green checkmark
-        if blur.check_sharpness(img, 100):
+        if result:
             self.ids.result.color = (1, 1, 1, 1)
             self.ids.result.source = 'assets/yes.png'
             return True
@@ -175,7 +181,7 @@ class BlackScreen3(Screen):
 
 
 class EndScreen(Screen):
-    print("EndScreen")
+    pass
 
 
 class LoadDialog(FloatLayout):
@@ -204,6 +210,7 @@ class BirdApp(App):
 
     def build(self):
         self.title = ''
+        Window.borderless = True
         return sm
 
 
