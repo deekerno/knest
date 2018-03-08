@@ -1,25 +1,27 @@
 # UCF Senior Design 2017-18
 # Group 38
 
+import cv2
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.factory import Factory
-from kivy.uix.button import Button
 from kivy.lang import Builder
 from kivy.properties import ObjectProperty
 from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from PIL import Image
 import os
 import utils.blur as blur
 
-# global variables
+# global variables to read images in user-given path
 dir_path = ""
 num_files = 0
 index = 0
+
+# global variables to keep track of image data
+images = {}
 
 # global variables for image comparison
 compare = 0
@@ -76,6 +78,8 @@ class FolderSelectScreen(Screen):
     def update_toggle(self):
         global compare
 
+        # depending on status of switch, update whether
+        # application will implement image comparison
         if self.ids.choice.active:
             compare = 1
         else:
@@ -134,7 +138,7 @@ class ProcessScreen(Screen):
                 self.ids.result.source = ''
 
                 # call blur detection on image
-                blur_result = self.check_blur(file_path)
+                blur_result = self.check_blur(file_path, os.listdir(dir_path)[index])
 
                 # if blur detection produces a result,
                 # move on to next image by updating number
@@ -156,14 +160,20 @@ class ProcessScreen(Screen):
             return False
 
     # call blur detection and display results
-    def check_blur(self, img):
+    def check_blur(self, img, filename):
+        global images
 
-        sharpness, result = blur.check_sharpness(img, 100)
+        __, result = blur.check_sharpness(img, 100)
 
         # if image is not blurry, display green checkmark
         if result:
             self.ids.result.color = (1, 1, 1, 1)
             self.ids.result.source = 'assets/yes.png'
+
+            # images that pass blur detection will be added to
+            # image dictionary
+            data = cv2.imread(img)
+            images[filename] = cv2.cvtColor(data, cv2.COLOR_BGR2RGB)
             return True
         # otherwise, display red x
         else:
@@ -210,6 +220,9 @@ class BirdApp(App):
 
     def build(self):
         self.title = ''
+        # removes os-created window border
+        # without this, we need to create custom exit and
+        # minimize buttons
         Window.borderless = True
         return sm
 

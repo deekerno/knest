@@ -3,6 +3,10 @@
 #:import Window kivy.core.window.Window
 
 <LandingScreen>:
+    Button:
+        background_color: (0.0, 0.0, 0.0, 0.0)
+        on_release: app.root.current = 'folder_select'
+
     Image:
         allow_stretch: True
         keep_ratio: True
@@ -16,10 +20,6 @@
         font_size: 120
         font_name: 'assets/Montserrat-Regular'
         text: 'K N E S T'
-
-    Button:
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        on_release: app.root.current = 'folder_select'
 
 <FolderSelectScreen>:
     on_leave: self.ids.path.text = "Please choose a directory"
@@ -73,12 +73,8 @@
             font_size: 100
             font_name: 'assets/Montserrat-Regular'
             text: "K N E S T"
-            top: root.height * 3 / 4
-            center_x: root.width / 2
 
         Image:
-            center_x: root.width / 2
-            center_y: root.height * 1 / 1.5
             size: self.size
             source: 'assets/color_bird.png'          
 
@@ -117,9 +113,9 @@
         size_hint: (.02, .03)
         font_name: 'assets/Montserrat-Regular'
         pos_hint: {'center_x': .035, 'center_y': .967}
-        on_press: app.stop()
         halign: 'center'
         valign: 'middle'
+        on_press: app.stop()
 
     Button:
         text: '__'
@@ -128,9 +124,9 @@
         size_hint: (.02, .025)
         font_name: 'assets/Montserrat-Regular'
         pos_hint: {'center_x': .065, 'center_y': .975}
-        on_press: Window.minimize()
         halign: 'center'
         valign: 'middle'
+        on_press: Window.minimize()
 
 <ProgressScreen>:
     on_enter: Clock.schedule_once(root.switch, 3)
@@ -142,9 +138,9 @@
         size_hint: (.02, .03)
         font_name: 'assets/Montserrat-Regular'
         pos_hint: {'center_x': .035, 'center_y': .967}
-        on_press: app.stop()
         halign: 'center'
         valign: 'middle'
+        on_press: app.stop()
 
     Button:
         text: '__'
@@ -153,9 +149,9 @@
         size_hint: (.02, .025)
         font_name: 'assets/Montserrat-Regular'
         pos_hint: {'center_x': .065, 'center_y': .975}
-        on_press: Window.minimize()
         halign: 'center'
         valign: 'middle'
+        on_press: Window.minimize()
 
     Image:
         id: image
@@ -174,9 +170,9 @@
         size_hint: (.02, .03)
         font_name: 'assets/Montserrat-Regular'
         pos_hint: {'center_x': .035, 'center_y': .967}
-        on_press: app.stop()
         halign: 'center'
         valign: 'middle'
+        on_press: app.stop()
 
     Button:
         text: '__'
@@ -185,9 +181,9 @@
         size_hint: (.02, .025)
         font_name: 'assets/Montserrat-Regular'
         pos_hint: {'center_x': .065, 'center_y': .975}
-        on_press: Window.minimize()
         halign: 'center'
         valign: 'middle'
+        on_press: Window.minimize()
 
 <ProcessScreen>:
     on_enter: Clock.schedule_interval(root.update, 0)
@@ -204,9 +200,9 @@
         size_hint: (.02, .03)
         font_name: 'assets/Montserrat-Regular'
         pos_hint: {'center_x': .035, 'center_y': .967}
-        on_press: app.stop()
         halign: 'center'
         valign: 'middle'
+        on_press: app.stop()
 
     Button:
         text: '__'
@@ -215,9 +211,9 @@
         size_hint: (.02, .025)
         font_name: 'assets/Montserrat-Regular'
         pos_hint: {'center_x': .065, 'center_y': .975}
-        on_press: Window.minimize()
         halign: 'center'
         valign: 'middle'
+        on_press: Window.minimize()
 
     Label:
         id: message
@@ -254,9 +250,9 @@
         size_hint: (.02, .03)
         font_name: 'assets/Montserrat-Regular'
         pos_hint: {'center_x': .035, 'center_y': .967}
-        on_press: app.stop()
         halign: 'center'
         valign: 'middle'
+        on_press: app.stop()
 
     Button:
         text: '__'
@@ -265,11 +261,15 @@
         size_hint: (.02, .025)
         font_name: 'assets/Montserrat-Regular'
         pos_hint: {'center_x': .065, 'center_y': .975}
-        on_press: Window.minimize()
         halign: 'center'
         valign: 'middle'
+        on_press: Window.minimize()
 
 <EndScreen>:
+    Button:
+        background_color: (0.0, 0.0, 0.0, 0.0)
+        on_release: app.root.current = 'folder_select'
+
     Button:
         text: 'X'
         background_normal: ''
@@ -277,9 +277,9 @@
         size_hint: (.02, .03)
         font_name: 'assets/Montserrat-Regular'
         pos_hint: {'center_x': .035, 'center_y': .967}
-        on_press: app.stop()
         halign: 'center'
         valign: 'middle'
+        on_press: app.stop()
 
     Button:
         text: '__'
@@ -288,9 +288,9 @@
         size_hint: (.02, .025)
         font_name: 'assets/Montserrat-Regular'
         pos_hint: {'center_x': .065, 'center_y': .975}
-        on_press: Window.minimize()
         halign: 'center'
         valign: 'middle'
+        on_press: Window.minimize()
 
     BoxLayout:
         orientation: 'vertical'
@@ -314,11 +314,6 @@
             font_name: 'assets/Montserrat-Regular'
             text: 'Click Anywhere to Continue'
 
-    Button:
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        on_release: app.root.current = 'folder_select'
-
-
 <LoadDialog>:
     BoxLayout:
 		size: root.size
@@ -332,6 +327,7 @@
         BoxLayout:
             size_hint_y: None
             height: 70
+            
             Button:
                 text: 'Cancel'
                 font_name: 'assets/Montserrat-Regular'
