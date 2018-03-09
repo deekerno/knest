@@ -2,7 +2,7 @@
 # Group 38
 
 from sklearn.model_selection import train_test_split as tts
-import architectures.buff_bobo.buff_bobo
+import buff_bobo
 import os
 import pickle
 import tflearn
@@ -25,7 +25,7 @@ img_aug = tflearn.ImageAugmentation()
 img_aug.add_random_flip_leftright()
 
 # Create the "buffed" bobo architecture.
-bb = buff_bobo.BuffBobo()
+bb = buff_bobo.BuffBobo(n, img_aug, img_prep)
 
 # Build the model.
 model = tflearn.DNN(bb.network, checkpoint_path=OUTPUT_FOLDER,

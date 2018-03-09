@@ -3,18 +3,18 @@
 
 import tflearn
 
-class BuffBobo(Object):
+class BuffBobo(object):
     """
         The "buffed" version of our original classification network,
         affectionately named Bobo. The structure of this network is
         inspired by ResNet.
     """
 
-    def __init__(self):
-        self.network = self._build_network()
+    def __init__(self, n, img_aug, img_prep):
+        self.network = self._build_network(n, img_aug, img_prep)
 
     
-    def _build_network():
+    def _build_network(self, n, img_aug, img_prep):
         # Define the input to the network.
         net = tflearn.input_data(shape=[None, 448, 448, 3],
                                  data_preprocessing=img_prep,
