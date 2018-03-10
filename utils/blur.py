@@ -19,7 +19,7 @@ def variance(image):
             image:     (String) path to the image being tested
     """
     image = cv2.imread(image)
-    return cv2.Laplacian(image, cv2.CV_64F).var()
+    return image, cv2.Laplacian(image, cv2.CV_64F).var()
 
 
 def teng(image):
@@ -71,6 +71,6 @@ def check_sharpness(image_path, threshold=LAP_THRESHOLD):
             image:          (String) path to the image being tested
             threshhold      (Float)  minimum variance for acceptance
     """
-    sharpness = variance(image_path)
+    image, sharpness = variance(image_path)
 
-    return sharpness, sharpness > threshold
+    return image, sharpness, sharpness > threshold
