@@ -2,6 +2,7 @@
 # Group 38
 
 import cv2
+import gc
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
@@ -16,6 +17,7 @@ import os
 import utils.blur as blur
 
 # global variables to read images in user-given path
+first_pass = 0
 dir_path = ""
 num_files = 0
 index = 0
@@ -118,7 +120,7 @@ class ProcessScreen(Screen):
 
     def update(self, dt):
         # global references
-        global dir_path, index, num_files
+        global first_pass, dir_path, index, num_files
         global compare
 
         # preventive measure: avoid out of index error
@@ -127,10 +129,14 @@ class ProcessScreen(Screen):
 
             # avoid nonimages and hidden files
             if img_handler(file_path):
-                # update stage of processing
-                self.ids.message.text = 'B L U R   D E T E C T I O N'
-                # remove image transparency
-                self.ids.image.color = (1, 1, 1, 1)
+                if not first_pass:
+                    first_pass = 1
+                    # update stage of processing
+                    self.ids.message.text = 'B L U R   D E T E C T I O N'
+
+                    # remove image transparency
+                    self.ids.image.color = (1, 1, 1, 1)
+
                 # display working image
                 self.ids.image.source = file_path
                 # reset result and add transparency back
@@ -156,6 +162,7 @@ class ProcessScreen(Screen):
             num_files = 0
             dir_path = ""
             self.manager.current = 'black3'
+            gc.collect()
             # unschedule kivy's Clock.schedule_interval() function
             return False
 
@@ -163,7 +170,7 @@ class ProcessScreen(Screen):
     def check_blur(self, img, filename):
         global images
 
-        __, result = blur.check_sharpness(img, 100)
+        image, __, result = blur.check_sharpness(img, 100)
 
         # if image is not blurry, display green checkmark
         if result:
@@ -172,8 +179,7 @@ class ProcessScreen(Screen):
 
             # images that pass blur detection will be added to
             # image dictionary
-            data = cv2.imread(img)
-            images[filename] = cv2.cvtColor(data, cv2.COLOR_BGR2RGB)
+            images[filename] = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             return True
         # otherwise, display red x
         else:
