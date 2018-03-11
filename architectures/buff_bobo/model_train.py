@@ -4,11 +4,11 @@
 from sklearn.model_selection import train_test_split as tts
 import buff_bobo
 import os
-import pickle
+import h5py
 import tflearn
 import yaml
 
-DATASET = 'leavens.pkl'
+DATASET = 'leavens.h5'
 OUTPUT_FOLDER = '/output/buff_bobo'
 SEED = 798547
 
@@ -33,15 +33,16 @@ model = tflearn.DNN(bb.network, checkpoint_path=OUTPUT_FOLDER,
                     clip_gradients=0.)
 
 # Load the dataset.
-with open(DATASET, 'rb') as f:
-    pickle = pickle.load(f, encoding='latin1')
+h5f = h5py.File(DATASET, 'r')
 
 # Take the dataset representation, and load into arrays and labels.
-x = pickle['x']
-y = pickle['y']
+X = h5f['X']
+Y = h5f['Y']
+X_test = h5f['X_test']
+Y_test = h5f['Y_test']
 
 # Split the dataset into training and testing sets.
-(X, X_test, Y, Y_test) = tts(x, y, test_size=0.3, random_state=SEED)
+#(X, X_test, Y, Y_test) = tts(x, y, test_size=0.3, random_state=SEED)
 
 # Shuffle the data in place.
 X, Y = tflearn.data_utils.shuffle(X, Y)
