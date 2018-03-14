@@ -14,7 +14,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from PIL import Image
 import os
-import utils.blur as blur
+import blur
 
 # global variables to read images in user-given path
 first_pass = 0
@@ -158,10 +158,13 @@ class ProcessScreen(Screen):
         # reached end of directory; reset all global variables and change
         # screens
         else:
+            first_pass = 0
             index = 0
             num_files = 0
             dir_path = ""
             self.manager.current = 'black3'
+            # empty images dictionary
+            images.clear()
             gc.collect()
             # unschedule kivy's Clock.schedule_interval() function
             return False
@@ -170,7 +173,7 @@ class ProcessScreen(Screen):
     def check_blur(self, img, filename):
         global images
 
-        image, __, result = blur.check_sharpness(img, 100)
+        image, result = blur.detect_blur(img)
 
         # if image is not blurry, display green checkmark
         if result:

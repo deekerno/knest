@@ -9,6 +9,19 @@ import pywt
 LAP_THRESHOLD = 100.0
 
 
+def weighted_blur(image):
+    """
+        Calculate a weighted sum of certain blur detection metrics.
+            image:          (Array) Array representation of image
+    """
+    t_weight = 0.10 * teng(image)
+    f_weight = 0.10 * fft(image)
+    v_weight = 0.06 * lapm(image)
+    # sw_weight = 1e-7 * sum_wave(image)
+
+    return t_weight + f_weight + v_weight #+ sw_weight
+
+
 def variance(image):
     """
         Calculate the variance of Laplacian distribution, which is a
@@ -58,7 +71,7 @@ def sum_wave(image):
         Calculate the sum of coefficients given by the discrete wavelet transform.
             image:     (Array) Array (color/greyscale) representation of image
     """
-    coeffs = pywt.dwt2(image, 'db')
+    coeffs = pywt.dwt2(image, 'db1')
     cA, (cH, cV, cD) = coeffs
     total = np.sum(cA) + np.sum(cH) + np.sum(cV) + np.sum(cD)
     return total
