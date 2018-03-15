@@ -123,6 +123,7 @@ for image_path in TEST_IMAGE_PATHS:
 	rows = boxes.shape[0]
 	# Iterate through bounding boxes
 	for i in range(0, rows):
+	  print('step %d' % i)
 	  # If the coords are all 0 stop processing this ndarray
 	  if boxes[i,0] == 0 and boxes[i,1] == 0 and boxes[i,2] == 0 and boxes[i,3] == 0:
 	    break
