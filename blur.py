@@ -1,23 +1,10 @@
 import cv2
 import numpy as np
-from PIL import Image
 import pywt
 
 FIXED_SIZE = 1024
 EDGE_THRESH = 35
 MIN_ZERO = 0
-
-
-def img_handler(img_path):
-    try:
-        # file is an image
-        img = Image.open(img_path)
-        img.close()
-        return True
-
-    except IOError:
-        # file is not an image
-        return False
 
 # partition edge maps into windows
 def partition(emap, rows, cols):
@@ -31,7 +18,7 @@ def partition(emap, rows, cols):
 def haar_wavelet_transform(img):
     coeffs = pywt.dwt2(img, 'haar')
 
-    # cA, (cH, cV, cD)
+    # from pywt documentation: cA, (cH, cV, cD)
     # cA: LL
     # cH: LH
     # cV: HL
@@ -85,7 +72,7 @@ def calc_values(emax1, emax2, emax3):
 
             # Rule 3 & 4
             elif emax1[i] < emax2[i]:
-                # Roof- or 
+                # Roof- or
                 if emax2[i] < emax3[i]:
                     Nrg += 1
 
@@ -98,6 +85,7 @@ def calc_values(emax1, emax2, emax3):
                     Nbrg += 1
 
     return Nedge, Nda, Nrg, Nbrg
+
 
 def calc_intensities(img):
     # i = 1
@@ -117,11 +105,48 @@ def calc_intensities(img):
 
     return emax1, emax2, emax3
 
+# default resize value is 1024; however, if image dimensions are smaller,
+# resize accordingly. Smallest resize will be 256 or FIXED_SIZE divided by 4
+def determine_resize(img):
+    size = FIXED_SIZE
+
+    if len(img[0]) < size:
+        if len(img[0]) < size // 2:
+            return size // 4
+        else:
+            return size // 2
+
+    return size
+
+# classify whether image is blurry or not blurry
+# blur metrics vary based on resize value
+def blur_result(size, per, blur_extent):
+    if size == FIXED_SIZE:
+        if (per <= MIN_ZERO and blur_extent > .83) or blur_extent >= .9:
+            # blurry
+            return 0
+        else:
+            # not blurry
+            return 1
+    else:
+        if (per <= MIN_ZERO and blur_extent > .75) or blur_extent >= .9:
+            # blurry
+            return 0
+        else:
+            # not blurry
+            return 1
+
+    # preventive measure
+    # default to not blurry result
+    return 1
+
 
 def detect_blur(img_path):
     image = cv2.imread(img_path)
     img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    img = cv2.resize(img, (FIXED_SIZE, FIXED_SIZE))
+
+    size = determine_resize(img)
+    img = cv2.resize(img, (size, size))
 
     emax1, emax2, emax3 = calc_intensities(img)
 
@@ -129,15 +154,12 @@ def detect_blur(img_path):
     Nedge, Nda, Nrg, Nbrg = calc_values(emax1, emax2, emax3)
 
     # ratio of Dirac- and Astep-Structure to all edges
-    per = Nda / Nedge
-    # blur confident coefficient; how many Roof- and Gstep-Structure edges are blurred
-    blur_extent = Nbrg / Nrg
+    # if divisor is 0, set per to 0
+    per = Nedge == 0 and 0 or Nda / Nedge
+    # blur confident coefficient; how many Roof- and Gstep-Structure edges are
+    # blurred; if divisor is 0, set blur_extent to 0
+    blur_extent = Nrg == 0 and 0 or Nbrg / Nrg
 
-    if (per <= MIN_ZERO and blur_extent > .83) or blur_extent >= .9:
-        # blurry
-        result = 0
-    else:
-        # not blurry
-        result = 1
+    result = blur_result(size, per, blur_extent)
 
     return image, result
