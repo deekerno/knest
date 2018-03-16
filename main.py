@@ -14,7 +14,10 @@ from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from PIL import Image
 import os
-import blur
+import utils.blur as blur
+import limit
+
+DES_NAME = 'processed'
 
 # global variables to read images in user-given path
 first_pass = 0
@@ -121,7 +124,6 @@ class ProcessScreen(Screen):
     def update(self, dt):
         # global references
         global first_pass, dir_path, index, num_files
-        global compare
 
         # preventive measure: avoid out of index error
         if index < num_files:
@@ -158,16 +160,48 @@ class ProcessScreen(Screen):
         # reached end of directory; reset all global variables and change
         # screens
         else:
+            # the folder we will write all accepted images to
+            des_path = os.path.join(dir_path, DES_NAME)
+
+            # if it doesn't exist, make the folder
+            if not os.path.isdir(des_path):
+                os.makedirs(des_path)
+
+            self.write_to(des_path)
+
+            # reset all global variables for use in future passes
             first_pass = 0
             index = 0
             num_files = 0
             dir_path = ""
-            self.manager.current = 'black3'
+
             # empty images dictionary
             images.clear()
+
+            # switch to end screen
+            self.manager.current = 'black3'
+
+            # collect an garbage not already gathered by python
             gc.collect()
+
             # unschedule kivy's Clock.schedule_interval() function
             return False
+
+    def write_to(self, des_path):
+        global compare, images
+
+        # based on user choice, implement/ignore image comparison
+        # ignore
+        if compare == 0:
+            for filename in images:
+                # convert array to RGB image
+                img = Image.fromarray(images[filename])
+                # save to processed folder
+                img.save(os.path.join(des_path, filename))
+
+        # implement
+        else:
+            limit.limit(images, des_path)
 
     # call blur detection and display results
     def check_blur(self, img, filename):
