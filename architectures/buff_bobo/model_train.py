@@ -2,14 +2,14 @@
 # Group 38
 
 from sklearn.model_selection import train_test_split as tts
-import buff_bobo
+import buffed_resnet
 import os
 import h5py
 import tflearn
 import yaml
 
-DATASET = 'leavens.h5'
-OUTPUT_FOLDER = '/output/buff_bobo'
+DATASET = 'leavens_resized_112.h5'
+OUTPUT_FOLDER = 'output/buff_bobo_resnet_112'
 SEED = 798547
 
 # Residual blocks
@@ -25,7 +25,7 @@ img_aug = tflearn.ImageAugmentation()
 img_aug.add_random_flip_leftright()
 
 # Create the "buffed" bobo architecture.
-bb = buff_bobo.BuffBobo(n, img_aug, img_prep)
+bb = buffed_resnet.BuffBobo(n, img_aug, img_prep)
 
 # Build the model.
 model = tflearn.DNN(bb.network, checkpoint_path=OUTPUT_FOLDER,
@@ -48,11 +48,11 @@ Y_test = h5f['Y_test']
 X, Y = tflearn.data_utils.shuffle(X, Y)
 
 # Train the network.
-model.fit(X, Y, n_epoch=200, validation_set=(X_test, Y_test),
+model.fit(X, Y, n_epoch=100, validation_set=(X_test, Y_test),
           show_metric=True, batch_size=32, shuffle=True,
           run_id='buff_bobo')
 
 # Save the weights.
-model_name = "buff_bobo"  + ".tfl"
+model_name = "buff_bobo_resnet_112"  + ".tfl"
 model_path = os.path.join(OUTPUT_FOLDER, model_name)
 model.save(model_path)

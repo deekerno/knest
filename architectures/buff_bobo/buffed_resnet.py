@@ -16,7 +16,7 @@ class BuffBobo(object):
     
     def _build_network(self, n, img_aug, img_prep):
         # Define the input to the network.
-        net = tflearn.input_data(shape=[None, 448, 448, 3],
+        net = tflearn.input_data(shape=[None, 112, 112, 3],
                                  data_preprocessing=img_prep,
                                  data_augmentation=img_aug)
 
@@ -30,8 +30,6 @@ class BuffBobo(object):
         net = tflearn.residual_block(net, n-1, 128)
         net = tflearn.residual_block(net, 1, 256, downsample=True)
         net = tflearn.residual_block(net, n-1, 256)
-        net = tflearn.residual_block(net, 1, 512, downsample=True)
-        net = tflearn.residual_block(net, n-1, 512)
 
         # Perform batch normalization.
         net = tflearn.batch_normalization(net)
