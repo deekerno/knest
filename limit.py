@@ -5,13 +5,15 @@ import os
 DIFF_THRES = 20
 LIMIT = 2
 
+
 def limit(images, des_path):
     # initialized variable
     std = ''
     count = 0
+    files = images.keys()
 
     # go through dictionary of images
-    for filename in images:
+    for filename in files:
         if std == '':
             std, std_hash, count = set_standard(images, filename, des_path)
 
@@ -23,11 +25,10 @@ def limit(images, des_path):
 
             # image is similar to standard
             if diff <= DIFF_THRES:
-                # save to processed folder if there are less than 4 similar
-                # images already; otherwise, ignore similar image
-                if count < LIMIT:
-                    img = Image.fromarray(images[filename])
-                    img.save(os.path.join(des_path, filename))
+                # if there are 3 similar images already, remove the rest from
+                # the image dictionary
+                if count >= LIMIT:
+                    images.pop(filename)
 
                 # keep track of number of similar images
                 count += 1
@@ -35,12 +36,14 @@ def limit(images, des_path):
             # a non-similar image has been found, make it the new standard
             # for comparison
             else:
-                std_name, std_hash, count = set_standard(images, filename, des_path)
+                std, std_hash, count = set_standard(images, filename, des_path)
+
+    return images
 
 
 def set_standard(images, filename, des_path):
     # automatically save standard to processed folder
-    img = Image.fromarray(images[filename])
-    img.save(os.path.join(des_path, filename))
+    # img = Image.fromarray(images[filename])
+    # img.save(os.path.join(des_path, filename))
 
     return filename, compare.calc_hash(images[filename]), 0

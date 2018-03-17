@@ -157,51 +157,17 @@ class ProcessScreen(Screen):
             else:
                 index += 1
 
-        # reached end of directory; reset all global variables and change
-        # screens
+        # reached end of directory, begin writing to subdirectory
+        # switch to writing screen
         else:
-            # the folder we will write all accepted images to
-            des_path = os.path.join(dir_path, DES_NAME)
+            # switch to writing screen
+            self.manager.current = 'black4'
 
-            # if it doesn't exist, make the folder
-            if not os.path.isdir(des_path):
-                os.makedirs(des_path)
-
-            self.write_to(des_path)
-
-            # reset all global variables for use in future passes
-            first_pass = 0
-            index = 0
-            num_files = 0
-            dir_path = ""
-
-            # empty images dictionary
-            images.clear()
-
-            # switch to end screen
-            self.manager.current = 'black3'
-
-            # collect an garbage not already gathered by python
+            # collect any garbage not already gathered by python
             gc.collect()
 
             # unschedule kivy's Clock.schedule_interval() function
             return False
-
-    def write_to(self, des_path):
-        global compare, images
-
-        # based on user choice, implement/ignore image comparison
-        # ignore
-        if compare == 0:
-            for filename in images:
-                # convert array to RGB image
-                img = Image.fromarray(images[filename])
-                # save to processed folder
-                img.save(os.path.join(des_path, filename))
-
-        # implement
-        else:
-            limit.limit(images, des_path)
 
     # call blur detection and display results
     def check_blur(self, img, filename):
@@ -225,6 +191,60 @@ class ProcessScreen(Screen):
             return False
         # preventive measure: will never actually reach here
         return None
+
+
+class BlackScreen4(Screen):
+    
+    def switch(self, dt):
+        self.manager.current = 'write'
+
+
+class WriteScreen(Screen):
+
+    def begin(self):
+        # the folder we will write all accepted images to
+        des_path = os.path.join(dir_path, DES_NAME)
+
+        # if it doesn't exist, make the folder
+        if not os.path.isdir(des_path):
+            os.makedirs(des_path)
+
+        # write accepted images to subdirectory
+        self.write_to(des_path)
+
+        # reset all global variables for future passes
+        self.reset()
+
+        # switch to end screen
+        self.manager.current = 'black3'
+
+    def write_to(self, des_path):
+        global compare, images
+
+        # based on user choice, implement/ignore image comparison
+        # implement
+        if compare:
+            images = limit.limit(images, des_path)
+
+        self.ids.progress.max = len(images)
+
+        for i, filename in enumerate(images):
+            # convert array to RGB image
+            img = Image.fromarray(images[filename])
+            # save to processed folder
+            img.save(os.path.join(des_path, filename))
+
+    def reset(self):
+        global first_pass, index, num_files, dir_path, images
+
+        # reset all global variables for use in future passes
+        first_pass = 0
+        index = 0
+        num_files = 0
+        dir_path = ""
+
+        # empty images dictionary
+        images.clear()
 
 
 class BlackScreen3(Screen):
@@ -253,6 +273,8 @@ sm.add_widget(FolderSelectScreen(name='folder_select'))
 sm.add_widget(BlackScreen1(name='black1'))
 sm.add_widget(BlackScreen2(name='black2'))
 sm.add_widget(ProgressScreen(name='progress'))
+sm.add_widget(BlackScreen4(name='black4'))
+sm.add_widget(WriteScreen(name='write'))
 sm.add_widget(BlackScreen3(name='black3'))
 sm.add_widget(ProcessScreen(name='process'))
 sm.add_widget(EndScreen(name='end'))

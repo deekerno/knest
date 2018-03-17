@@ -1,6 +1,9 @@
 #:kivy 1.10.1
 #:import Clock kivy.clock.Clock
 #:import Window kivy.core.window.Window
+#:import Animation kivy.animation.Animation
+#:import ProgressBar kivy.uix.progressbar.ProgressBar
+
 
 <LandingScreen>:
     Button:
@@ -239,6 +242,68 @@
         height: dp(200)  # The fixed height you want
         color: (0.0, 0.0, 0.0, 0.0)
         source: ''
+
+<BlackScreen4>:
+    on_enter: Clock.schedule_once(root.switch, 1)
+
+    Button:
+        text: 'X'
+        background_normal: ''
+        background_color: (0.0, 0.0, 0.0, 0.0)
+        size_hint: (.02, .03)
+        font_name: 'assets/Montserrat-Regular'
+        pos_hint: {'center_x': .035, 'center_y': .967}
+        halign: 'center'
+        valign: 'middle'
+        on_press: app.stop()
+
+    Button:
+        text: '__'
+        background_normal: ''
+        background_color: (0.0, 0.0, 0.0, 0.0)
+        size_hint: (.02, .025)
+        font_name: 'assets/Montserrat-Regular'
+        pos_hint: {'center_x': .065, 'center_y': .975}
+        halign: 'center'
+        valign: 'middle'
+        on_press: Window.minimize()
+
+<WriteScreen>:
+    on_enter: root.begin()
+
+    Button:
+        text: 'X'
+        background_normal: ''
+        background_color: (0.0, 0.0, 0.0, 0.0)
+        size_hint: (.02, .03)
+        font_name: 'assets/Montserrat-Regular'
+        pos_hint: {'center_x': .035, 'center_y': .967}
+        halign: 'center'
+        valign: 'middle'
+        on_press: app.stop()
+
+    Button:
+        text: '__'
+        background_normal: ''
+        background_color: (0.0, 0.0, 0.0, 0.0)
+        size_hint: (.02, .025)
+        font_name: 'assets/Montserrat-Regular'
+        pos_hint: {'center_x': .065, 'center_y': .975}
+        halign: 'center'
+        valign: 'middle'
+        on_press: Window.minimize()
+
+    Label:
+        id: message
+        font_size: 75
+        pos_hint: {'center_x': 0.5, 'center_y': 0.8}
+        font_name: 'assets/Montserrat-Regular'
+        text: 'Writing to Subdirectory...'
+
+    ProgressBar:
+        id: progress
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
 
 <BlackScreen3>:
     on_enter: Clock.schedule_once(root.switch, 1)
