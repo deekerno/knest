@@ -22,6 +22,7 @@ DES_NAME = 'processed'
 # global variables to read images in user-given path
 first_pass = 0
 dir_path = ""
+des_path = ""
 num_files = 0
 index = 0
 
@@ -30,6 +31,12 @@ images = {}
 
 # global variables for image comparison
 compare = 0
+std = ''
+std_hash = None
+count = 0
+
+# global variables for writing to subdirectory
+files = []
 
 
 def img_handler(img_path):
@@ -123,7 +130,8 @@ class ProcessScreen(Screen):
 
     def update(self, dt):
         # global references
-        global first_pass, dir_path, index, num_files
+        global first_pass, dir_path, index, num_files, compare, images, des_path
+        global files
 
         # preventive measure: avoid out of index error
         if index < num_files:
@@ -160,8 +168,21 @@ class ProcessScreen(Screen):
         # reached end of directory, begin writing to subdirectory
         # switch to writing screen
         else:
+            index = 0
+            # the folder we will write all accepted images to
+            des_path = os.path.join(dir_path, DES_NAME)
+
+            # if it doesn't exist, make the folder
+            if not os.path.isdir(des_path):
+                os.makedirs(des_path)
+
+            if compare:
+                self.manager.current = 'black3'
+
+            files = list(images.keys())
+
             # switch to writing screen
-            self.manager.current = 'black4'
+            self.manager.current = 'black3'
 
             # collect any garbage not already gathered by python
             gc.collect()
@@ -193,61 +214,97 @@ class ProcessScreen(Screen):
         return None
 
 
-class BlackScreen4(Screen):
+class CompareScreen(Screen):
+    
+    def compare(self, dt):
+        global images, std, count, index, std_hash, files
+
+        length = self.ids.progress.max = len(files)
+
+        if index < length:
+            self.ids.loading.text = "Loading " + str(index + 1) + " of " + str(length)
+            if std == '':
+                std, std_hash, count = limit.set_standard(images, files[index])
+
+            else:
+                result = limit.limit(images[files[index]], std_hash, count)
+
+                if result == 'remove':
+                    images.pop(files[index])
+                    count += 1
+                elif result == 'continue':
+                    count += 1
+                elif result == 'update_std':
+                    std, std_hash, count = limit.set_standard(images, files[index])
+
+            self.ids.progress.value = index + 1
+            index += 1
+
+        else:
+            index = 0
+            self.manager.current = 'write'
+            files = list(images.keys())
+            return False
+
+
+class BlackScreen3(Screen):
     
     def switch(self, dt):
-        self.manager.current = 'write'
+        if compare:
+            self.manager.current = 'compare'
+        else:
+            self.manager.current = 'write'
 
 
 class WriteScreen(Screen):
 
-    def begin(self):
-        # the folder we will write all accepted images to
-        des_path = os.path.join(dir_path, DES_NAME)
+    def begin(self, dt):
+        global files, index
 
-        # if it doesn't exist, make the folder
-        if not os.path.isdir(des_path):
-            os.makedirs(des_path)
+        length = self.ids.progress.max = len(images)
 
-        # write accepted images to subdirectory
-        self.write_to(des_path)
+        if index < length:
+            self.ids.loading.text = "Loading " + str(index + 1) + " of " + str(length)
+            # write accepted images to subdirectory
+            self.write_to(files[index])
+            self.ids.progress.value = index + 1
 
-        # reset all global variables for future passes
-        self.reset()
+            index += 1
 
-        # switch to end screen
-        self.manager.current = 'black3'
+        else:
+            # reset all global variables for future passes
+            self.reset()
 
-    def write_to(self, des_path):
-        global compare, images
+            # switch to end screen
+            self.manager.current = 'black4'
 
-        # based on user choice, implement/ignore image comparison
-        # implement
-        if compare:
-            images = limit.limit(images, des_path)
+            return False
 
-        self.ids.progress.max = len(images)
+    def write_to(self, filename):
 
-        for i, filename in enumerate(images):
-            # convert array to RGB image
-            img = Image.fromarray(images[filename])
-            # save to processed folder
-            img.save(os.path.join(des_path, filename))
+        img = Image.fromarray(images[filename])
+        img.save(os.path.join(des_path, filename))
 
     def reset(self):
-        global first_pass, index, num_files, dir_path, images
+        global first_pass, index, num_files, dir_path, des_path, images
+        global std, count, files, std_hash
 
         # reset all global variables for use in future passes
         first_pass = 0
         index = 0
         num_files = 0
         dir_path = ""
+        des_path = ""
+        std = ''
+        count = 0
+        files = []
+        std_hash = None
 
         # empty images dictionary
         images.clear()
 
 
-class BlackScreen3(Screen):
+class BlackScreen4(Screen):
 
     def switch(self, dt):
         self.manager.current = 'end'
@@ -273,9 +330,10 @@ sm.add_widget(FolderSelectScreen(name='folder_select'))
 sm.add_widget(BlackScreen1(name='black1'))
 sm.add_widget(BlackScreen2(name='black2'))
 sm.add_widget(ProgressScreen(name='progress'))
-sm.add_widget(BlackScreen4(name='black4'))
-sm.add_widget(WriteScreen(name='write'))
 sm.add_widget(BlackScreen3(name='black3'))
+sm.add_widget(CompareScreen(name='compare'))
+sm.add_widget(WriteScreen(name='write'))
+sm.add_widget(BlackScreen4(name='black4'))
 sm.add_widget(ProcessScreen(name='process'))
 sm.add_widget(EndScreen(name='end'))
 

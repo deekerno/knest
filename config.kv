@@ -243,7 +243,53 @@
         color: (0.0, 0.0, 0.0, 0.0)
         source: ''
 
-<BlackScreen4>:
+<CompareScreen>:
+    on_enter: Clock.schedule_interval(root.compare, 0)
+    on_leave: self.ids.progress.value = 0
+    on_leave: self.ids.loading.text = ''
+
+    Button:
+        text: 'X'
+        background_normal: ''
+        background_color: (0.0, 0.0, 0.0, 0.0)
+        size_hint: (.02, .03)
+        font_name: 'assets/Montserrat-Regular'
+        pos_hint: {'center_x': .035, 'center_y': .967}
+        halign: 'center'
+        valign: 'middle'
+        on_press: app.stop()
+
+    Button:
+        text: '__'
+        background_normal: ''
+        background_color: (0.0, 0.0, 0.0, 0.0)
+        size_hint: (.02, .025)
+        font_name: 'assets/Montserrat-Regular'
+        pos_hint: {'center_x': .065, 'center_y': .975}
+        halign: 'center'
+        valign: 'middle'
+        on_press: Window.minimize()
+
+    Label:
+        id: message
+        font_size: 75
+        pos_hint: {'center_x': 0.5, 'center_y': 0.8}
+        font_name: 'assets/Montserrat-Regular'
+        text: 'Comparing Images'
+
+    ProgressBar:
+        id: progress
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+    Label:
+        id: loading
+        font_size: 45
+        pos_hint: {'center_x': 0.5, 'center_y': 0.45}
+        font_name: 'assets/Montserrat-Regular'
+        text: ''
+
+
+<BlackScreen3>:
     on_enter: Clock.schedule_once(root.switch, 1)
 
     Button:
@@ -269,7 +315,9 @@
         on_press: Window.minimize()
 
 <WriteScreen>:
-    on_enter: root.begin()
+    on_enter: Clock.schedule_interval(root.begin, 0)
+    on_leave: self.ids.progress.value = 0
+    on_leave: self.ids.loading.text = ''
 
     Button:
         text: 'X'
@@ -304,8 +352,15 @@
         id: progress
         pos_hint: {'center_x': 0.5, 'center_y': 0.5}
 
+    Label:
+        id: loading
+        font_size: 45
+        pos_hint: {'center_x': 0.5, 'center_y': 0.45}
+        font_name: 'assets/Montserrat-Regular'
+        text: ''
 
-<BlackScreen3>:
+
+<BlackScreen4>:
     on_enter: Clock.schedule_once(root.switch, 1)
 
     Button:
