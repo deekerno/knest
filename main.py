@@ -124,6 +124,16 @@ class BlackScreen1(Screen):
 class ProgressScreen(Screen):
 
     def switch(self, dt):
+        global load, model
+        if not load:
+            print("Loading model")
+
+            import architectures.buff_bobo.classifier as cl
+            model = cl.ClassificationModel((112, 112), 'output/buff_bobo-670')
+
+            print("Done loading model")
+            load = 1
+
         self.manager.current = 'black2'
 
 
@@ -188,22 +198,7 @@ class ProcessScreen(Screen):
                 files = list(images.keys())
                 blur_step = 1
 
-                self.ids.load.text = 'L O A D I N G    M O D E L'
-                self.ids.load_img.source = 'assets/color_bird.png'
-                self.ids.load_img.color = (1, 1, 1, 1)
-
         elif not bird_step:
-            if not load:
-                print("Loading model")
-
-                import architectures.buff_bobo.classifier as cl
-                model = cl.ClassificationModel((112, 112), 'output/buff_bobo-670')
-
-                self.ids.load.text = ''
-                self.ids.load_img.color = (0, 0, 0, 0)
-                print("Done loading model")
-                load = 1
-
             if index < len(files):
                 file_path = os.path.join(dir_path, files[index])
 
@@ -222,7 +217,7 @@ class ProcessScreen(Screen):
                 self.ids.result.source = ''
 
                 # call object classification on image
-                class_result = self.check_class(images[files[index]])
+                class_result = self.check_class(images[files[index]], files[index])
 
                 if class_result is True or class_result is False:
                     index += 1
@@ -277,7 +272,7 @@ class ProcessScreen(Screen):
         # preventive measure: will never actually reach here
         return None
 
-    def check_class(self, img):
+    def check_class(self, img, filename):
         resized_img = cv2.resize(img, (112, 112))
         prediction = model.predict([resized_img])
         result = model.classify(prediction)
@@ -291,6 +286,7 @@ class ProcessScreen(Screen):
         else:
             self.ids.result.color = (1, 1, 1, 1)
             self.ids.result.source = 'assets/no.png'
+            images.pop(filename)
             return False
         # preventive measure: will never actually reach here
         return None
