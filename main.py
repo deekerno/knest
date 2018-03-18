@@ -15,9 +15,16 @@ from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from PIL import Image
 import os
 import utils.blur as blur
-import limit
+import utils.compare as compare
+# import architectures.buff_bobo.classifier as cl
 
 DES_NAME = 'processed'
+
+# global variables for entire process
+blur_step = 0
+bird_step = 0
+load = 0
+model = None
 
 # global variables to read images in user-given path
 first_pass = 0
@@ -30,7 +37,7 @@ index = 0
 images = {}
 
 # global variables for image comparison
-compare = 0
+comp = 0
 std = ''
 std_hash = None
 count = 0
@@ -88,14 +95,14 @@ class FolderSelectScreen(Screen):
             self.ids.path.text = "No directory path given"
 
     def update_toggle(self):
-        global compare
+        global comp
 
         # depending on status of switch, update whether
         # application will implement image comparison
         if self.ids.choice.active:
-            compare = 1
+            comp = 1
         else:
-            compare = 0
+            comp = 0
 
 
 class LandingScreen(Screen):
@@ -129,20 +136,81 @@ class BlackScreen2(Screen):
 class ProcessScreen(Screen):
 
     def update(self, dt):
-        # global references
-        global first_pass, dir_path, index, num_files, compare, images, des_path
-        global files
+        global blur_step, bird_step
+        global first_pass, dir_path, index, num_files, comp, images, des_path
+        global files, load, model
 
-        # preventive measure: avoid out of index error
-        if index < num_files:
-            file_path = os.path.join(dir_path, os.listdir(dir_path)[index])
+        if not blur_step:
+            print("implementing blur detection")
+            # preventive measure: avoid out of index error
+            if index < num_files:
+                file_path = os.path.join(dir_path, os.listdir(dir_path)[index])
 
-            # avoid nonimages and hidden files
-            if img_handler(file_path):
+                # avoid nonimages and hidden files
+                if img_handler(file_path):
+                    if not first_pass:
+                        first_pass = 1
+                        # update stage of processing
+                        self.ids.message.text = 'B L U R   D E T E C T I O N'
+
+                        # remove image transparency
+                        self.ids.image.color = (1, 1, 1, 1)
+
+                    # display working image
+                    self.ids.image.source = file_path
+                    # reset result and add transparency back
+                    self.ids.result.color = (0, 0, 0, 0)
+                    self.ids.result.source = ''
+
+                    # call blur detection on image
+                    blur_result = self.check_blur(file_path, os.listdir(dir_path)[index])
+
+                    # if blur detection produces a result,
+                    # move on to next image by updating number
+                    if blur_result is True or blur_result is False:
+                        index += 1
+
+                # indicates a nonimage or hidden file; move on to next file
+                else:
+                    index += 1
+
+            else:
+                self.ids.message.text = ''
+
+                self.ids.image.color = (0, 0, 0, 0)
+                self.ids.image.source = ''
+
+                self.ids.result.color = (0, 0, 0, 0)
+                self.ids.result.source = ''
+
+                index = 0
+                first_pass = 0
+                files = list(images.keys())
+                blur_step = 1
+
+                self.ids.load.text = 'L O A D I N G    M O D E L'
+                self.ids.load_img.source = 'assets/color_bird.png'
+                self.ids.load_img.color = (1, 1, 1, 1)
+
+        elif not bird_step:
+            if not load:
+                print("Loading model")
+
+                import architectures.buff_bobo.classifier as cl
+                model = cl.ClassificationModel((112, 112), 'output/buff_bobo-670')
+
+                self.ids.load.text = ''
+                self.ids.load_img.color = (0, 0, 0, 0)
+                print("Done loading model")
+                load = 1
+
+            if index < len(files):
+                file_path = os.path.join(dir_path, files[index])
+
+                print("implementing bird classification")
                 if not first_pass:
                     first_pass = 1
-                    # update stage of processing
-                    self.ids.message.text = 'B L U R   D E T E C T I O N'
+                    self.ids.message.text = 'B I R D   C L A S S I F I C A T I O N'
 
                     # remove image transparency
                     self.ids.image.color = (1, 1, 1, 1)
@@ -153,17 +221,16 @@ class ProcessScreen(Screen):
                 self.ids.result.color = (0, 0, 0, 0)
                 self.ids.result.source = ''
 
-                # call blur detection on image
-                blur_result = self.check_blur(file_path, os.listdir(dir_path)[index])
+                # call object classification on image
+                class_result = self.check_class(images[files[index]])
 
-                # if blur detection produces a result,
-                # move on to next image by updating number
-                if blur_result is True or blur_result is False:
+                if class_result is True or class_result is False:
                     index += 1
 
-            # indicates a nonimage or hidden file; move on to next file
             else:
-                index += 1
+                index = 0
+                files = list(images.keys())
+                bird_step = 1
 
         # reached end of directory, begin writing to subdirectory
         # switch to writing screen
@@ -176,12 +243,9 @@ class ProcessScreen(Screen):
             if not os.path.isdir(des_path):
                 os.makedirs(des_path)
 
-            if compare:
-                self.manager.current = 'black3'
-
             files = list(images.keys())
 
-            # switch to writing screen
+            # switch to writing/compare screen
             self.manager.current = 'black3'
 
             # collect any garbage not already gathered by python
@@ -213,6 +277,24 @@ class ProcessScreen(Screen):
         # preventive measure: will never actually reach here
         return None
 
+    def check_class(self, img):
+        resized_img = cv2.resize(img, (112, 112))
+        prediction = model.predict([resized_img])
+        result = model.classify(prediction)
+
+        # if image has a bird, display green checkmark
+        if result:
+            self.ids.result.color = (1, 1, 1, 1)
+            self.ids.result.source = 'assets/yes.png'
+            return True
+        # otherwise, display red x
+        else:
+            self.ids.result.color = (1, 1, 1, 1)
+            self.ids.result.source = 'assets/no.png'
+            return False
+        # preventive measure: will never actually reach here
+        return None
+
 
 class CompareScreen(Screen):
     
@@ -224,10 +306,10 @@ class CompareScreen(Screen):
         if index < length:
             self.ids.loading.text = "Loading " + str(index + 1) + " of " + str(length)
             if std == '':
-                std, std_hash, count = limit.set_standard(images, files[index])
+                std, std_hash, count = compare.set_standard(images, files[index])
 
             else:
-                result = limit.limit(images[files[index]], std_hash, count)
+                result = compare.limit(images[files[index]], std_hash, count)
 
                 if result == 'remove':
                     images.pop(files[index])
@@ -235,7 +317,7 @@ class CompareScreen(Screen):
                 elif result == 'continue':
                     count += 1
                 elif result == 'update_std':
-                    std, std_hash, count = limit.set_standard(images, files[index])
+                    std, std_hash, count = compare.set_standard(images, files[index])
 
             self.ids.progress.value = index + 1
             index += 1
@@ -250,7 +332,7 @@ class CompareScreen(Screen):
 class BlackScreen3(Screen):
     
     def switch(self, dt):
-        if compare:
+        if comp:
             self.manager.current = 'compare'
         else:
             self.manager.current = 'write'
@@ -287,7 +369,7 @@ class WriteScreen(Screen):
 
     def reset(self):
         global first_pass, index, num_files, dir_path, des_path, images
-        global std, count, files, std_hash
+        global std, count, files, std_hash, blur_step, bird_step
 
         # reset all global variables for use in future passes
         first_pass = 0
@@ -299,6 +381,9 @@ class WriteScreen(Screen):
         count = 0
         files = []
         std_hash = None
+
+        blur_step = 0
+        bird_step = 0
 
         # empty images dictionary
         images.clear()

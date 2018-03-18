@@ -1,7 +1,6 @@
 #:kivy 1.10.1
 #:import Clock kivy.clock.Clock
 #:import Window kivy.core.window.Window
-#:import Animation kivy.animation.Animation
 #:import ProgressBar kivy.uix.progressbar.ProgressBar
 
 
@@ -242,6 +241,22 @@
         height: dp(200)  # The fixed height you want
         color: (0.0, 0.0, 0.0, 0.0)
         source: ''
+
+    Label:
+        id: load
+        pos_hint: {'center_x': 0.5, 'center_y': 0.7}
+        font_size: 50
+        font_name: 'assets/Montserrat-Regular'
+        text: ''
+
+    Image:
+        id: load_img
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        size_hint_y: None  # Tells the layout to ignore the size_hint in y dir
+        height: dp(200)  # The fixed height you want
+        color: (0, 0, 0, 0)
+        source: ''
+
 
 <CompareScreen>:
     on_enter: Clock.schedule_interval(root.compare, 0)
