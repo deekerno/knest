@@ -24,7 +24,17 @@ class ClassificationModel(object):
 
     def _build_network(self, n, image_size):
         # Define the input to the network.
-        net = tflearn.input_data(shape=[None, image_size[0], image_size[1], 3])
+
+        img_prep = tflearn.ImagePreprocessing()
+        img_prep.add_featurewise_zero_center(per_channel=True)
+
+        # Real-time data augmentation.
+        img_aug = tflearn.ImageAugmentation()
+        img_aug.add_random_flip_leftright()
+
+        net = tflearn.input_data(shape=[None, image_size[0], image_size[1], 3],
+                                 data_preprocessing=img_prep,
+                                 data_augmentation=img_aug)
 
         # Start with a normal convolutional layer.
         net = tflearn.conv_2d(net, 64, 3, regularizer='L2', weight_decay=0.0001)
