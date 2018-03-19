@@ -1,8 +1,6 @@
 # UCF Senior Design 2017-18
 # Group 38
 
-import cv2
-import gc
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
@@ -13,11 +11,13 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from PIL import Image
+import cv2
+import gc
+import math
 import os
 import utils.blur as blur
 import utils.compare as compare
 import utils.global_var as gv
-import math
 
 # all accepted images will be written to a subdirectory
 # named 'processed'
@@ -56,6 +56,7 @@ class LandingScreen(Screen):
     def switch(self, dt):
         """
         Switch to folder selection screen
+            dt: (int) time in seconds
         """
         self.manager.current = 'folder_select'
 
@@ -79,9 +80,10 @@ class FolderSelectScreen(Screen):
                             size_hint=(0.9, 0.9))
         self._popup.open()
 
-    def load(self, path, filename):
+    def load(self, path):
         """
         Load the selected path
+            path: (String) directory path chosen by user
         """
 
         # store user-selected path
@@ -95,6 +97,7 @@ class FolderSelectScreen(Screen):
     def update_path(self, dir_path):
         """
         Display the selected path for user to see
+            dir_path: (String) absolute path to user-selected folder
         """
         # only display relative path
         new_text = "Directory Name: " + \
@@ -133,6 +136,7 @@ class BlackScreen1(Screen):
     def switch(self, dt):
         """
         Switch to progress screen to begin application
+            dt: (int) time in seconds
         """
         self.manager.current = 'progress'
 
@@ -148,6 +152,7 @@ class ProgressScreen(Screen):
         """
         Load the classification model and switch to next screen to begin
         processing images
+            dt: (int) time in seconds
         """
         # load the model if it has not been done
         if not gv.load:
@@ -169,6 +174,7 @@ class BlackScreen2(Screen):
     def switch(self, dt):
         """
         Switch to process screen to begin processing images
+            dt: (int) time in seconds
         """
         self.manager.current = 'process'
 
@@ -191,6 +197,7 @@ class ProcessScreen(Screen):
     def update(self, dt):
         """
         Display processing results to screen in real-time for user to see
+            dt: (int) time in seconds
         """
         # if blur detection has not been implemented
         if not gv.blur_step:
@@ -292,6 +299,8 @@ class ProcessScreen(Screen):
     def check_blur(self, img, filename):
         """
         Detect if an image is blurry and display results
+            img: (ndarray) image file
+            filename: (String) name of the image file
         """
         image, result = blur.detect_blur(img)
 
@@ -313,6 +322,8 @@ class ProcessScreen(Screen):
     def check_class(self, img, filename):
         """
         Classify if an image contains a bird and display results
+            img: (ndarray) image file
+            filename: (String) name of the image file
         """
         resized_img = cv2.resize(img, (112, 112))
         prediction = gv.model.predict([resized_img])
@@ -342,6 +353,7 @@ class BlackScreen3(Screen):
     def switch(self, dt):
         """
         Switch to next screen based on corner toggle button
+            dt: (int) time in seconds
         """
         if gv.comp:
             # switch to comparing screen
@@ -360,6 +372,7 @@ class CompareScreen(Screen):
     def compare(self, dt):
         """
         Reduce number of similar images in a dictionary and update progress bar
+            dt: (int) time in seconds
         """
         # set the progress bar maximum to the size of the dictionary
         length = self.ids.progress.max = len(gv.files)
@@ -418,6 +431,7 @@ class WriteScreen(Screen):
     def begin(self, dt):
         """
         Write final images to 'processed' folder and display progress for user
+            dt: (int) time in seconds
         """
 
         # set the progress bar maximum to the size of the dictionary
@@ -451,6 +465,7 @@ class WriteScreen(Screen):
     def write_to(self, filename):
         """
         Write image to 'processed' folder
+            filename: (String): name of the image
         """
         img = Image.fromarray(gv.images[filename])
         img.save(os.path.join(gv.des_path, filename))
@@ -464,6 +479,7 @@ class BlackScreen4(Screen):
     def switch(self, dt):
         """
         Switch to end screen
+            dt: (int) time in seconds
         """
         self.manager.current = 'end'
 
