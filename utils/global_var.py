@@ -48,7 +48,7 @@ def reset():
     first_pass = index = 0
     files = []
 
-    comp = count = 0
+    count = 0
     std = ''
     std_hash = None
 
