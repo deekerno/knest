@@ -63,7 +63,6 @@ class ClassificationModel(object):
     def classify(self, prediction):
 
         is_bird = np.argmax(prediction[0]) == 1
-        print(is_bird)
         return is_bird
 
 
