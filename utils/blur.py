@@ -1,3 +1,6 @@
+# UCF Senior Design 2017-18
+# Group 38
+
 import cv2
 import numpy as np
 import pywt
@@ -6,8 +9,14 @@ FIXED_SIZE = 1024
 EDGE_THRESH = 35
 MIN_ZERO = 0
 
-# partition edge maps into windows
+
 def partition(emap, rows, cols):
+    """
+    Partition edge maps into windows
+        emap: (array) edge map
+        rows: (int) number of rows for each partition
+        cols: (int) number of columns for each partition
+    """
     h, w = emap.shape
 
     return (emap.reshape(h // rows, rows, -1, cols)
@@ -15,8 +24,11 @@ def partition(emap, rows, cols):
             .reshape(-1, rows, cols))
 
 
-# haar wavelet transform calculation
 def haar_wavelet_transform(img):
+    """
+    Calculate haar wavelet transform for a given image
+        img: (ndarray) grayscale image file
+    """
     coeffs = pywt.dwt2(img, 'haar')
 
     # from pywt documentation: cA, (cH, cV, cD)
@@ -29,16 +41,24 @@ def haar_wavelet_transform(img):
     return LL, LH, HL, HH
 
 
-# calc emap, iterating over LL
 def calc_emap(LH, HL, HH):
+    """
+    Construct edge map
+        LH: (array) vertical detail
+        HL: (array) horizontal detail
+        HH: (array) diagonal detail
+    """
     # square root of LH^2 + HL^2 + HH^2
     return np.sqrt((np.power(LH, 2) + np.power(HL, 2) + np.power(HH, 2)))
-    
 
-# find local maxima of each edgemap partition
+
 def calc_emax(emap, window_size):
-    # split edge map into windows sized (window_size X window_size)
-    # find the local maxima of each window
+    """
+    Calculate local maxima of each edgemap partition
+        emap: (array) edge map
+        window_size: (int) dimensions of each partition
+    """
+    # split edge map into partitions sized (window_sized X window_sized)
     result = partition(emap, window_size, window_size)
     max_points = []
 
@@ -53,6 +73,12 @@ def calc_emax(emap, window_size):
 
 
 def calc_values(emax1, emax2, emax3):
+    """
+    Calculate values necessary for blur detection
+        emax1: (array) list of local maxima in first edgemap
+        emax2: (array) list of local maxima in second edgemap
+        emax3: (array) list of local maxima in third edgemap
+    """
     # total number of edge points
     Nedge = 0
     # total number of Dirac- or Astep-Structure edge points
@@ -91,6 +117,10 @@ def calc_values(emax1, emax2, emax3):
 
 
 def calc_intensities(img):
+    """
+    Calculate haar wavelet transforms, edge maps and maxima
+        img: (ndarray) grayscale image file
+    """
     # i = 1
     LL_1, LH_1, HL_1, HH_1 = haar_wavelet_transform(img)
     emap1 = calc_emap(LH_1, HL_1, HH_1)
@@ -109,9 +139,13 @@ def calc_intensities(img):
     return emax1, emax2, emax3
 
 
-# default resize value is 1024; however, if image dimensions are smaller,
-# resize accordingly. Smallest resize will be 256 or FIXED_SIZE divided by 4
 def determine_resize(img):
+    """
+    Determine dimensions for resize. Default value is 1024; however,
+    if image dimensions are smaller, resize accordingly.
+    Smallest resize will be 256 or FIXED_SIZE divided by 4
+        img: (ndarray) grayscale image file
+    """
     size = FIXED_SIZE
 
     if len(img[0]) < size:
@@ -123,9 +157,15 @@ def determine_resize(img):
     return size
 
 
-# classify whether image is blurry or not blurry
-# blur metrics vary based on resize value
 def blur_result(size, per, blur_extent):
+    """
+    Classify whether or not an image is blurry. Blur metrics vary based
+    on resize dimensions
+        size: (int) resized dimension
+        per: (float) ratio of Dirac- and Astep-Structure to all edges
+        blur_extent: (float) blur confident coefficient;
+                     how many Roof- and Gstep-Structure edges are
+    """
     if size == FIXED_SIZE:
         if (per <= MIN_ZERO and blur_extent > .83) or blur_extent >= .9:
             # blurry
@@ -147,12 +187,20 @@ def blur_result(size, per, blur_extent):
 
 
 def detect_blur(img_path):
+    """
+    Method where final image and blur classification is returned
+        img_path: (String) absolute path to image file
+    """
+    # convert image to numpy array
     image = cv2.imread(img_path)
+    # convert to RGB
     img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
+    # determine dimensions for resize
     size = determine_resize(img)
     img = cv2.resize(img, (size, size))
 
+    # calculate local maxima of each edge map (3 in total)
     emax1, emax2, emax3 = calc_intensities(img)
 
     # calculate Nedge, Nda, Nrg and Nbrg
@@ -165,6 +213,7 @@ def detect_blur(img_path):
     # blurred; if divisor is 0, set blur_extent to 0
     blur_extent = Nrg == 0 and 0 or Nbrg / Nrg
 
+    # classify whether or not image is blurry
     result = blur_result(size, per, blur_extent)
 
     return image, result

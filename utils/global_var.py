@@ -1,7 +1,9 @@
+# UCF Senior Design 2017-18
+# Group 38
+
 """
 Module to hold all global variables used in `main.py`
 """
-
 # completion indicators of process checkpoints
 blur_step = 0
 bird_step = 0
@@ -48,9 +50,9 @@ def reset():
     first_pass = index = 0
     files = []
 
-    count = 0
     std = ''
     std_hash = None
+    count = 0
 
     # empty images dictionary
     images.clear()
