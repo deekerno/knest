@@ -16,37 +16,18 @@ from PIL import Image
 import os
 import utils.blur as blur
 import utils.compare as compare
-# import architectures.buff_bobo.classifier as cl
+import utils.global_var as gv
 
+# all accepted images will be written to a subdirectory
+# named 'processed'
 DES_NAME = 'processed'
-
-# global variables for entire process
-blur_step = 0
-bird_step = 0
-load = 0
-model = None
-
-# global variables to read images in user-given path
-first_pass = 0
-dir_path = ""
-des_path = ""
-num_files = 0
-index = 0
-
-# global variables to keep track of image data
-images = {}
-
-# global variables for image comparison
-comp = 0
-std = ''
-std_hash = None
-count = 0
-
-# global variables for writing to subdirectory
-files = []
 
 
 def img_handler(img_path):
+    """
+    Determine whether or not a given file is an image
+        img_path: (String) path to the file
+    """
     try:
         # file is an image
         img = Image.open(img_path)
@@ -57,112 +38,174 @@ def img_handler(img_path):
         # file is not an image
         return False
 
-# Define behavior specific to a particular screen
+
+class LandingScreen(Screen):
+    """
+    This is the splash screen; It displays the team name and logo for three
+    seconds. User may move on to next screen by pressing on it
+    """
+
+    def __init__(self, **kwargs):
+        """
+        Display screen for three seconds
+        """
+        super(LandingScreen, self).__init__(**kwargs)
+        Clock.schedule_once(self.switch, 3)
+
+    def switch(self, dt):
+        """
+        Switch to folder selection screen
+        """
+        self.manager.current = 'folder_select'
+
+
 class FolderSelectScreen(Screen):
+    """
+    This screen is where users can select their input folder and toggle on/off
+    the image comparison option
+    """
     loadFile = ObjectProperty(None)
 
     def dismiss_popup(self):
         self._popup.dismiss()
 
-    # Create a pop-up inside the window to select a folder
     def show_load(self):
+        """
+        Create a pop-up inside the window to select a folder
+        """
         content = LoadDialog(load=self.load, cancel=self.dismiss_popup)
         self._popup = Popup(title="Select folder", content=content,
                             size_hint=(0.9, 0.9))
         self._popup.open()
 
-    # Store the path in a variable to send to the backend
     def load(self, path, filename):
-        global dir_path, num_files
+        """
+        Load the selected path
+        """
 
-        dir_path = path
-        num_files = len(os.listdir(dir_path))
+        # store user-selected path
+        gv.dir_path = path
+        # determine how many files are in the path
+        gv.num_files = len(os.listdir(gv.dir_path))
 
-        self.update_path(dir_path)
-
+        self.update_path(gv.dir_path)
         self.dismiss_popup()
 
     def update_path(self, dir_path):
+        """
+        Display the selected path for user to see
+        """
         # only display relative path
         new_text = "Directory Name: " + \
             os.path.normpath(os.path.basename(dir_path))
+        # update the path to show to user
         self.ids.path.text = new_text
 
     def check_path(self):
-        if not dir_path == "":
+        """
+        Check if the user has selected an input folder
+        """
+        if not gv.dir_path == "":
+            # begin processing images if a path is given
+            # switch to transition screen
             self.manager.current = 'black1'
         else:
+            # if no path was given, prompt user for one
             self.ids.path.text = "No directory path given"
 
     def update_toggle(self):
-        global comp
-
-        # depending on status of switch, update whether
-        # application will implement image comparison
+        """
+        Update whether application will implement image comparison
+        depending on state of toggle button
+        """
         if self.ids.choice.active:
-            comp = 1
+            gv.comp = 1
         else:
-            comp = 0
-
-
-class LandingScreen(Screen):
-
-    def __init__(self, **kwargs):
-        super(LandingScreen, self).__init__(**kwargs)
-        Clock.schedule_once(self.switch, 3)
-
-    def switch(self, dt):
-        self.manager.current = 'folder_select'
+            gv.comp = 0
 
 
 class BlackScreen1(Screen):
+    """
+    Transition screen
+    """
 
     def switch(self, dt):
+        """
+        Switch to progress screen to begin application
+        """
         self.manager.current = 'progress'
 
 
 class ProgressScreen(Screen):
+    """
+    This screen is where the classification model will be loaded. It
+    also acts as a transition from folder selection to the beginning of
+    the application process
+    """
 
     def switch(self, dt):
-        global load, model
-        if not load:
-            print("Loading model")
-
+        """
+        Load the classification model and switch to next screen to begin
+        processing images
+        """
+        # load the model if it has not been done
+        if not gv.load:
             import architectures.buff_bobo.classifier as cl
-            model = cl.ClassificationModel((112, 112), 'output/buff_bobo-670')
+            gv.model = cl.ClassificationModel(
+                (112, 112), 'output/buff_bobo-670')
+            # update that model has been loaded
+            gv.load = 1
 
-            print("Done loading model")
-            load = 1
-
+        # switch to transition screen
         self.manager.current = 'black2'
 
 
 class BlackScreen2(Screen):
+    """
+    Transition screen
+    """
 
     def switch(self, dt):
+        """
+        Switch to process screen to begin processing images
+        """
         self.manager.current = 'process'
 
 
 class ProcessScreen(Screen):
+    """
+    This screen is where all the images get processed. The steps are:
+        1) blur detection
+        2) bird classification
+        3) bird localization
+        4) face classification
+        5) face localization
+
+    The images and its results for each respective steps are displayed in
+    real-time. Images are initially added to a global dictionary organized
+    as {filename: numpy array} and get removed one-by-one every time an image
+    fails a processing step
+    """
 
     def update(self, dt):
-        global blur_step, bird_step
-        global first_pass, dir_path, index, num_files, comp, images, des_path
-        global files, load, model
-
-        if not blur_step:
-            print("implementing blur detection")
-            # preventive measure: avoid out of index error
-            if index < num_files:
-                file_path = os.path.join(dir_path, os.listdir(dir_path)[index])
+        """
+        Display processing results to screen in real-time for user to see
+        """
+        # if blur detection has not been implemented
+        if not gv.blur_step:
+            # preventive measure: avoid out-of-index error
+            if gv.index < gv.num_files:
+                file_path = os.path.join(
+                    gv.dir_path, os.listdir(gv.dir_path)[gv.index])
 
                 # avoid nonimages and hidden files
                 if img_handler(file_path):
-                    if not first_pass:
-                        first_pass = 1
+                    # if this is the first pass into this step of the process,
+                    # update the title of the process for user to see
+                    if not gv.first_pass:
+                        gv.first_pass = 1
                         # update stage of processing
                         self.ids.message.text = 'B L U R   D E T E C T I O N'
-
                         # remove image transparency
                         self.ids.image.color = (1, 1, 1, 1)
 
@@ -173,40 +216,31 @@ class ProcessScreen(Screen):
                     self.ids.result.source = ''
 
                     # call blur detection on image
-                    blur_result = self.check_blur(file_path, os.listdir(dir_path)[index])
+                    self.check_blur(file_path, os.listdir(gv.dir_path)[gv.index])
 
-                    # if blur detection produces a result,
-                    # move on to next image by updating number
-                    if blur_result is True or blur_result is False:
-                        index += 1
+                # continue to next image
+                gv.index += 1
 
-                # indicates a nonimage or hidden file; move on to next file
-                else:
-                    index += 1
-
+            # implemented blur detection on all images
+            # update and move to next step
             else:
-                self.ids.message.text = ''
+                gv.index = 0
+                gv.first_pass = 0
+                gv.files = list(gv.images.keys())
+                gv.blur_step = 1
 
-                self.ids.image.color = (0, 0, 0, 0)
-                self.ids.image.source = ''
+        # if bird classification has not been implemented
+        elif not gv.bird_step:
+            # preventive measure: avoid out-of-index error
+            if gv.index < len(gv.files):
+                file_path = os.path.join(gv.dir_path, gv.files[gv.index])
 
-                self.ids.result.color = (0, 0, 0, 0)
-                self.ids.result.source = ''
-
-                index = 0
-                first_pass = 0
-                files = list(images.keys())
-                blur_step = 1
-
-        elif not bird_step:
-            if index < len(files):
-                file_path = os.path.join(dir_path, files[index])
-
-                print("implementing bird classification")
-                if not first_pass:
-                    first_pass = 1
+                # if this is the first pass into this step of the process,
+                # update the title of the process for user to see
+                if not gv.first_pass:
+                    gv.first_pass = 1
+                    # update stage of processing
                     self.ids.message.text = 'B I R D   C L A S S I F I C A T I O N'
-
                     # remove image transparency
                     self.ids.image.color = (1, 1, 1, 1)
 
@@ -217,30 +251,33 @@ class ProcessScreen(Screen):
                 self.ids.result.source = ''
 
                 # call object classification on image
-                class_result = self.check_class(images[files[index]], files[index])
+                self.check_class(gv.images[gv.files[gv.index]], gv.files[gv.index])
 
-                if class_result is True or class_result is False:
-                    index += 1
+                # continue to next image
+                gv.index += 1
 
+            # implemented bird classification on all images
+            # update and move to next step
             else:
-                index = 0
-                files = list(images.keys())
-                bird_step = 1
+                gv.index = 0
+                gv.files = list(gv.images.keys())
+                gv.bird_step = 1
 
-        # reached end of directory, begin writing to subdirectory
-        # switch to writing screen
+        # all images have been processed successfully
+        # update and move to next screen
         else:
-            index = 0
-            # the folder we will write all accepted images to
-            des_path = os.path.join(dir_path, DES_NAME)
+            gv.index = 0
 
-            # if it doesn't exist, make the folder
-            if not os.path.isdir(des_path):
-                os.makedirs(des_path)
+            # the folder path where all accepted images will be written
+            gv.des_path = os.path.join(gv.dir_path, DES_NAME)
 
-            files = list(images.keys())
+            # create the folder if it does not exist
+            if not os.path.isdir(gv.des_path):
+                os.makedirs(gv.des_path)
 
-            # switch to writing/compare screen
+            gv.files = list(gv.images.keys())
+
+            # switch to transition screen
             self.manager.current = 'black3'
 
             # collect any garbage not already gathered by python
@@ -249,106 +286,155 @@ class ProcessScreen(Screen):
             # unschedule kivy's Clock.schedule_interval() function
             return False
 
-    # call blur detection and display results
     def check_blur(self, img, filename):
-        global images
-
+        """
+        Detect if an image is blurry and display results
+        """
         image, result = blur.detect_blur(img)
 
-        # if image is not blurry, display green checkmark
+        # image is not blurry
         if result:
+            # remove image transparency and display green check
             self.ids.result.color = (1, 1, 1, 1)
             self.ids.result.source = 'assets/yes.png'
 
-            # images that pass blur detection will be added to
-            # image dictionary
-            images[filename] = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            return True
-        # otherwise, display red x
+            # add non-blurry image to image dictionary
+            gv.images[filename] = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+        # image is blurry
         else:
+            # remove image transparency and display red x
             self.ids.result.color = (1, 1, 1, 1)
             self.ids.result.source = 'assets/no.png'
-            return False
-        # preventive measure: will never actually reach here
-        return None
 
     def check_class(self, img, filename):
+        """
+        Classify if an image contains a bird and display results
+        """
         resized_img = cv2.resize(img, (112, 112))
-        prediction = model.predict([resized_img])
-        result = model.classify(prediction)
+        prediction = gv.model.predict([resized_img])
+        result = gv.model.classify(prediction)
 
-        # if image has a bird, display green checkmark
+        # image contains a bird
         if result:
+            # remove image transparency and display green check
             self.ids.result.color = (1, 1, 1, 1)
             self.ids.result.source = 'assets/yes.png'
-            return True
-        # otherwise, display red x
+
+        # image does not contain a bird
         else:
+            # remove image transparency and display red x
             self.ids.result.color = (1, 1, 1, 1)
             self.ids.result.source = 'assets/no.png'
-            images.pop(filename)
-            return False
-        # preventive measure: will never actually reach here
-        return None
 
-
-class CompareScreen(Screen):
-    
-    def compare(self, dt):
-        global images, std, count, index, std_hash, files
-
-        length = self.ids.progress.max = len(files)
-
-        if index < length:
-            self.ids.loading.text = "Loading " + str(index + 1) + " of " + str(length)
-            if std == '':
-                std, std_hash, count = compare.set_standard(images, files[index])
-
-            else:
-                result = compare.limit(images[files[index]], std_hash, count)
-
-                if result == 'remove':
-                    images.pop(files[index])
-                    count += 1
-                elif result == 'continue':
-                    count += 1
-                elif result == 'update_std':
-                    std, std_hash, count = compare.set_standard(images, files[index])
-
-            self.ids.progress.value = index + 1
-            index += 1
-
-        else:
-            index = 0
-            self.manager.current = 'write'
-            files = list(images.keys())
-            return False
+            # remove image from dictionary
+            gv.images.pop(filename)
 
 
 class BlackScreen3(Screen):
-    
+    """
+    Transition screen
+    """
+
     def switch(self, dt):
-        if comp:
+        """
+        Switch to next screen based on corner toggle button
+        """
+        if gv.comp:
+            # switch to comparing screen
             self.manager.current = 'compare'
         else:
+            # switch to writing screen
             self.manager.current = 'write'
 
 
+class CompareScreen(Screen):
+    """
+    This screen is where the application reduces the number of similar images
+    in the final subdirectory, based on user choice
+    """
+
+    def compare(self, dt):
+        """
+        Reduce number of similar images in a dictionary and update progress bar
+        """
+        # set the progress bar maximum to the size of the dictionary
+        length = self.ids.progress.max = len(gv.files)
+
+        # preventive measure to avoid out-of-index error
+        if gv.index < length:
+            # display progress to screen
+            self.ids.loading.text = "Loading " + \
+                str(gv.index + 1) + " of " + str(length)
+
+            # set a comparison standard if there is none
+            if gv.std == '':
+                gv.std, gv.std_hash, gv.count = compare.set_standard(
+                    gv.images, gv.files[gv.index])
+
+            else:
+                # compare the standard to the working image
+                result = compare.limit(
+                    gv.images[gv.files[gv.index]], gv.std_hash, gv.count)
+
+                if result == 'remove':
+                    # too many similar images; remove from dictionary
+                    gv.images.pop(gv.files[gv.index])
+                    gv.count += 1
+
+                elif result == 'continue':
+                    # continue with same standard
+                    gv.count += 1
+
+                elif result == 'update_std':
+                    # non-similar image found; update standard
+                    gv.std, gv.std_hash, gv.count = compare.set_standard(
+                        gv.images, gv.files[gv.index])
+
+            # update progress bar for user to see
+            self.ids.progress.value = gv.index + 1
+            # continue to next image
+            gv.index += 1
+
+        # compared entire dictionary; update and move on to next screen
+        else:
+            gv.index = 0
+            # switch to writing screen
+            self.manager.current = 'write'
+            gv.files = list(gv.images.keys())
+            # unschedule kivy's Clock.schedule_interval() function
+            return False
+
+
 class WriteScreen(Screen):
+    """
+    This screen is where the accepted images get written into the final
+    subdirectory, called 'processed'
+    """
 
     def begin(self, dt):
-        global files, index
+        """
+        Write final images to 'processed' folder and display progress for user
+        """
 
-        length = self.ids.progress.max = len(images)
+        # set the progress bar maximum to the size of the dictionary
+        length = self.ids.progress.max = len(gv.images)
 
-        if index < length:
-            self.ids.loading.text = "Loading " + str(index + 1) + " of " + str(length)
+        # preventive measure to avoid out-of-index error
+        if gv.index < length:
+            # display progress to screen
+            self.ids.loading.text = "Loading " + \
+                str(gv.index + 1) + " of " + str(length)
+
             # write accepted images to subdirectory
-            self.write_to(files[index])
-            self.ids.progress.value = index + 1
+            self.write_to(gv.files[gv.index])
 
-            index += 1
+            # update progress bar for user to see
+            self.ids.progress.value = gv.index + 1
+            # continue to next image
+            gv.index += 1
 
+        # all images have been written; update and move on to next screen
         else:
             # reset all global variables for future passes
             self.reset()
@@ -356,42 +442,52 @@ class WriteScreen(Screen):
             # switch to end screen
             self.manager.current = 'black4'
 
+            # unschedule kivy's Clock.schedule_interval() function
             return False
 
     def write_to(self, filename):
-
-        img = Image.fromarray(images[filename])
-        img.save(os.path.join(des_path, filename))
+        """
+        Write image to 'processed' folder
+        """
+        img = Image.fromarray(gv.images[filename])
+        img.save(os.path.join(gv.des_path, filename))
 
     def reset(self):
-        global first_pass, index, num_files, dir_path, des_path, images
-        global std, count, files, std_hash, blur_step, bird_step
-
-        # reset all global variables for use in future passes
-        first_pass = 0
-        index = 0
-        num_files = 0
-        dir_path = ""
-        des_path = ""
-        std = ''
-        count = 0
-        files = []
-        std_hash = None
-
-        blur_step = 0
-        bird_step = 0
+        """
+        Reset all global variables for use in future passes
+        """
+        gv.first_pass = 0
+        gv.index = 0
+        gv.num_files = 0
+        gv.dir_path = ""
+        gv.des_path = ""
+        gv.std = ''
+        gv.count = 0
+        gv.files = []
+        gv.std_hash = None
+        gv.blur_step = 0
+        gv.bird_step = 0
 
         # empty images dictionary
-        images.clear()
+        gv.images.clear()
 
 
 class BlackScreen4(Screen):
+    """
+    Transition screen
+    """
 
     def switch(self, dt):
+        """
+        Switch to end screen
+        """
         self.manager.current = 'end'
 
 
 class EndScreen(Screen):
+    """
+    This screen is where the user is notified that the process is complete
+    """
     pass
 
 
@@ -411,22 +507,22 @@ sm.add_widget(FolderSelectScreen(name='folder_select'))
 sm.add_widget(BlackScreen1(name='black1'))
 sm.add_widget(BlackScreen2(name='black2'))
 sm.add_widget(ProgressScreen(name='progress'))
-sm.add_widget(BlackScreen3(name='black3'))
 sm.add_widget(CompareScreen(name='compare'))
+sm.add_widget(BlackScreen3(name='black3'))
 sm.add_widget(WriteScreen(name='write'))
 sm.add_widget(BlackScreen4(name='black4'))
 sm.add_widget(ProcessScreen(name='process'))
 sm.add_widget(EndScreen(name='end'))
 
 
-# Pass it onto the kivy module
 class BirdApp(App):
+    """
+    Kivy module
+    """
 
     def build(self):
         self.title = ''
         # removes os-created window border
-        # without this, we need to create custom exit and
-        # minimize buttons
         Window.borderless = True
         return sm
 

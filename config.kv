@@ -242,6 +242,31 @@
         color: (0.0, 0.0, 0.0, 0.0)
         source: ''
 
+<BlackScreen3>:
+    on_enter: Clock.schedule_once(root.switch, 1)
+
+    Button:
+        text: 'X'
+        background_normal: ''
+        background_color: (0.0, 0.0, 0.0, 0.0)
+        size_hint: (.02, .03)
+        font_name: 'assets/Montserrat-Regular'
+        pos_hint: {'center_x': .035, 'center_y': .967}
+        halign: 'center'
+        valign: 'middle'
+        on_press: app.stop()
+
+    Button:
+        text: '__'
+        background_normal: ''
+        background_color: (0.0, 0.0, 0.0, 0.0)
+        size_hint: (.02, .025)
+        font_name: 'assets/Montserrat-Regular'
+        pos_hint: {'center_x': .065, 'center_y': .975}
+        halign: 'center'
+        valign: 'middle'
+        on_press: Window.minimize()
+
 <CompareScreen>:
     on_enter: Clock.schedule_interval(root.compare, 0)
     on_leave: self.ids.progress.value = 0
@@ -286,32 +311,6 @@
         pos_hint: {'center_x': 0.5, 'center_y': 0.45}
         font_name: 'assets/Montserrat-Regular'
         text: ''
-
-
-<BlackScreen3>:
-    on_enter: Clock.schedule_once(root.switch, 1)
-
-    Button:
-        text: 'X'
-        background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .03)
-        font_name: 'assets/Montserrat-Regular'
-        pos_hint: {'center_x': .035, 'center_y': .967}
-        halign: 'center'
-        valign: 'middle'
-        on_press: app.stop()
-
-    Button:
-        text: '__'
-        background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .025)
-        font_name: 'assets/Montserrat-Regular'
-        pos_hint: {'center_x': .065, 'center_y': .975}
-        halign: 'center'
-        valign: 'middle'
-        on_press: Window.minimize()
 
 <WriteScreen>:
     on_enter: Clock.schedule_interval(root.begin, 0)
