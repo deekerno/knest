@@ -17,6 +17,7 @@ import os
 import utils.blur as blur
 import utils.compare as compare
 import utils.global_var as gv
+import math
 
 # all accepted images will be written to a subdirectory
 # named 'processed'
@@ -216,7 +217,8 @@ class ProcessScreen(Screen):
                     self.ids.result.source = ''
 
                     # call blur detection on image
-                    self.check_blur(file_path, os.listdir(gv.dir_path)[gv.index])
+                    self.check_blur(file_path, os.listdir(
+                        gv.dir_path)[gv.index])
 
                 # continue to next image
                 gv.index += 1
@@ -251,7 +253,8 @@ class ProcessScreen(Screen):
                 self.ids.result.source = ''
 
                 # call object classification on image
-                self.check_class(gv.images[gv.files[gv.index]], gv.files[gv.index])
+                self.check_class(
+                    gv.images[gv.files[gv.index]], gv.files[gv.index])
 
                 # continue to next image
                 gv.index += 1
@@ -364,8 +367,8 @@ class CompareScreen(Screen):
         # preventive measure to avoid out-of-index error
         if gv.index < length:
             # display progress to screen
-            self.ids.loading.text = "Loading " + \
-                str(gv.index + 1) + " of " + str(length)
+            self.ids.loading.text = str(math.floor(
+                ((gv.index + 1) / length) * 100)) + "%   C O M P L E T E"
 
             # set a comparison standard if there is none
             if gv.std == '':
@@ -423,8 +426,8 @@ class WriteScreen(Screen):
         # preventive measure to avoid out-of-index error
         if gv.index < length:
             # display progress to screen
-            self.ids.loading.text = "Loading " + \
-                str(gv.index + 1) + " of " + str(length)
+            self.ids.loading.text = str(math.floor(
+                ((gv.index + 1) / length) * 100)) + "%   C O M P L E T E"
 
             # write accepted images to subdirectory
             self.write_to(gv.files[gv.index])
