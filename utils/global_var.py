@@ -11,8 +11,8 @@ load = 0
 model = None
 
 # path information variables
-dir_path = ""
-des_path = ""
+dir_path = ''
+des_path = ''
 num_files = 0
 
 # reusuable variables for use in real-time display
@@ -28,3 +28,29 @@ comp = 0
 std = ''
 std_hash = None
 count = 0
+
+
+def reset():
+    """
+    Reset all global variables for use in future passes
+    """
+    global blur_step, bird_step
+    global dir_path, des_path, num_files
+    global first_pass, index, files
+    global images
+    global comp, std, std_hash, count
+
+    blur_step = bird_step = 0
+
+    dir_path = des_path = ''
+    num_files = 0
+
+    first_pass = index = 0
+    files = []
+
+    comp = count = 0
+    std = ''
+    std_hash = None
+
+    # empty images dictionary
+    images.clear()

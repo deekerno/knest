@@ -437,7 +437,7 @@ class WriteScreen(Screen):
         # all images have been written; update and move on to next screen
         else:
             # reset all global variables for future passes
-            self.reset()
+            gv.reset()
 
             # switch to end screen
             self.manager.current = 'black4'
@@ -451,25 +451,6 @@ class WriteScreen(Screen):
         """
         img = Image.fromarray(gv.images[filename])
         img.save(os.path.join(gv.des_path, filename))
-
-    def reset(self):
-        """
-        Reset all global variables for use in future passes
-        """
-        gv.first_pass = 0
-        gv.index = 0
-        gv.num_files = 0
-        gv.dir_path = ""
-        gv.des_path = ""
-        gv.std = ''
-        gv.count = 0
-        gv.files = []
-        gv.std_hash = None
-        gv.blur_step = 0
-        gv.bird_step = 0
-
-        # empty images dictionary
-        gv.images.clear()
 
 
 class BlackScreen4(Screen):
