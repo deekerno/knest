@@ -379,10 +379,6 @@ class CompareScreen(Screen):
 
         # preventive measure to avoid out-of-index error
         if gv.index < length:
-            # display progress to screen
-            self.ids.loading.text = str(math.floor(
-                ((gv.index + 1) / length) * 100)) + "%   C O M P L E T E"
-
             # set a comparison standard if there is none
             if gv.std == '':
                 gv.std, gv.std_hash, gv.count = compare.set_standard(
@@ -407,6 +403,9 @@ class CompareScreen(Screen):
                     gv.std, gv.std_hash, gv.count = compare.set_standard(
                         gv.images, gv.files[gv.index])
 
+            # display progress to screen
+            self.ids.loading.text = str(math.floor(
+                ((gv.index + 1) / length) * 100)) + "%   C O M P L E T E"
             # update progress bar for user to see
             self.ids.progress.value = gv.index + 1
             # continue to next image
@@ -415,11 +414,19 @@ class CompareScreen(Screen):
         # compared entire dictionary; update and move on to next screen
         else:
             gv.index = 0
-            # switch to writing screen
-            self.manager.current = 'write'
+            # switch to writing screen after one second
+            Clock.schedule_once(self.switch, 1)
+
             gv.files = list(gv.images.keys())
             # unschedule kivy's Clock.schedule_interval() function
             return False
+
+    def switch(self, dt):
+        """
+        Switch to writing screen
+            dt: (int) time in seconds
+        """
+        self.manager.current = 'write'
 
 
 class WriteScreen(Screen):
@@ -439,12 +446,12 @@ class WriteScreen(Screen):
 
         # preventive measure to avoid out-of-index error
         if gv.index < length:
+            # write accepted images to subdirectory
+            self.write_to(gv.files[gv.index])
+
             # display progress to screen
             self.ids.loading.text = str(math.floor(
                 ((gv.index + 1) / length) * 100)) + "%   C O M P L E T E"
-
-            # write accepted images to subdirectory
-            self.write_to(gv.files[gv.index])
 
             # update progress bar for user to see
             self.ids.progress.value = gv.index + 1

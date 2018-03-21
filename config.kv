@@ -276,7 +276,7 @@
     on_enter: Clock.schedule_interval(root.compare, 0)
     on_leave: self.ids.progress.value = 0
     on_leave: self.ids.loading.text = ''
-    on_enter: app.root.transition = NoTransition()
+    #on_enter: app.root.transition = NoTransition()
 
     Button:
         text: 'X'

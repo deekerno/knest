@@ -167,7 +167,7 @@ def blur_result(size, per, blur_extent):
                      how many Roof- and Gstep-Structure edges are
     """
     if size == FIXED_SIZE:
-        if (per <= MIN_ZERO and blur_extent > .83) or blur_extent >= .9:
+        if (per <= MIN_ZERO and blur_extent > .83) or blur_extent >= .95:
             # blurry
             return 0
         else:
@@ -208,10 +208,10 @@ def detect_blur(img_path):
 
     # ratio of Dirac- and Astep-Structure to all edges
     # if divisor is 0, set per to 0
-    per = Nedge == 0 and 0 or Nda / Nedge
+    per = 0 if Nedge == 0 else Nda / Nedge
     # blur confident coefficient; how many Roof- and Gstep-Structure edges are
     # blurred; if divisor is 0, set blur_extent to 0
-    blur_extent = Nrg == 0 and 0 or Nbrg / Nrg
+    blur_extent = 0 if Nrg == 0 else Nbrg / Nrg
 
     # classify whether or not image is blurry
     result = blur_result(size, per, blur_extent)
