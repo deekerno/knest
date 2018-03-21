@@ -30,6 +30,8 @@ FLAGS = flags.FLAGS
 def class_text_to_int(row_label):
     if row_label == 'bird':
         return 1
+    elif row_label == 'bird_face':
+        return 2
     else:
         None
 
