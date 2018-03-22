@@ -7,7 +7,7 @@
 #:import ProgressBar kivy.uix.progressbar.ProgressBar
 #:import NoTransition kivy.uix.screenmanager.NoTransition
 #:import FadeTransition kivy.uix.screenmanager.FadeTransition
-
+#:import Factory kivy.factory.Factory
 
 <LandingScreen>:
     Button:
@@ -109,6 +109,39 @@
                 text: "Start"
                 font_name: 'assets/Montserrat-Regular'
                 on_release: root.check_path()
+
+<PermissionDenied@Popup>:
+    auto_dismiss: False
+    title: 'Error'
+    title_font: 'assets/Montserrat-Regular'
+    size_hint: (.4, .4)
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        GridLayout:
+            cols: 2
+
+            Image:
+                id: error
+                size_hint_x: None
+                width: 125
+                source: 'assets/error.png'
+
+            Label:
+                id: message
+                text: 'User does not have write permission. Please choose another directory.'
+                font_name: 'assets/Montserrat-Regular'
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+
+        Button:
+            text: 'OK'
+            size_hint_y: None
+            height: 50  
+            font_name: 'assets/Montserrat-Regular'
+            on_release: root.dismiss()
 
 <BlackScreen1>:
     on_enter: Clock.schedule_once(root.switch, 1.5)
@@ -246,6 +279,40 @@
         height: dp(200)  # The fixed height you want
         color: (0.0, 0.0, 0.0, 0.0)
         source: ''
+
+
+<OutOfIndex@Popup>:
+    auto_dismiss: False
+    title: 'Error'
+    title_font: 'assets/Montserrat-Regular'
+    size_hint: (.4, .4)
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        GridLayout:
+            cols: 2
+
+            Image:
+                id: error
+                size_hint_x: None
+                width: 125
+                source: 'assets/error.png'
+
+            Label:
+                id: message
+                text: 'Directory was altered during processing. Please try again.'
+                font_name: 'assets/Montserrat-Regular'
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+
+        Button:
+            text: 'OK'
+            size_hint_y: None
+            height: 50  
+            font_name: 'assets/Montserrat-Regular'
+            on_release: root.dismiss()
 
 <BlackScreen3>:
     on_enter: Clock.schedule_once(root.switch, 1)

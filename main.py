@@ -76,7 +76,9 @@ class FolderSelectScreen(Screen):
         Create a pop-up inside the window to select a folder
         """
         content = LoadDialog(load=self.load, cancel=self.dismiss_popup)
-        self._popup = Popup(title="Select folder", content=content,
+        self._popup = Popup(title="Select a Folder",
+                            title_font='assets/Montserrat-Regular',
+                            content=content,
                             size_hint=(0.9, 0.9))
         self._popup.open()
 
@@ -85,7 +87,6 @@ class FolderSelectScreen(Screen):
         Load the selected path
             path: (String) directory path chosen by user
         """
-
         # store user-selected path
         gv.dir_path = path
         # determine how many files are in the path
@@ -110,9 +111,16 @@ class FolderSelectScreen(Screen):
         Check if the user has selected an input folder
         """
         if not gv.dir_path == "":
-            # begin processing images if a path is given
-            # switch to transition screen
-            self.manager.current = 'black1'
+            # ensure that we are able to write to the path
+            if os.access(gv.dir_path, os.W_OK):
+                # begin processing images if a path is given
+                # switch to transition screen
+                self.manager.current = 'black1'
+            else:
+                # permission denied; display pop-up error message
+                # and prompt user to choose another directory
+                Factory.PermissionDenied().open()
+
         else:
             # if no path was given, prompt user for one
             self.ids.path.text = "No directory path given"
@@ -156,9 +164,8 @@ class ProgressScreen(Screen):
         """
         # load the model if it has not been done
         if not gv.load:
-            import architectures.buff_bobo.classifier as cl
-            gv.model = cl.ClassificationModel(
-                (112, 112), 'output/buff_bobo-670')
+            import architectures.bobo.classifier as cl
+            gv.model = cl.ClassificationModel('output/bird-classifier6.tfl')
             # update that model has been loaded
             gv.load = 1
 
@@ -203,32 +210,39 @@ class ProcessScreen(Screen):
         if not gv.blur_step:
             # preventive measure: avoid out-of-index error
             if gv.index < gv.num_files:
-                file_path = os.path.join(
-                    gv.dir_path, os.listdir(gv.dir_path)[gv.index])
+                # ensure user did not alter working director mid-process
+                if not (gv.num_files == len(os.listdir(gv.dir_path))):
+                    Factory.OutOfIndex().open()
+                    gv.reset()
+                    self.manager.current = 'folder_select'
+                    return False
+                else:
+                    file_path = os.path.join(
+                        gv.dir_path, os.listdir(gv.dir_path)[gv.index])
 
-                # avoid nonimages and hidden files
-                if img_handler(file_path):
-                    # if this is the first pass into this step of the process,
-                    # update the title of the process for user to see
-                    if not gv.first_pass:
-                        gv.first_pass = 1
-                        # update stage of processing
-                        self.ids.message.text = 'B L U R   D E T E C T I O N'
-                        # remove image transparency
-                        self.ids.image.color = (1, 1, 1, 1)
+                    # avoid nonimages and hidden files
+                    if img_handler(file_path):
+                        # if this is the first pass into this step of the process,
+                        # update the title of the process for user to see
+                        if not gv.first_pass:
+                            gv.first_pass = 1
+                            # update stage of processing
+                            self.ids.message.text = 'B L U R   D E T E C T I O N'
+                            # remove image transparency
+                            self.ids.image.color = (1, 1, 1, 1)
 
-                    # display working image
-                    self.ids.image.source = file_path
-                    # reset result and add transparency back
-                    self.ids.result.color = (0, 0, 0, 0)
-                    self.ids.result.source = ''
+                        # display working image
+                        self.ids.image.source = file_path
+                        # reset result and add transparency back
+                        self.ids.result.color = (0, 0, 0, 0)
+                        self.ids.result.source = ''
 
-                    # call blur detection on image
-                    self.check_blur(file_path, os.listdir(
-                        gv.dir_path)[gv.index])
+                        # call blur detection on image
+                        self.check_blur(file_path, os.listdir(
+                            gv.dir_path)[gv.index])
 
-                # continue to next image
-                gv.index += 1
+                    # continue to next image
+                    gv.index += 1
 
             # implemented blur detection on all images
             # update and move to next step
@@ -325,8 +339,8 @@ class ProcessScreen(Screen):
             img: (ndarray) image file
             filename: (String) name of the image file
         """
-        resized_img = cv2.resize(img, (112, 112))
-        prediction = gv.model.predict([resized_img])
+        resized_img = cv2.resize(img, (32, 32))
+        prediction = gv.model.predict(resized_img)
         result = gv.model.classify(prediction)
 
         # image contains a bird
@@ -389,19 +403,18 @@ class CompareScreen(Screen):
                 result = compare.limit(
                     gv.images[gv.files[gv.index]], gv.std_hash, gv.count)
 
-                if result == 'remove':
-                    # too many similar images; remove from dictionary
-                    gv.images.pop(gv.files[gv.index])
-                    gv.count += 1
-
-                elif result == 'continue':
-                    # continue with same standard
-                    gv.count += 1
-
-                elif result == 'update_std':
+                if result == 'update_std':
                     # non-similar image found; update standard
                     gv.std, gv.std_hash, gv.count = compare.set_standard(
                         gv.images, gv.files[gv.index])
+
+                else:
+                    if result == 'remove':
+                        # too many similar images; remove from dictionary
+                        gv.images.pop(gv.files[gv.index])
+
+                    # continue with same standard
+                    gv.count += 1
 
             # display progress to screen
             self.ids.loading.text = str(math.floor(
