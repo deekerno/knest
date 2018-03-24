@@ -44,7 +44,7 @@ python object_detection/builders/model_builder_test.py
 ### Train the neural network (faster_rcnn_nas)
 ```bash
 # from knest/tf_object_detection/models/research/object_detection
-python3 train.py --logtostderr --train_dir=training/ --pipeline_config_path=training/faster_rcnn_nas_coco.config
+python3 train.py --logtostderr --train_dir=training/ --pipeline_config_path=training/faster_rcnn_nas_coco.config --gpudev=1
 ```
 
 ### Inference - exporting the inference graph
