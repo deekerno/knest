@@ -167,7 +167,7 @@ def blur_result(size, per, blur_extent):
                      how many Roof- and Gstep-Structure edges are
     """
     if size == FIXED_SIZE:
-        if (per <= MIN_ZERO and blur_extent > .83) or blur_extent >= .95:
+        if (per <= MIN_ZERO and blur_extent > .825) or blur_extent >= .95:
             # blurry
             return 0
         else:

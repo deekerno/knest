@@ -7,6 +7,7 @@ Module to hold all global variables used in `main.py`
 # completion indicators of process checkpoints
 blur_step = 0
 bird_step = 0
+birdbb_step = 0
 
 # classification model variables
 load = 0
@@ -36,13 +37,13 @@ def reset():
     """
     Reset all global variables for use in future passes
     """
-    global blur_step, bird_step
+    global blur_step, bird_step, birdbb_step
     global dir_path, des_path, num_files
     global first_pass, index, files
-    global images
     global comp, std, std_hash, count
+    global images
 
-    blur_step = bird_step = 0
+    blur_step = bird_step = birdbb_step = 0
 
     dir_path = des_path = ''
     num_files = 0
