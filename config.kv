@@ -114,6 +114,7 @@
     auto_dismiss: False
     title: 'Error'
     title_font: 'assets/Montserrat-Regular'
+    title_size: sp(16)
     size_hint: (.4, .4)
 
     BoxLayout:
@@ -121,6 +122,7 @@
 
         GridLayout:
             cols: 2
+            padding: 40
 
             Image:
                 id: error
@@ -132,6 +134,7 @@
                 id: message
                 text: 'User does not have write permission. Please choose another directory.'
                 font_name: 'assets/Montserrat-Regular'
+                font_size: dp(16)
                 text_size: self.size
                 halign: 'left'
                 valign: 'middle'
@@ -285,6 +288,7 @@
     auto_dismiss: False
     title: 'Error'
     title_font: 'assets/Montserrat-Regular'
+    title_size: sp(16)
     size_hint: (.4, .4)
 
     BoxLayout:
@@ -292,6 +296,7 @@
 
         GridLayout:
             cols: 2
+            padding: 40
 
             Image:
                 id: error
@@ -303,6 +308,7 @@
                 id: message
                 text: 'Directory was altered during processing. Please try again.'
                 font_name: 'assets/Montserrat-Regular'
+                font_size: dp(16)
                 text_size: self.size
                 halign: 'left'
                 valign: 'middle'
@@ -342,7 +348,7 @@
 <CompareScreen>:
     on_enter: Clock.schedule_interval(root.compare, 0)
     on_leave: self.ids.progress.value = 0
-    on_leave: self.ids.loading.text = ''
+    on_leave: self.ids.loading.text = '0%   C O M P L E T E'
     #on_enter: app.root.transition = NoTransition()
 
     Button:
@@ -388,7 +394,7 @@
 <WriteScreen>:
     on_enter: Clock.schedule_interval(root.begin, 0)
     on_leave: self.ids.progress.value = 0
-    on_leave: self.ids.loading.text = ''
+    on_leave: self.ids.loading.text = '0%   C O M P L E T E'
     on_enter: app.root.transition = FadeTransition()
 
     Button:

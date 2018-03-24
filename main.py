@@ -78,6 +78,7 @@ class FolderSelectScreen(Screen):
         content = LoadDialog(load=self.load, cancel=self.dismiss_popup)
         self._popup = Popup(title="Select a Folder",
                             title_font='assets/Montserrat-Regular',
+                            title_size='15sp',
                             content=content,
                             size_hint=(0.9, 0.9))
         self._popup.open()
@@ -89,8 +90,6 @@ class FolderSelectScreen(Screen):
         """
         # store user-selected path
         gv.dir_path = path
-        # determine how many files are in the path
-        gv.num_files = len(os.listdir(gv.dir_path))
 
         self.update_path(gv.dir_path)
         self.dismiss_popup()
@@ -169,6 +168,8 @@ class ProgressScreen(Screen):
             # update that model has been loaded
             gv.load = 1
 
+        # determine how many files are in the path
+        gv.num_files = len(os.listdir(gv.dir_path))
         # switch to transition screen
         self.manager.current = 'black2'
 
@@ -222,8 +223,9 @@ class ProcessScreen(Screen):
 
                     # avoid nonimages and hidden files
                     if img_handler(file_path):
-                        # if this is the first pass into this step of the process,
-                        # update the title of the process for user to see
+                        # if this is the first pass into this step of the
+                        # process, update the title of the process for
+                        # user to see
                         if not gv.first_pass:
                             gv.first_pass = 1
                             # update stage of processing
@@ -284,8 +286,42 @@ class ProcessScreen(Screen):
             # update and move to next step
             else:
                 gv.index = 0
+                gv.first_pass = 0
                 gv.files = list(gv.images.keys())
                 gv.bird_step = 1
+
+        elif not gv.birdbb_step:
+            # preventive measure : avoid out-of-index error
+            if gv.index < len(gv.files):
+                file_path = os.path.join(gv.dir_path, gv.files[gv.index])
+
+                # if this is the first pass into this step of the process,
+                # update the title of the process for user to see
+                if not gv.first_pass:
+                    gv.first_pass = 1
+                    # update stage of processing
+                    self.ids.message.text = 'B I R D   D E T E C T I O N'
+                    # remove image transparency
+                    self.ids.image.color = (1, 1, 1, 1)
+
+                # display working image
+                self.ids.image.source = file_path
+                # reset result and add transparency back
+                self.ids.result.color = (0, 0, 0, 0)
+                self.ids.result.source = ''
+
+                # call object detection on image
+
+                # continue to next image
+                gv.index += 1
+
+            # implemented bird classification on all images
+            # update and move to next step
+            else:
+                gv.index = 0
+                gv.first_pass = 0
+                gv.files = list(gv.images.keys())
+                gv.birdbb_step = 1
 
         # all images have been processed successfully
         # update and move to next screen
@@ -301,8 +337,12 @@ class ProcessScreen(Screen):
 
             gv.files = list(gv.images.keys())
 
-            # switch to transition screen
-            self.manager.current = 'black3'
+            if len(gv.images) == 0:
+                # if there are no images to write, switch to 'end' screen
+                self.manager.current = 'black4'
+            else:
+                # switch to transition screen
+                self.manager.current = 'black3'
 
             # collect any garbage not already gathered by python
             gc.collect()
