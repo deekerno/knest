@@ -1,23 +1,15 @@
 # UCF Senior Design 2017-18
 # Group 38
 
-from sklearn.model_selection import train_test_split as tts
-import squeezenet
-import os
 import h5py
+import os
+import squeezenet
 import tflearn
 
-DATASET = 'leavens.h5'
-OUTPUT_FOLDER = 'output/squeezenet_448/'
+CONFIG = 'config/squeezenet/config.yaml'
+DATASET = 'leavens_real.h5'
+OUTPUT_FOLDER = 'output/squeezenet/'
 SEED = 552353
-
-# Create the "buffed" bobo architecture.
-sq = squeezenet.Model((448, 448), 2)
-
-# Build the model.
-model = tflearn.DNN(sq.network, checkpoint_path=OUTPUT_FOLDER,
-                    max_checkpoints=10, tensorboard_verbose=3,
-                    clip_gradients=0.)
 
 # Load the dataset.
 print("Loading dataset...")
@@ -33,12 +25,20 @@ Y_test = h5f['Y_test']
 print("Shuffling dataset...")
 X, Y = tflearn.data_utils.shuffle(X, Y)
 
+# Create the SqueezeNet architecture using defined hyperparameters.
+sq = squeezenet.Model(CONFIG)
+
+# Build the model.
+model = tflearn.DNN(sq.network, checkpoint_path=OUTPUT_FOLDER,
+                    max_checkpoints=10, tensorboard_verbose=3,
+                    clip_gradients=0.)
+
 # Train the network.
 model.fit(X, Y, n_epoch=100, validation_set=(X_test, Y_test),
           show_metric=True, batch_size=30, shuffle=True,
-          run_id='squeezenet_448')
+          run_id='squeezenet')
 
 # Save the weights.
-model_name = "squeezenet_448"  + ".tfl"
+model_name = "squeezenet" + ".tfl"
 model_path = os.path.join(OUTPUT_FOLDER, model_name)
 model.save(model_path)
