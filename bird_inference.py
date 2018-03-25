@@ -31,6 +31,8 @@ category_index = label_map_util.create_category_index(categories)
 
 
 def inference(image):
+    # copy image parameter
+    img = np.copy(image)
 
     with detection_graph.as_default():
         with tf.Session() as sess:
@@ -53,7 +55,7 @@ def inference(image):
 
         # run inference
         output_dict = sess.run(tensor_dict, feed_dict={
-                               image_tensor: np.expand_dims(image, 0)})
+                               image_tensor: np.expand_dims(img, 0)})
 
         # convert all types as float32 numpy arrays
         output_dict['num_detections'] = int(output_dict['num_detections'][0])
@@ -62,7 +64,7 @@ def inference(image):
         output_dict['detection_boxes'] = output_dict['detection_boxes'][0]
         output_dict['detection_scores'] = output_dict['detection_scores'][0]
 
-        vis_util.visualize_boxes_and_labels_on_image_array(image, output_dict[
+        vis_util.visualize_boxes_and_labels_on_image_array(img, output_dict[
             'detection_boxes'], output_dict['detection_classes'], output_dict[
             'detection_scores'], category_index, instance_masks=output_dict.get(
             'detection_masks'), use_normalized_coordinates=True, line_thickness=8)
@@ -72,8 +74,8 @@ def inference(image):
         # get the number of boxes
         rows = boxes.shape[0]
         # get the width and height of image
-        image_width = np.shape(image)[0]
-        image_height = np.shape(image)[1]
+        image_width = np.shape(img)[0]
+        image_height = np.shape(img)[1]
 
         # iterate through bounding boxes
         for i in range(0, rows):
@@ -94,7 +96,7 @@ def inference(image):
 
         # return the image with bounding boxes displayed
         # and the coordinates for all the boxes
-        return image, boxes
+        return img, boxes
 
 
 if __name__ == '__main__':

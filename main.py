@@ -6,6 +6,7 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.factory import Factory
 from kivy.graphics.texture import Texture
+from functools import partial
 from kivy.lang import Builder
 from kivy.properties import ObjectProperty
 from kivy.uix.floatlayout import FloatLayout
@@ -294,7 +295,7 @@ class ProcessScreen(Screen):
                 self.ids.result.color = (0, 0, 0, 0)
                 self.ids.result.source = ''
 
-                # since classification requires a long loading period, 
+                # since classification requires a long loading period,
                 # display first image and next stage of processing
                 self.ids.image.source = os.path.join(gv.dir_path, gv.files[0])
                 self.ids.message.text = 'B I R D   L O C A L I Z A T I O N'
@@ -304,6 +305,12 @@ class ProcessScreen(Screen):
                 gv.files = list(gv.images.keys())
                 gv.bird_step = 1
 
+                # update the Clock.schedule_interval() function from
+                # every zero to every one second
+                self.change_clock()
+                # unschedule the initial Clock.schedule_interval() function
+                return False
+
         elif not gv.birdbb_step:
             # preventive measure : avoid out-of-index error
             if gv.index < len(gv.files):
@@ -312,9 +319,9 @@ class ProcessScreen(Screen):
                 # display working image
                 self.ids.image.source = file_path
 
-                # call object detection on image
-                self.detect_bird(
-                    gv.images[gv.files[gv.index]], gv.files[gv.index])
+                # call object detection on image after 500ms
+                Clock.schedule_once(partial(self.detect_bird, gv.images[
+                                    gv.files[gv.index]], gv.files[gv.index]), .5)
 
                 # continue to next image
                 gv.index += 1
@@ -401,24 +408,28 @@ class ProcessScreen(Screen):
             # remove image from dictionary
             gv.images.pop(filename)
 
-    def detect_bird(self, img, filename):
+    def detect_bird(self, img, filename, dt):
         """
         Localize bird(s) and bird face(s) in the image and display results
             img: (ndarray) image file
             filename: (String) name of the image file
         """
-        temp_path = os.path.join(gv.des_path, filename)
+        # display working image
+        self.ids.image.source = os.path.join(gv.dir_path, filename)
         image, boxes = bf.inference(img)
 
         im = Image.fromarray(image)
-        im.save(temp_path)
-        self.ids.image.source = temp_path
-        os.remove(temp_path)
+        im.save(filename)
+        self.ids.image.source = filename
+        os.remove(filename)
 
         # # create kivy texture from image ndarray
         # texture = Texture.create(size=(16, 16), colorfmt="rgb")
         # data = image.tostring()
         # texture.blit_buffer(data, bufferfmt="ubyte", colorfmt="rgb")
+
+    def change_clock(self):
+        Clock.schedule_interval(self.update, 1)
 
 
 class BlackScreen3(Screen):
