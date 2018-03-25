@@ -77,6 +77,15 @@ def inference(image):
         image_width = np.shape(img)[0]
         image_height = np.shape(img)[1]
 
+        # determine if image contains birds
+        # counters
+        face_cnt = 0
+        for i, score in enumerate(output_dict['detection_scores']):
+            if score > .5:
+                # label of 2 indicates bird face
+                if output_dict['detection_classes'][i] == 2:
+                    face_cnt += 1
+
         # iterate through bounding boxes
         for i in range(0, rows):
             # if the coordinates are all zero, stop processing
@@ -96,7 +105,7 @@ def inference(image):
 
         # return the image with bounding boxes displayed
         # and the coordinates for all the boxes
-        return img, boxes
+        return img, boxes, face_cnt
 
 
 if __name__ == '__main__':
@@ -106,7 +115,7 @@ if __name__ == '__main__':
             img = cv2.imread(os.path.join('/users/ayylmao/desktop/goo_test/', filename))
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-            image, boxes = inference(img)
+            image, boxes, face_cnt = inference(img)
 
             img = Image.fromarray(image)
             img.show()

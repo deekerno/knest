@@ -318,6 +318,9 @@ class ProcessScreen(Screen):
 
                 # display working image
                 self.ids.image.source = file_path
+                # reset result and add transparency back
+                self.ids.result.color = (0, 0, 0, 0)
+                self.ids.result.source = ''
 
                 # call object detection on image after 500ms
                 Clock.schedule_once(partial(self.detect_bird, gv.images[
@@ -414,14 +417,23 @@ class ProcessScreen(Screen):
             img: (ndarray) image file
             filename: (String) name of the image file
         """
-        # display working image
-        self.ids.image.source = os.path.join(gv.dir_path, filename)
-        image, boxes = bf.inference(img)
+        # run inference code
+        image, boxes, face_cnt = bf.inference(img)
 
-        im = Image.fromarray(image)
-        im.save(filename)
-        self.ids.image.source = filename
-        os.remove(filename)
+        # no bird faces were detected
+        if not face_cnt:
+            # remove image transparency and display red x
+            self.ids.result.color = (1, 1, 1, 1)
+            self.ids.result.source = 'assets/no.png'
+
+            # remove image from dictionary
+            gv.images.pop(filename)
+
+        else:
+            im = Image.fromarray(image)
+            im.save(filename)
+            self.ids.image.source = filename
+            os.remove(filename)
 
         # # create kivy texture from image ndarray
         # texture = Texture.create(size=(16, 16), colorfmt="rgb")
