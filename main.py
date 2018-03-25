@@ -5,6 +5,7 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.factory import Factory
+from kivy.graphics.texture import Texture
 from kivy.lang import Builder
 from kivy.properties import ObjectProperty
 from kivy.uix.floatlayout import FloatLayout
@@ -161,9 +162,13 @@ class ProgressScreen(Screen):
         processing images
             dt: (int) time in seconds
         """
+        # make object detection import global
+        global bf
+
         # load the model if it has not been done
         if not gv.load:
             import architectures.bobo.classifier as cl
+            import bird_inference as bf
             gv.model = cl.ClassificationModel('output/bird-classifier6.tfl')
             # update that model has been loaded
             gv.load = 1
@@ -285,6 +290,15 @@ class ProcessScreen(Screen):
             # implemented bird classification on all images
             # update and move to next step
             else:
+                # no more use for result images
+                self.ids.result.color = (0, 0, 0, 0)
+                self.ids.result.source = ''
+
+                # since classification requires a long loading period, 
+                # display first image and next stage of processing
+                self.ids.image.source = os.path.join(gv.dir_path, gv.files[0])
+                self.ids.message.text = 'B I R D   L O C A L I Z A T I O N'
+
                 gv.index = 0
                 gv.first_pass = 0
                 gv.files = list(gv.images.keys())
@@ -295,22 +309,12 @@ class ProcessScreen(Screen):
             if gv.index < len(gv.files):
                 file_path = os.path.join(gv.dir_path, gv.files[gv.index])
 
-                # if this is the first pass into this step of the process,
-                # update the title of the process for user to see
-                if not gv.first_pass:
-                    gv.first_pass = 1
-                    # update stage of processing
-                    self.ids.message.text = 'B I R D   D E T E C T I O N'
-                    # remove image transparency
-                    self.ids.image.color = (1, 1, 1, 1)
-
                 # display working image
                 self.ids.image.source = file_path
-                # reset result and add transparency back
-                self.ids.result.color = (0, 0, 0, 0)
-                self.ids.result.source = ''
 
                 # call object detection on image
+                self.detect_bird(
+                    gv.images[gv.files[gv.index]], gv.files[gv.index])
 
                 # continue to next image
                 gv.index += 1
@@ -319,7 +323,6 @@ class ProcessScreen(Screen):
             # update and move to next step
             else:
                 gv.index = 0
-                gv.first_pass = 0
                 gv.files = list(gv.images.keys())
                 gv.birdbb_step = 1
 
@@ -397,6 +400,25 @@ class ProcessScreen(Screen):
 
             # remove image from dictionary
             gv.images.pop(filename)
+
+    def detect_bird(self, img, filename):
+        """
+        Localize bird(s) and bird face(s) in the image and display results
+            img: (ndarray) image file
+            filename: (String) name of the image file
+        """
+        temp_path = os.path.join(gv.des_path, filename)
+        image, boxes = bf.inference(img)
+
+        im = Image.fromarray(image)
+        im.save(temp_path)
+        self.ids.image.source = temp_path
+        os.remove(temp_path)
+
+        # # create kivy texture from image ndarray
+        # texture = Texture.create(size=(16, 16), colorfmt="rgb")
+        # data = image.tostring()
+        # texture.blit_buffer(data, bufferfmt="ubyte", colorfmt="rgb")
 
 
 class BlackScreen3(Screen):

@@ -5,9 +5,6 @@
 #:import Clock kivy.clock.Clock
 #:import Window kivy.core.window.Window
 #:import ProgressBar kivy.uix.progressbar.ProgressBar
-#:import NoTransition kivy.uix.screenmanager.NoTransition
-#:import FadeTransition kivy.uix.screenmanager.FadeTransition
-#:import Factory kivy.factory.Factory
 
 <LandingScreen>:
     Button:
@@ -24,7 +21,7 @@
 
     Label:
         pos_hint: {'center_x': 0.5, 'center_y': 0.2}
-        font_size: 120
+        font_size: dp(60)
         font_name: 'assets/Montserrat-Regular'
         text: 'K N E S T'
 
@@ -37,7 +34,7 @@
         halign: 'center'
         valign: 'middle'
         font_name: 'assets/Montserrat-Regular'
-        font_size: 20
+        font_size: dp(10)
         pos_hint: {'center_x': .85, 'center_y': .91}
 
     Switch:
@@ -45,8 +42,8 @@
         size_hint_x: None
         size_hint_y: None
         # actual size of built-in kivy switch image
-        size_x: 83
-        size_y: 32
+        size_x: dp(83)
+        size_y: dp(32)
         pos_hint: {'center_x': .85, 'center_y': .87}
         on_active: root.update_toggle()
 
@@ -77,7 +74,7 @@
 
         Label:
         	id: title
-            font_size: 100
+            font_size: dp(50)
             font_name: 'assets/Montserrat-Regular'
             text: "K N E S T"
 
@@ -87,7 +84,7 @@
 
         Label:
         	id: path
-        	font_size: 50
+        	font_size: dp(25)
             font_name: 'assets/Montserrat-Regular'
         	text: 'Please choose a directory'
             text_size: self.size
@@ -98,7 +95,7 @@
             orientation: 'horizontal'
             pos_hint: {'center_x': .5, 'bottom': 1}
             size_hint_y: None
-            height: 120
+            height: dp(60)
 
             Button:
                 text: "Choose Folder"
@@ -127,7 +124,7 @@
             Image:
                 id: error
                 size_hint_x: None
-                width: 125
+                width: dp(62.5)
                 source: 'assets/error.png'
 
             Label:
@@ -142,7 +139,7 @@
         Button:
             text: 'OK'
             size_hint_y: None
-            height: 50  
+            height: dp(25)  
             font_name: 'assets/Montserrat-Regular'
             on_release: root.dismiss()
 
@@ -261,7 +258,7 @@
     Label:
         id: message
         pos_hint: {'center_x': 0.5, 'center_y': 0.2}
-        font_size: 50
+        font_size: dp(25)
         font_name: 'assets/Montserrat-Regular'
         text: ''
 
@@ -301,7 +298,7 @@
             Image:
                 id: error
                 size_hint_x: None
-                width: 125
+                width: dp(62.5)
                 source: 'assets/error.png'
 
             Label:
@@ -316,7 +313,7 @@
         Button:
             text: 'OK'
             size_hint_y: None
-            height: 50  
+            height: dp(25) 
             font_name: 'assets/Montserrat-Regular'
             on_release: root.dismiss()
 
@@ -349,7 +346,6 @@
     on_enter: Clock.schedule_interval(root.compare, 0)
     on_leave: self.ids.progress.value = 0
     on_leave: self.ids.loading.text = '0%   C O M P L E T E'
-    #on_enter: app.root.transition = NoTransition()
 
     Button:
         text: 'X'
@@ -375,7 +371,7 @@
 
     Label:
         id: message
-        font_size: 50
+        font_size: dp(25)
         pos_hint: {'center_x': 0.5, 'center_y': 0.55}
         font_name: 'assets/Montserrat-Regular'
         text: 'R E D U C I N G   S I M I L A R   I M A G E S'
@@ -386,7 +382,7 @@
 
     Label:
         id: loading
-        font_size: 45
+        font_size: dp(22.5)
         pos_hint: {'center_x': 0.5, 'center_y': 0.45}
         font_name: 'assets/Montserrat-Regular'
         text: '0%   C O M P L E T E'
@@ -395,7 +391,6 @@
     on_enter: Clock.schedule_interval(root.begin, 0)
     on_leave: self.ids.progress.value = 0
     on_leave: self.ids.loading.text = '0%   C O M P L E T E'
-    on_enter: app.root.transition = FadeTransition()
 
     Button:
         text: 'X'
@@ -421,7 +416,7 @@
 
     Label:
         id: message
-        font_size: 50
+        font_size: dp(25)
         pos_hint: {'center_x': 0.5, 'center_y': 0.55}
         font_name: 'assets/Montserrat-Regular'
         text: 'W R I T I N G   T O   S U B D I R E C T O R Y'
@@ -432,7 +427,7 @@
 
     Label:
         id: loading
-        font_size: 45
+        font_size: dp(22.5)
         pos_hint: {'center_x': 0.5, 'center_y': 0.45}
         font_name: 'assets/Montserrat-Regular'
         text: '0%   C O M P L E T E'
@@ -495,7 +490,7 @@
 
         Label:
             id: message
-            font_size: 75
+            font_size: dp(37.5)
             font_name: 'assets/Montserrat-Regular'
             text: 'P R O C E S S   C O M P L E T E'
 
@@ -508,7 +503,7 @@
 
         Label:
             id: continue
-            font_size: 45
+            font_size: dp(22.5)
             font_name: 'assets/Montserrat-Regular'
             text: 'Click Anywhere to Continue'
 
@@ -524,7 +519,7 @@
 
         BoxLayout:
             size_hint_y: None
-            height: 70
+            height: dp(35)
             
             Button:
                 text: 'Cancel'
