@@ -72,12 +72,12 @@ class Model(object):
         img_aug.add_random_flip_leftright()
 
         # Start the network with an input layer of custom image size.
-        net = tflearn.input_data(shape=[None, image_size[0], image_size[1], 3],
+        net = tflearn.input_data(shape=[None, image_size, image_size, 3],
                                  data_preprocessing=img_prep,
                                  data_augmentation=img_aug)
 
-        net = tflearn.layers.conv.conv_2d(net, self.config['num_filters'],
-                                          self.config['filter_size'], strides=self.cfg['strides'],
+        net = tflearn.layers.conv.conv_2d(net, self.cfg['num_filters'],
+                                          self.cfg['filter_size'], strides=self.cfg['strides'],
                                           padding='valid', activation=self.cfg['act'],
                                           weights_init=self.cfg['weight_init'],
                                           name='conv1')
