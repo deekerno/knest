@@ -21,9 +21,9 @@ class Pill(object):
 
     def crop_to_subject(self, box):
         """
-        Box should be a 4-tuple (left, upper, right, lower) containing
-        the pixel location coordinates of the area to which the image
-        will be cropped. Note that (0,0) is the upper left corner.
+        Box should be a 4-tuple (left_upper_x, left_upper_y, right_lower_x,
+        right_lower_y) containing the pixel location coordinates of the area
+        of the image to be cropped. Note that (0,0) is the upper left corner.
         """
         self.pill = self.pill.crop(box)
 
