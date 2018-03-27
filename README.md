@@ -22,10 +22,11 @@ Take a folder that contains photos of birds and other stuff, get a folder of jus
 + utils - image utilities
 
 ## Application Stages
-1. [Blur Detection](https://github.com/adcrn/knest/wiki/Blur-Detection)
-2. [Object Classification](https://github.com/adcrn/knest/wiki/Object-Classification)
-3. [Object Localization](https://github.com/adcrn/knest/wiki/Object-Localization)
-4. [Image Comparison](https://github.com/adcrn/knest/wiki/Image-Comparison)
+1. [Blur Detection](https://github.com/adcrn/knest/wiki/Blur-Detection): Can we clearly see subjects in the image?
+2. [Object Classification](https://github.com/adcrn/knest/wiki/Object-Classification): Given a clear image, is there a bird in it?
+3. [Object Localization](https://github.com/adcrn/knest/wiki/Object-Localization): Given an image containing a bird, where is the bird?
+4. [Image Comparison](https://github.com/adcrn/knest/wiki/Image-Comparison): Are there similiar images in this collection?
+5. [Image Manipulation](https://github.com/adcrn/knest/wiki/Image-Manipulation): Can we crop this image in an aesthetically-pleasing manner?
 
 ## Additional Setup
 Due to GitHub's file size limit of 100MB, much of our object localization network configuration cannot be hosted directly on GitHub. To alleviate this process, we are using Git Large File Storage (GLFS) in order to provide a seamless Git experience. In the case of datasets, Google Drive was used to facilitate ease of transfers.
