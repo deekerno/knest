@@ -1,6 +1,7 @@
 from PIL import Image
 from tf_object_detection.models.research.object_detection.utils import label_map_util
-from tf_object_detection.models.research.object_detection.utils import visualization_utils as vis_util
+# from tf_object_detection.models.research.object_detection.utils import visualization_utils as vis_util
+import vis_utils
 import cv2
 import numpy as np
 import os
@@ -64,10 +65,10 @@ def inference(image):
         output_dict['detection_boxes'] = output_dict['detection_boxes'][0]
         output_dict['detection_scores'] = output_dict['detection_scores'][0]
 
-        vis_util.visualize_boxes_and_labels_on_image_array(img, output_dict[
+        vis_utils.visualize_boxes_and_labels_on_image_array(img, output_dict[
             'detection_boxes'], output_dict['detection_classes'], output_dict[
             'detection_scores'], category_index, instance_masks=output_dict.get(
-            'detection_masks'), use_normalized_coordinates=True, line_thickness=8)
+            'detection_masks'), use_normalized_coordinates=True, line_thickness=16)
 
         # get detection boxes as [N, 4]
         boxes = np.squeeze(output_dict['detection_boxes'])
