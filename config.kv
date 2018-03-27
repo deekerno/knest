@@ -48,26 +48,32 @@
         on_active: root.update_toggle()
 
     Button:
-        text: 'X'
-        font_name: 'assets/Montserrat-Regular'
-        background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .03)
+        size_hint: (.03, .04)
         pos_hint: {'center_x': .035, 'center_y': .967}
-        halign: 'center'
-        valign: 'middle'
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
         on_press: app.stop()
 
+        Image:
+            source: 'assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
     Button:
-        text: '—'
-        font_name: 'assets/Montserrat-Regular'
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
         background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .02)
-        pos_hint: {'center_x': .065, 'center_y': .9695}
-        halign: 'center'
-        valign: 'middle'
+        background_color: (0, 0, 0, 0)
         on_press: Window.minimize()
+
+        Image:
+            source: 'assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
 
     BoxLayout:
         orientation: 'vertical'
@@ -147,51 +153,63 @@
     on_enter: Clock.schedule_once(root.switch, 1.5)
 
     Button:
-        text: 'X'
-        background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .03)
-        font_name: 'assets/Montserrat-Regular'
+        size_hint: (.03, .04)
         pos_hint: {'center_x': .035, 'center_y': .967}
-        halign: 'center'
-        valign: 'middle'
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
         on_press: app.stop()
 
+        Image:
+            source: 'assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
     Button:
-        text: '__'
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
         background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .025)
-        font_name: 'assets/Montserrat-Regular'
-        pos_hint: {'center_x': .065, 'center_y': .975}
-        halign: 'center'
-        valign: 'middle'
+        background_color: (0, 0, 0, 0)
         on_press: Window.minimize()
+
+        Image:
+            source: 'assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
 
 <ProgressScreen>:
     on_enter: Clock.schedule_once(root.switch, 3)
 
     Button:
-        text: 'X'
-        background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .03)
-        font_name: 'assets/Montserrat-Regular'
+        size_hint: (.03, .04)
         pos_hint: {'center_x': .035, 'center_y': .967}
-        halign: 'center'
-        valign: 'middle'
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
         on_press: app.stop()
 
+        Image:
+            source: 'assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
     Button:
-        text: '__'
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
         background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .025)
-        font_name: 'assets/Montserrat-Regular'
-        pos_hint: {'center_x': .065, 'center_y': .975}
-        halign: 'center'
-        valign: 'middle'
+        background_color: (0, 0, 0, 0)
         on_press: Window.minimize()
+
+        Image:
+            source: 'assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
 
     Image:
         id: image
@@ -204,26 +222,32 @@
     on_enter: Clock.schedule_once(root.switch, 2)
 
     Button:
-        text: 'X'
-        background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .03)
-        font_name: 'assets/Montserrat-Regular'
+        size_hint: (.03, .04)
         pos_hint: {'center_x': .035, 'center_y': .967}
-        halign: 'center'
-        valign: 'middle'
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
         on_press: app.stop()
 
+        Image:
+            source: 'assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
     Button:
-        text: '__'
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
         background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .025)
-        font_name: 'assets/Montserrat-Regular'
-        pos_hint: {'center_x': .065, 'center_y': .975}
-        halign: 'center'
-        valign: 'middle'
+        background_color: (0, 0, 0, 0)
         on_press: Window.minimize()
+
+        Image:
+            source: 'assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
 
 <ProcessScreen>:
     on_enter: Clock.schedule_interval(root.update, 0)
@@ -234,26 +258,32 @@
     on_leave: self.ids.message.text = ''
 
     Button:
-        text: 'X'
-        background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .03)
-        font_name: 'assets/Montserrat-Regular'
+        size_hint: (.03, .04)
         pos_hint: {'center_x': .035, 'center_y': .967}
-        halign: 'center'
-        valign: 'middle'
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
         on_press: app.stop()
 
+        Image:
+            source: 'assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
     Button:
-        text: '__'
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
         background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .025)
-        font_name: 'assets/Montserrat-Regular'
-        pos_hint: {'center_x': .065, 'center_y': .975}
-        halign: 'center'
-        valign: 'middle'
+        background_color: (0, 0, 0, 0)
         on_press: Window.minimize()
+
+        Image:
+            source: 'assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
 
     Label:
         id: message
@@ -325,26 +355,32 @@
     on_enter: Clock.schedule_once(root.switch, 1)
 
     Button:
-        text: 'X'
-        background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .03)
-        font_name: 'assets/Montserrat-Regular'
+        size_hint: (.03, .04)
         pos_hint: {'center_x': .035, 'center_y': .967}
-        halign: 'center'
-        valign: 'middle'
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
         on_press: app.stop()
 
+        Image:
+            source: 'assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
     Button:
-        text: '__'
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
         background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .025)
-        font_name: 'assets/Montserrat-Regular'
-        pos_hint: {'center_x': .065, 'center_y': .975}
-        halign: 'center'
-        valign: 'middle'
+        background_color: (0, 0, 0, 0)
         on_press: Window.minimize()
+
+        Image:
+            source: 'assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
 
 <CompareScreen>:
     on_enter: Clock.schedule_interval(root.compare, 0)
@@ -352,26 +388,32 @@
     on_leave: self.ids.loading.text = '0%   C O M P L E T E'
 
     Button:
-        text: 'X'
-        background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .03)
-        font_name: 'assets/Montserrat-Regular'
+        size_hint: (.03, .04)
         pos_hint: {'center_x': .035, 'center_y': .967}
-        halign: 'center'
-        valign: 'middle'
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
         on_press: app.stop()
 
+        Image:
+            source: 'assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
     Button:
-        text: '__'
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
         background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .025)
-        font_name: 'assets/Montserrat-Regular'
-        pos_hint: {'center_x': .065, 'center_y': .975}
-        halign: 'center'
-        valign: 'middle'
+        background_color: (0, 0, 0, 0)
         on_press: Window.minimize()
+
+        Image:
+            source: 'assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
 
     Label:
         id: message
@@ -397,26 +439,32 @@
     on_leave: self.ids.loading.text = '0%   C O M P L E T E'
 
     Button:
-        text: 'X'
-        background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .03)
-        font_name: 'assets/Montserrat-Regular'
+        size_hint: (.03, .04)
         pos_hint: {'center_x': .035, 'center_y': .967}
-        halign: 'center'
-        valign: 'middle'
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
         on_press: app.stop()
 
+        Image:
+            source: 'assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
     Button:
-        text: '__'
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
         background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .025)
-        font_name: 'assets/Montserrat-Regular'
-        pos_hint: {'center_x': .065, 'center_y': .975}
-        halign: 'center'
-        valign: 'middle'
+        background_color: (0, 0, 0, 0)
         on_press: Window.minimize()
+
+        Image:
+            source: 'assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
 
     Label:
         id: message
@@ -441,26 +489,32 @@
     on_enter: Clock.schedule_once(root.switch, 1)
 
     Button:
-        text: 'X'
-        background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .03)
-        font_name: 'assets/Montserrat-Regular'
+        size_hint: (.03, .04)
         pos_hint: {'center_x': .035, 'center_y': .967}
-        halign: 'center'
-        valign: 'middle'
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
         on_press: app.stop()
 
+        Image:
+            source: 'assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
     Button:
-        text: '__'
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
         background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .025)
-        font_name: 'assets/Montserrat-Regular'
-        pos_hint: {'center_x': .065, 'center_y': .975}
-        halign: 'center'
-        valign: 'middle'
+        background_color: (0, 0, 0, 0)
         on_press: Window.minimize()
+
+        Image:
+            source: 'assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
 
 <EndScreen>:
     Button:
@@ -468,26 +522,32 @@
         on_release: app.root.current = 'folder_select'
 
     Button:
-        text: 'X'
-        background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .03)
-        font_name: 'assets/Montserrat-Regular'
+        size_hint: (.03, .04)
         pos_hint: {'center_x': .035, 'center_y': .967}
-        halign: 'center'
-        valign: 'middle'
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
         on_press: app.stop()
 
+        Image:
+            source: 'assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
     Button:
-        text: '__'
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
         background_normal: ''
-        background_color: (0.0, 0.0, 0.0, 0.0)
-        size_hint: (.02, .025)
-        font_name: 'assets/Montserrat-Regular'
-        pos_hint: {'center_x': .065, 'center_y': .975}
-        halign: 'center'
-        valign: 'middle'
+        background_color: (0, 0, 0, 0)
         on_press: Window.minimize()
+
+        Image:
+            source: 'assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
 
     BoxLayout:
         orientation: 'vertical'
