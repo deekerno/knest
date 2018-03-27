@@ -5,6 +5,7 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.factory import Factory
+from kivy.graphics import Rectangle
 from kivy.graphics.texture import Texture
 from functools import partial
 from kivy.lang import Builder
@@ -168,9 +169,10 @@ class ProgressScreen(Screen):
 
         # load the model if it has not been done
         if not gv.load:
-            import architectures.bobo.classifier as cl
+            import architectures.squeezenet.classifier as cl
             import bird_inference as bf
-            gv.model = cl.ClassificationModel('output/bird-classifier6.tfl')
+            gv.model = cl.ClassificationModel(
+                (400, 400), 'output/squeezenet.tfl', 2)
             # update that model has been loaded
             gv.load = 1
 
@@ -322,6 +324,9 @@ class ProcessScreen(Screen):
                 self.ids.result.color = (0, 0, 0, 0)
                 self.ids.result.source = ''
 
+                # clear previous detection results
+                self.ids.detection.canvas.clear()
+
                 # call object detection on image after 500ms
                 Clock.schedule_once(partial(self.detect_bird, gv.images[
                                     gv.files[gv.index]], gv.files[gv.index]), .5)
@@ -329,7 +334,7 @@ class ProcessScreen(Screen):
                 # continue to next image
                 gv.index += 1
 
-            # implemented bird classification on all images
+            # implemented bird/face detection on all images
             # update and move to next step
             else:
                 gv.index = 0
@@ -357,6 +362,12 @@ class ProcessScreen(Screen):
                 # switch to transition screen
                 self.manager.current = 'black3'
 
+            # clear previous detection results
+            self.ids.detection.canvas.clear()
+            # add transparency back to display image, result and text
+            self.ids.image.color = (0, 0, 0, 0)
+            self.ids.result.color = (0, 0, 0, 0)
+            self.ids.message.text = ''
             # collect any garbage not already gathered by python
             gc.collect()
 
@@ -392,7 +403,7 @@ class ProcessScreen(Screen):
             img: (ndarray) image file
             filename: (String) name of the image file
         """
-        resized_img = cv2.resize(img, (32, 32))
+        resized_img = cv2.resize(img, (400, 400))
         prediction = gv.model.predict(resized_img)
         result = gv.model.classify(prediction)
 
@@ -401,12 +412,14 @@ class ProcessScreen(Screen):
             # remove image transparency and display green check
             self.ids.result.color = (1, 1, 1, 1)
             self.ids.result.source = 'assets/yes.png'
+            print(filename, " has a bird")
 
         # image does not contain a bird
         else:
             # remove image transparency and display red x
             self.ids.result.color = (1, 1, 1, 1)
             self.ids.result.source = 'assets/no.png'
+            print(filename, " does not have a bird")
 
             # remove image from dictionary
             gv.images.pop(filename)
@@ -429,19 +442,30 @@ class ProcessScreen(Screen):
             # remove image from dictionary
             gv.images.pop(filename)
 
+        # bird face is detected
         else:
-            im = Image.fromarray(image)
-            im.save(filename)
-            self.ids.image.source = filename
-            os.remove(filename)
+            # get display dimensions
+            width = self.ids.image.width
+            height = self.ids.image.height
 
-        # # create kivy texture from image ndarray
-        # texture = Texture.create(size=(16, 16), colorfmt="rgb")
-        # data = image.tostring()
-        # texture.blit_buffer(data, bufferfmt="ubyte", colorfmt="rgb")
+            # create kivy texture from image ndarray
+            texture = Texture.create(size=(width, height), colorfmt="rgb")
+            # resize image for display
+            image = cv2.resize(
+                image, ((math.floor(width), math.floor(height))))
+            # convert array to string
+            data = image.tostring()
+            # blit data to texture and flip vertically to display upright
+            texture.blit_buffer(data, bufferfmt="ubyte", colorfmt="rgb")
+            texture.flip_vertical()
+
+            # display result to screen
+            with self.ids.detection.canvas:
+                Rectangle(texture=texture, pos=self.ids.image.pos,
+                          size=(width, height))
 
     def change_clock(self):
-        Clock.schedule_interval(self.update, 1)
+        Clock.schedule_interval(self.update, 5)
 
 
 class BlackScreen3(Screen):

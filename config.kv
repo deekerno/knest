@@ -264,13 +264,18 @@
 
     Image:
         id: image
+        allow_stretch: True
+        keep_ratio: True
         pos_hint: {'center_x': 0.5, 'center_y': 0.5}
         size_hint_x: None  # Tells the layout to ignore the size_hint in y dir
         size_hint_y: None
-        width: dp(400) # The fixed width you want
-        height: dp(300)
+        width: self.parent.width / 2
+        height: ((self.parent.width / 2) / self.image_ratio) if self.image_ratio > 1 else (self.parent.height / 2)
         color: (0.0, 0.0, 0.0, 0.0)
         source: ''
+
+    Widget:
+        id: detection
 
     Image:
         id: result
@@ -279,7 +284,6 @@
         height: dp(200)  # The fixed height you want
         color: (0.0, 0.0, 0.0, 0.0)
         source: ''
-
 
 <OutOfIndex@Popup>:
     auto_dismiss: False
