@@ -3,7 +3,6 @@
 
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.core.window import Window
 from kivy.factory import Factory
 from kivy.graphics import Rectangle
 from kivy.graphics.texture import Texture
@@ -21,6 +20,11 @@ import os
 import utils.blur as blur
 import utils.compare as compare
 import utils.global_var as gv
+from kivy.config import Config
+# remove os-provided border
+Config.set('graphics', 'borderless', 'True')
+# set window icon from default kivy image to knest logo
+Config.set('kivy', 'window_icon', 'assets/color_bird.png')
 
 # all accepted images will be written to a subdirectory
 # named 'processed'
@@ -651,8 +655,6 @@ class BirdApp(App):
 
     def build(self):
         self.title = ''
-        # removes os-created window border
-        Window.borderless = True
         return sm
 
 
