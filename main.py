@@ -25,6 +25,10 @@ from kivy.config import Config
 Config.set('graphics', 'borderless', 'True')
 # set window icon from default kivy image to knest logo
 Config.set('kivy', 'window_icon', 'assets/color_bird.png')
+# Config.set('graphics', 'resizable', 0)
+# Config.set('graphics', 'position', 'custom')
+# Config.set('graphics', 'left', 250)
+# Config.set('graphics', 'top', 100)
 
 # all accepted images will be written to a subdirectory
 # named 'processed'
@@ -333,7 +337,7 @@ class ProcessScreen(Screen):
 
                 # call object detection on image after 500ms
                 Clock.schedule_once(partial(self.detect_bird, gv.images[
-                                    gv.files[gv.index]], gv.files[gv.index]), .5)
+                                    gv.files[gv.index]], gv.files[gv.index]), 1)
 
                 # continue to next image
                 gv.index += 1
