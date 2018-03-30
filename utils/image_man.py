@@ -7,23 +7,23 @@ import numpy as np
 
 SCALING_FACTOR = 3
 
+
 def man(boxes, image_array, scaling_factor=SCALING_FACTOR):
-    
+
     """
         Crop and manipulate the iamge for final output.
             image_array:    (Array) array representation of the image
             boxes:          (Dict) bounding box around subject;
                             form: (ymin, xmin, ymax, xmax)
-            scaling_factor  (Integer) the amount by which to scale the 
+            scaling_factor  (Integer) the amount by which to scale the
                             bounding box of the object; this is done as a way
                             to include some of the environment in the final image
     """
     image = Image.fromarray(image_array)
-    width, height = image.size()
+    width, height = image.size
     img_center_x = width / 2
 
-    face_index = 0
-    dist_face_center_x = dist_face_center_y = math.inf
+    dist_face_center_x = math.inf
     central_face_x, central_face_y = 0, 0
 
     for i in boxes['faces']:
@@ -32,17 +32,16 @@ def man(boxes, image_array, scaling_factor=SCALING_FACTOR):
         fb_xmin, fb_ymin, fb_xmax, fb_ymax = i
 
         # Calculate the center of the face bounding box.
-        fb_center_x, fb_center_y = fb_xmax - fb_xmin, fb_ymax - fb_ymin
+        fb_center_x, fb_center_y = (fb_xmax + fb_xmin) / 2, (fb_ymax + fb_ymin) / 2
 
         # Calculate the distance of the x-component of the
         # the face box centerfrom the center of the image.
-        delta_center_x = math.abs(fb_center_x - img_center_x)
+        delta_center_x = math.fabs(fb_center_x - img_center_x)
 
         # Get the closest face box center coordinates over all face boxes.
         if delta_center_x < dist_face_center_x:
             dist_face_center_x = delta_center_x
             central_face_x, central_face_y = fb_center_x, fb_center_y
-            face_index = i
 
     # Initialize bounding box extrema.
     sm_xmin, sm_ymin, lar_xmax, lar_ymax = math.inf, math.inf, 0, 0
@@ -57,11 +56,9 @@ def man(boxes, image_array, scaling_factor=SCALING_FACTOR):
         lar_xmax = max(lar_xmax, i[2])
         lar_ymax = max(lar_ymax, i[3])
 
-
     # Calculate the width and height of the final crop area.
     bb_width, bb_height = lar_xmax - sm_xmin, lar_ymax - sm_ymin
-    new_width, new_height = round(bb_width * factor, 0),
-                            round(bb_height * factor, 0)
+    new_width, new_height = round(bb_width * factor, 0), round(bb_height * factor, 0)
 
     # Calculate the amounts by which to adjust the face_box coordinates.
     width_diff, height_diff = new_width / 2, new_height / 2
@@ -74,15 +71,14 @@ def man(boxes, image_array, scaling_factor=SCALING_FACTOR):
     if final_xmin < 0: final_xmin = 0
     if final_xmax > width: final_xmax = width
     if final_ymin < 0: final_ymin = 0
-    if final_ymax > width: final_ymax = height
+    if final_ymax > height: final_ymax = height
 
     # Crop and attempt to save image.
-    cropped_area = image.crop(final_xmin, final_ymin, final_xmax, final_ymax)
-    
+    cropped_area = image.crop((final_xmin, final_ymin, final_xmax, final_ymax))
+
     try:
         final_image = np.asarray(cropped_area)
         return final_image, True
     except IOError:
         print("File could not be written properly.")
         return False
-
