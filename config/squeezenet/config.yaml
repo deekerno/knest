@@ -1,0 +1,25 @@
+model:
+  name: squeezenet
+  network:
+    num_classes: 2
+    image_size: 400
+    color_dims: 3
+    strides: 2
+    num_filters: 64
+    filter_size: 3
+    act: elu
+    weight_init: xavier
+    fire:
+      sq_2_3: 16
+      ex_2_3: 64
+      sq_4_5: 32
+      ex_4_5: 128
+      sq_6_7: 48
+      ex_6_7: 192
+      sq_8_9: 64
+      ex_8_9: 256
+    dropout_prob: 0.5
+    nesterov:
+      lr: 0.001
+      lr_decay: 0.96
+      decay_step: 100
