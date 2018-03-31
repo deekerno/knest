@@ -253,9 +253,13 @@
     on_enter: Clock.schedule_interval(root.update, 0)
     on_leave: self.ids.image.source = ''
     on_leave: self.ids.image.color = (0.0, 0.0, 0.0, 0.0)
+    on_leave: self.ids.image.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
     on_leave: self.ids.result.source = ''
     on_leave: self.ids.result.color = (0.0, 0.0, 0.0, 0.0)
+    on_leave: self.ids.result.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
     on_leave: self.ids.message.text = ''
+    on_leave: self.ids.previous.text = ''
+    on_leave: self.ids.current.text = ''
 
     Button:
         size_hint: (.03, .04)
@@ -314,6 +318,20 @@
         height: dp(200)  # The fixed height you want
         color: (0.0, 0.0, 0.0, 0.0)
         source: ''
+
+    Label:
+        id: previous
+        pos_hint: {'center_x': 0.25, 'center_y': 0.75}
+        font_size: dp(15)
+        font_name: 'assets/Montserrat-Regular'
+        text: ''
+
+    Label:
+        id: current
+        pos_hint: {'center_x': 0.75, 'center_y': 0.75}
+        font_size: dp(15)
+        font_name: 'assets/Montserrat-Regular'
+        text: ''
 
 <OutOfIndex@Popup>:
     auto_dismiss: False

@@ -3,7 +3,6 @@
 
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.core.window import Window
 from kivy.factory import Factory
 from kivy.graphics import Rectangle
 from kivy.graphics.texture import Texture
@@ -21,6 +20,13 @@ import os
 import utils.blur as blur
 import utils.compare as compare
 import utils.global_var as gv
+import utils.image_man as im
+from kivy.config import Config
+
+# remove os-provided border
+Config.set('graphics', 'borderless', 'True')
+# set window icon from default kivy image to knest logo
+Config.set('kivy', 'window_icon', 'assets/color_bird.png')
 
 # all accepted images will be written to a subdirectory
 # named 'processed'
@@ -170,9 +176,12 @@ class ProgressScreen(Screen):
         # load the model if it has not been done
         if not gv.load:
             import architectures.squeezenet.classifier as cl
-            import bird_inference as bf
+            import utils.inference as bf
+
             gv.model = cl.ClassificationModel(
                 (400, 400), 'output/squeezenet.tfl', 2)
+
+            bf.instantiate()
             # update that model has been loaded
             gv.load = 1
 
@@ -201,8 +210,6 @@ class ProcessScreen(Screen):
         1) blur detection
         2) bird classification
         3) bird localization
-        4) face classification
-        5) face localization
 
     The images and its results for each respective steps are displayed in
     real-time. Images are initially added to a global dictionary organized
@@ -221,10 +228,17 @@ class ProcessScreen(Screen):
             if gv.index < gv.num_files:
                 # ensure user did not alter working director mid-process
                 if not (gv.num_files == len(os.listdir(gv.dir_path))):
+                    # display error message
                     Factory.OutOfIndex().open()
+                    # reset all global variables
                     gv.reset()
+                    # return to the folder selection screen having
+                    # cancelled the process
                     self.manager.current = 'folder_select'
+                    # unschedule the Clock.schedule_interval() method
                     return False
+
+                # continue the process as usual
                 else:
                     file_path = os.path.join(
                         gv.dir_path, os.listdir(gv.dir_path)[gv.index])
@@ -293,49 +307,50 @@ class ProcessScreen(Screen):
             # implemented bird classification on all images
             # update and move to next step
             else:
-                # no more use for result images
-                self.ids.result.color = (0, 0, 0, 0)
-                self.ids.result.source = ''
-
-                # since classification requires a long loading period,
-                # display first image and next stage of processing
-                self.ids.image.source = os.path.join(gv.dir_path, gv.files[0])
-                self.ids.message.text = 'B I R D   L O C A L I Z A T I O N'
-
                 gv.index = 0
                 gv.first_pass = 0
                 gv.files = list(gv.images.keys())
                 gv.bird_step = 1
-
-                # update the Clock.schedule_interval() function from
-                # every zero to every one second
-                self.change_clock()
-                # unschedule the initial Clock.schedule_interval() function
-                return False
 
         elif not gv.birdbb_step:
             # preventive measure : avoid out-of-index error
             if gv.index < len(gv.files):
                 file_path = os.path.join(gv.dir_path, gv.files[gv.index])
 
+                # if this is the first pass into this step of the process,
+                # update the title of the process for user to see and
+                # change the format of the display
+                if not gv.first_pass:
+                    gv.first_pass = 1
+                    # update stage of processing
+                    self.ids.message.text = 'B I R D   L O C A L I Z A T I O N'
+                    # add additional text descriptions
+                    self.ids.previous.text = 'L A S T   P R O C E S S E D'
+                    self.ids.current.text = 'C U R R E N T L Y   P R O C E S S I N G'
+                    # remove image transparency
+                    self.ids.image.color = (1, 1, 1, 1)
+                    # change image and result position
+                    self.ids.image.pos_hint = {
+                        'center_x': 0.75, 'center_y': 0.5}
+                    self.ids.result.pos_hint = {
+                        'center_x': 0.25, 'center_y': 0.5}
+                    # reset result and add transparency back
+                    self.ids.result.color = (0, 0, 0, 0)
+                    self.ids.result.source = ''
+
                 # display working image
                 self.ids.image.source = file_path
-                # reset result and add transparency back
-                self.ids.result.color = (0, 0, 0, 0)
-                self.ids.result.source = ''
 
-                # clear previous detection results
-                self.ids.detection.canvas.clear()
-
-                # call object detection on image after 500ms
+                # call object detection on image
+                # a Clock event is scheduled to display images before
+                # processing (required)
                 Clock.schedule_once(partial(self.detect_bird, gv.images[
-                                    gv.files[gv.index]], gv.files[gv.index]), .5)
+                    gv.files[gv.index]], gv.files[gv.index]), 0)
 
                 # continue to next image
                 gv.index += 1
 
             # implemented bird/face detection on all images
-            # update and move to next step
             else:
                 gv.index = 0
                 gv.files = list(gv.images.keys())
@@ -344,8 +359,6 @@ class ProcessScreen(Screen):
         # all images have been processed successfully
         # update and move to next screen
         else:
-            gv.index = 0
-
             # the folder path where all accepted images will be written
             gv.des_path = os.path.join(gv.dir_path, DES_NAME)
 
@@ -353,6 +366,7 @@ class ProcessScreen(Screen):
             if not os.path.isdir(gv.des_path):
                 os.makedirs(gv.des_path)
 
+            # update new list of images
             gv.files = list(gv.images.keys())
 
             if len(gv.images) == 0:
@@ -362,15 +376,10 @@ class ProcessScreen(Screen):
                 # switch to transition screen
                 self.manager.current = 'black3'
 
-            # clear previous detection results
-            self.ids.detection.canvas.clear()
-            # add transparency back to display image, result and text
-            self.ids.image.color = (0, 0, 0, 0)
-            self.ids.result.color = (0, 0, 0, 0)
-            self.ids.message.text = ''
+            # update texture location to remove detection results later
+            gv.canvas = self.ids.detection.canvas
             # collect any garbage not already gathered by python
             gc.collect()
-
             # unschedule kivy's Clock.schedule_interval() function
             return False
 
@@ -412,14 +421,12 @@ class ProcessScreen(Screen):
             # remove image transparency and display green check
             self.ids.result.color = (1, 1, 1, 1)
             self.ids.result.source = 'assets/yes.png'
-            print(filename, " has a bird")
 
         # image does not contain a bird
         else:
             # remove image transparency and display red x
             self.ids.result.color = (1, 1, 1, 1)
             self.ids.result.source = 'assets/no.png'
-            print(filename, " does not have a bird")
 
             # remove image from dictionary
             gv.images.pop(filename)
@@ -429,12 +436,33 @@ class ProcessScreen(Screen):
         Localize bird(s) and bird face(s) in the image and display results
             img: (ndarray) image file
             filename: (String) name of the image file
+            dt: (int) time in seconds
         """
         # run inference code
-        image, boxes, face_cnt = bf.inference(img)
+        image = bf.inference(filename, img)
+        # get display dimensions
+        width = self.ids.image.width
+        height = self.ids.image.height
 
-        # no bird faces were detected
-        if not face_cnt:
+        # create kivy texture from image ndarray
+        texture = Texture.create(size=(width, height), colorfmt="rgb")
+        # resize image for display
+        image = cv2.resize(
+            image, ((math.floor(width), math.floor(height))))
+        # convert array to string
+        data = image.tostring()
+        # blit data to texture
+        texture.blit_buffer(data, bufferfmt="ubyte", colorfmt="rgb")
+        # flip vertically to display upright
+        texture.flip_vertical()
+
+        # display result to screen
+        with self.ids.detection.canvas:
+            Rectangle(texture=texture, pos=(.25, self.ids.image.y),
+                      size=(width, height))
+
+        # no bird/faces were detected
+        if not len(gv.boxes[filename]['birds']) or not len(gv.boxes[filename]['faces']):
             # remove image transparency and display red x
             self.ids.result.color = (1, 1, 1, 1)
             self.ids.result.source = 'assets/no.png'
@@ -444,28 +472,11 @@ class ProcessScreen(Screen):
 
         # bird face is detected
         else:
-            # get display dimensions
-            width = self.ids.image.width
-            height = self.ids.image.height
-
-            # create kivy texture from image ndarray
-            texture = Texture.create(size=(width, height), colorfmt="rgb")
-            # resize image for display
-            image = cv2.resize(
-                image, ((math.floor(width), math.floor(height))))
-            # convert array to string
-            data = image.tostring()
-            # blit data to texture and flip vertically to display upright
-            texture.blit_buffer(data, bufferfmt="ubyte", colorfmt="rgb")
-            texture.flip_vertical()
-
-            # display result to screen
-            with self.ids.detection.canvas:
-                Rectangle(texture=texture, pos=self.ids.image.pos,
-                          size=(width, height))
-
-    def change_clock(self):
-        Clock.schedule_interval(self.update, 5)
+            # reset result and add transparency back in the
+            # case that the previous image may not have had
+            # a bird or face
+            self.ids.result.color = (0, 0, 0, 0)
+            self.ids.result.source = ''
 
 
 class BlackScreen3(Screen):
@@ -568,8 +579,14 @@ class WriteScreen(Screen):
 
         # preventive measure to avoid out-of-index error
         if gv.index < length:
-            # write accepted images to subdirectory
-            self.write_to(gv.files[gv.index])
+            # call crop method on image to calculate bounding box
+            # information and determine expansion and range of crop
+            final_image, success = im.man(
+                gv.boxes[gv.files[gv.index]], gv.images[gv.files[gv.index]])
+
+            if success:
+                # write accepted images to subdirectory
+                self.write_to(gv.files[gv.index], final_image)
 
             # display progress to screen
             self.ids.loading.text = str(math.floor(
@@ -591,12 +608,13 @@ class WriteScreen(Screen):
             # unschedule kivy's Clock.schedule_interval() function
             return False
 
-    def write_to(self, filename):
+    def write_to(self, filename, cropped_img):
         """
         Write image to 'processed' folder
             filename: (String): name of the image
+            cropped_img: (ndarray) array representation of an image
         """
-        img = Image.fromarray(gv.images[filename])
+        img = Image.fromarray(cropped_img)
         img.save(os.path.join(gv.des_path, filename))
 
 
@@ -651,8 +669,6 @@ class BirdApp(App):
 
     def build(self):
         self.title = ''
-        # removes os-created window border
-        Window.borderless = True
         return sm
 
 
