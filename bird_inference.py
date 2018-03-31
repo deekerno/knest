@@ -1,6 +1,5 @@
 from PIL import Image
-from tf_object_detection.models.research.object_detection.utils import label_map_util
-# from tf_object_detection.models.research.object_detection.utils import visualization_utils as vis_util
+import label_map_utils
 import vis_utils
 import cv2
 import numpy as np
@@ -25,10 +24,10 @@ with detection_graph.as_default():
         od_graph_def.ParseFromString(serialized_graph)
         tf.import_graph_def(od_graph_def, name='')
 
-label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
-categories = label_map_util.convert_label_map_to_categories(
+label_map = label_map_utils.load_labelmap(PATH_TO_LABELS)
+categories = label_map_utils.convert_label_map_to_categories(
     label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
-category_index = label_map_util.create_category_index(categories)
+category_index = label_map_utils.create_category_index(categories)
 
 
 def inference(image):
@@ -75,17 +74,28 @@ def inference(image):
         # get the number of boxes
         rows = boxes.shape[0]
         # get the width and height of image
-        image_width = np.shape(img)[0]
-        image_height = np.shape(img)[1]
+        width = np.shape(img)[1]
+        height = np.shape(img)[0]
 
         # determine if image contains birds
         # counters
         face_cnt = 0
         for i, score in enumerate(output_dict['detection_scores']):
             if score > .5:
-                # label of 2 indicates bird face
-                if output_dict['detection_classes'][i] == 2:
+                # convert normalized coordinates to standard image integer
+                # coordinates
+                xmin = (boxes[i, 1] * height).astype('int64')
+                xmax = (boxes[i, 3] * width).astype('int64')
+                ymin = (boxes[i, 0] * height).astype('int64')
+                ymax = (boxes[i, 2] * width).astype('int64')
+
+                # label of '1' indicates a bird
+                if output_dict['detection_classes'][i] == 1:
+                    print("bird: ", xmin, xmax, ymin, ymax)
+                # label of '2' indicates a bird face
+                elif output_dict['detection_classes'][i] == 2:
                     face_cnt += 1
+                    print("face: ", xmin, xmax, ymin, ymax)
 
         # iterate through bounding boxes
         for i in range(0, rows):
@@ -95,10 +105,10 @@ def inference(image):
 
             # retrieve normalized coordinates and convert them to coordinates
             # that make sense
-            ymin = boxes[i, 0] * image_height
-            xmin = boxes[i, 1] * image_width
-            ymax = boxes[i, 2] * image_height
-            xmax = boxes[i, 3] * image_width
+            ymin = boxes[i, 0] * height
+            xmin = boxes[i, 1] * width
+            ymax = boxes[i, 2] * height
+            xmax = boxes[i, 3] * width
             boxes[i, 0] = ymin.astype('int64')
             boxes[i, 1] = xmin.astype('int64')
             boxes[i, 2] = ymax.astype('int64')
@@ -111,12 +121,11 @@ def inference(image):
 
 if __name__ == '__main__':
 
-    for filename in os.listdir('/users/ayylmao/desktop/goo_test/'):
-        if not filename.startswith('.'):
-            img = cv2.imread(os.path.join('/users/ayylmao/desktop/goo_test/', filename))
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = cv2.imread('imgtest1.JPG')
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-            image, boxes, face_cnt = inference(img)
+    image, boxes, face_cnt = inference(img)
 
-            img = Image.fromarray(image)
-            img.show()
+    img = Image.fromarray(image)
+    img.show()
+    img.save('myfuckingimage.JPG')
