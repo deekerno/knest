@@ -13,6 +13,12 @@ birdbb_step = 0
 load = 0
 model = None
 
+# detection model variables
+graph = None
+label_map = None
+categories = None
+category_index = None
+
 # path information variables
 dir_path = ''
 des_path = ''
@@ -26,11 +32,16 @@ files = []
 # holds image data of entire process
 images = {}
 
+# holds box coordinates for each image
+boxes = {}
+
 # image comparison variable
 comp = 0
 std = ''
 std_hash = None
 count = 0
+
+canvas = None
 
 
 def reset():
@@ -41,7 +52,7 @@ def reset():
     global dir_path, des_path, num_files
     global first_pass, index, files
     global comp, std, std_hash, count
-    global images
+    global images, boxes, canvas
 
     blur_step = bird_step = birdbb_step = 0
 
@@ -55,5 +66,10 @@ def reset():
     std_hash = None
     count = 0
 
-    # empty images dictionary
+    # empty dictionaries
     images.clear()
+    boxes.clear()
+
+    # clear numpy texture
+    canvas.clear()
+    canvas = None
