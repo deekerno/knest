@@ -340,12 +340,15 @@ class ProcessScreen(Screen):
 
                 # display working image
                 self.ids.image.source = file_path
+                # get working image's dimensions
+                width = self.ids.image.width
+                height = self.ids.image.height
 
                 # call object detection on image
                 # a Clock event is scheduled to display images before
                 # processing (required)
                 Clock.schedule_once(partial(self.detect_bird, gv.images[
-                    gv.files[gv.index]], gv.files[gv.index]), 0)
+                    gv.files[gv.index]], gv.files[gv.index], width, height), 0)
 
                 # continue to next image
                 gv.index += 1
@@ -431,7 +434,7 @@ class ProcessScreen(Screen):
             # remove image from dictionary
             gv.images.pop(filename)
 
-    def detect_bird(self, img, filename, dt):
+    def detect_bird(self, img, filename, width, height, dt):
         """
         Localize bird(s) and bird face(s) in the image and display results
             img: (ndarray) image file
@@ -440,9 +443,10 @@ class ProcessScreen(Screen):
         """
         # run inference code
         image = bf.inference(filename, img)
-        # get display dimensions
-        width = self.ids.image.width
-        height = self.ids.image.height
+
+        # clear any previous texture information as
+        # to avoid continuosly writing data on top of data
+        self.ids.detection.canvas.clear()
 
         # create kivy texture from image ndarray
         texture = Texture.create(size=(width, height), colorfmt="rgb")
