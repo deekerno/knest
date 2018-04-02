@@ -19,6 +19,12 @@ label_map = None
 categories = None
 category_index = None
 
+sess = None
+ops = None
+tensor_names = None
+tensor_dict = None
+image_tensor = None
+
 # path information variables
 dir_path = ''
 des_path = ''

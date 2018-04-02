@@ -369,6 +369,42 @@
             font_name: 'assets/Montserrat-Regular'
             on_release: root.dismiss()
 
+<NoDestination@Popup>:
+    auto_dismiss: False
+    title: 'Error'
+    title_font: 'assets/Montserrat-Regular'
+    title_size: sp(16)
+    size_hint: (.4, .4)
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        GridLayout:
+            cols: 2
+            padding: 40
+
+            Image:
+                id: error
+                size_hint_x: None
+                width: dp(62.5)
+                source: 'assets/error.png'
+
+            Label:
+                id: message
+                text: 'Destination path was altered during processing. Please try again.'
+                font_name: 'assets/Montserrat-Regular'
+                font_size: dp(16)
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+
+        Button:
+            text: 'OK'
+            size_hint_y: None
+            height: dp(25) 
+            font_name: 'assets/Montserrat-Regular'
+            on_release: root.dismiss()
+
 <BlackScreen3>:
     on_enter: Clock.schedule_once(root.switch, 1)
 

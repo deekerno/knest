@@ -27,11 +27,9 @@ def inference(filename, image):
     # copy image parameter
     img = np.copy(image)
 
-    sess, ops, tensor_names, tensor_dict, image_tensor = setup()
-
     # run inference
-    output_dict = sess.run(tensor_dict, feed_dict={
-                           image_tensor: np.expand_dims(img, 0)})
+    output_dict = gv.sess.run(gv.tensor_dict, feed_dict={
+        gv.image_tensor: np.expand_dims(img, 0)})
 
     # convert all types as float32 numpy arrays
     output_dict['detection_classes'] = output_dict[
@@ -100,28 +98,21 @@ def instantiate():
         gv.label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
     gv.category_index = label_map_utils.create_category_index(gv.categories)
 
-
-def setup():
-    """
-    Setup some additional detection-dependent variables
-    """
     with gv.graph.as_default():
-        with tf.Session() as sess:
+        with tf.Session() as gv.sess:
             # get handles to input and output tensors
-            ops = tf.get_default_graph().get_operations()
-            tensor_names = {
-                output.name for op in ops for output in op.outputs}
-            tensor_dict = {}
+            gv.ops = tf.get_default_graph().get_operations()
+            gv.tensor_names = {
+                output.name for op in gv.ops for output in op.outputs}
+            gv.tensor_dict = {}
 
         for key in [
             'num_detections', 'detection_boxes', 'detection_scores',
             'detection_classes', 'detection_masks'
         ]:
             name = key + ':0'
-            if name in tensor_names:
-                tensor_dict[key] = tf.get_default_graph(
+            if name in gv.tensor_names:
+                gv.tensor_dict[key] = tf.get_default_graph(
                 ).get_tensor_by_name(name)
 
-        image_tensor = tf.get_default_graph().get_tensor_by_name('image_tensor:0')
-
-    return sess, ops, tensor_names, tensor_dict, image_tensor
+        gv.image_tensor = tf.get_default_graph().get_tensor_by_name('image_tensor:0')

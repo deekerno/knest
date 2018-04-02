@@ -178,9 +178,11 @@ class ProgressScreen(Screen):
             import architectures.squeezenet.classifier as cl
             import utils.inference as bf
 
+            # load the model
             gv.model = cl.ClassificationModel(
                 (400, 400), 'output/squeezenet.tfl', 2)
 
+            # instantiate object detection variables
             bf.instantiate()
             # update that model has been loaded
             gv.load = 1
@@ -439,6 +441,8 @@ class ProcessScreen(Screen):
         Localize bird(s) and bird face(s) in the image and display results
             img: (ndarray) image file
             filename: (String) name of the image file
+            width: (float) width of img
+            height: (float) height of img
             dt: (int) time in seconds
         """
         # run inference code
@@ -589,6 +593,19 @@ class WriteScreen(Screen):
                 gv.boxes[gv.files[gv.index]], gv.images[gv.files[gv.index]])
 
             if success:
+                # preventive measure in the case that the subdirectory is
+                # altered or removed during processing
+                if not os.path.isdir(gv.des_path):
+                    # display error message
+                    Factory.NoDestination().open()
+                    # reset all global variables
+                    gv.reset()
+                    # return to the folder selection screen having
+                    # cancelled the process
+                    self.manager.current = 'folder_select'
+                    # unschedule the Clock.schedule_interval() method
+                    return False
+
                 # write accepted images to subdirectory
                 self.write_to(gv.files[gv.index], final_image)
 
