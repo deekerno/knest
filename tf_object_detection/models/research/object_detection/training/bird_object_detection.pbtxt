@@ -1,0 +1,9 @@
+item {
+    id: 1
+    name: 'bird'
+}
+
+item {
+    id: 2
+    name: 'bird_face'
+}
