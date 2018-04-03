@@ -17,7 +17,7 @@
 import logging
 import tensorflow as tf
 from google.protobuf import text_format
-from object_detection.protos import string_int_label_map_pb2
+import utils.string_int_label_map_pb2 as pb2
 
 
 def _validate_label_map(label_map):
@@ -113,7 +113,7 @@ def load_labelmap(path):
     """
     with tf.gfile.GFile(path, 'r') as fid:
         label_map_string = fid.read()
-        label_map = string_int_label_map_pb2.StringIntLabelMap()
+        label_map = pb2.StringIntLabelMap()
         try:
             text_format.Merge(label_map_string, label_map)
         except text_format.ParseError:

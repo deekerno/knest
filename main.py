@@ -364,6 +364,7 @@ class ProcessScreen(Screen):
         # all images have been processed successfully
         # update and move to next screen
         else:
+            self.ids.image.opacity = 0
             # the folder path where all accepted images will be written
             gv.des_path = os.path.join(gv.dir_path, DES_NAME)
 
