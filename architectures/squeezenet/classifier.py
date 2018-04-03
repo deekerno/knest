@@ -9,7 +9,7 @@ OUTPUT_FOLDER = 'output/'
 
 class ClassificationModel(object):
     """
-    A model for object classification.
+        A model for object classification.
     """
 
     def __init__(self, image_size, weights, num_classes):
@@ -21,11 +21,11 @@ class ClassificationModel(object):
 
     def _fire_module(self, input_layer, fire_layer_id, squeeze=16, expand=64):
         """
-        The Fire module from the original SqueezeNet paper.
-            input_layer:    (Tensor) preceding layers of network
-            fire_layer_id:  (Integer) used to differentiate layers
-            squeeze:        (Integer) filter size for the 'squeeze' part of module
-            expand:         (Integer) filter size for the 'expand' part of module
+            The Fire module from the original SqueezeNet paper.
+                input_layer:    (Tensor) preceding layers of network
+                fire_layer_id:  (Integer) used to differentiate layers
+                squeeze:        (Integer) filter size for the 'squeeze' part of module
+                expand:         (Integer) filter size for the 'expand' part of module
         """
 
         layer_id = 'fire' + str(fire_layer_id) + '/'
@@ -93,17 +93,17 @@ class ClassificationModel(object):
 
     def predict(self, image):
         """
-        Wraps the TFLearn model prediction function. Returns the
-        predicted probabilites in an array.
-            image: (ndarray) array representation of the image
+            Wraps the TFLearn model prediction function. Returns the
+            predicted probabilites in an array.
+                image: (ndarray) array representation of the image
         """
         return self.model.predict([image])
 
     def classify(self, prediction):
         """
-        Determines whether an image contains a bird. Returns a boolean.
-            prediction: (array) an array holding percent estimates of how
-                        likely or unlikely that a bird is in the image
+            Determines whether an image contains a bird. Returns a boolean.
+                prediction: (array) an array holding percent estimates of how
+                            likely or unlikely that a bird is in the image
         """
         # if the first index has the higher percentage, there is a bird
         is_bird = np.argmax(prediction[0]) == 0

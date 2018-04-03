@@ -1,4 +1,2 @@
-architectures/detection/ filter=lfs diff=lfs merge=lfs -text
 *.pb filter=lfs diff=lfs merge=lfs -text
-architectures/detection/model.ckpt.data-00000-of-00001 filter=lfs diff=lfs merge=lfs -text
-model.ckpt.data-00000-of-00001 filter=lfs diff=lfs merge=lfs -text
+*.ckpt.* filter=lfs diff=lfs merge=lfs -text

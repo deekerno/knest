@@ -116,6 +116,9 @@ leavens/
 CUB_200_2011\.tar
 
 # log spam
+images/
+leavens/
+CUB_200_2011\.tar
 saved/
 
 # Mac stuff
@@ -123,3 +126,27 @@ saved/
 
 # Goo Test
 goo_test/
+images/
+leavens/
+CUB_200_2011\.tar
+saved/
+
+#joe
+checkpoint
+data.zip
+infer.py
+faster_rcnn_nas_coco_*
+/tf_object_detection/models/research/object_detection/training/checkpoint
+/tf_object_detection/models/research/object_detection/training/events.out.tfevents.*
+/tf_object_detection/models/research/object_detection/training/graph.pbtxt
+/tf_object_detection/models/research/object_detection/training/model.*
+/tf_object_detection/models/research/object_detection/training/pipeline.config
+
+# bobo_buff testing
+nonbirds/
+nonbird_crops/
+boxes/
+crops/
+leavens_real.h5
+dataset.csv
+
