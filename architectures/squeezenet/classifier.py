@@ -1,10 +1,10 @@
 # UCF Senior Design 2017-18
 # Group 38
 
-import os
+import numpy as np
 import tflearn
 
-OUTPUT_FOLDER = 'output/squeezenet'
+OUTPUT_FOLDER = 'output/'
 
 
 class ClassificationModel(object):
@@ -95,5 +95,16 @@ class ClassificationModel(object):
         """
             Wraps the TFLearn model prediction function. Returns the
             predicted probabilites in an array.
+                image: (ndarray) array representation of the image
         """
         return self.model.predict([image])
+
+    def classify(self, prediction):
+        """
+            Determines whether an image contains a bird. Returns a boolean.
+                prediction: (array) an array holding percent estimates of how
+                            likely or unlikely that a bird is in the image
+        """
+        # if the first index has the higher percentage, there is a bird
+        is_bird = np.argmax(prediction[0]) == 0
+        return is_bird

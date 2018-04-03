@@ -9,7 +9,6 @@ SCALING_FACTOR = 3
 
 
 def man(boxes, image_array, scaling_factor=SCALING_FACTOR):
-
     """
         Crop and manipulate the iamge for final output.
             image_array:    (Array) array representation of the image
