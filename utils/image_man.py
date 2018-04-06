@@ -31,7 +31,8 @@ def man(boxes, image_array, scaling_factor=SCALING_FACTOR):
         fb_xmin, fb_ymin, fb_xmax, fb_ymax = i
 
         # Calculate the center of the face bounding box.
-        fb_center_x, fb_center_y = (fb_xmax + fb_xmin) / 2, (fb_ymax + fb_ymin) / 2
+        fb_center_x, fb_center_y = (
+            fb_xmax + fb_xmin) / 2, (fb_ymax + fb_ymin) / 2
 
         # Calculate the distance of the x-component of the
         # the face box centerfrom the center of the image.
@@ -57,14 +58,20 @@ def man(boxes, image_array, scaling_factor=SCALING_FACTOR):
 
     # Calculate the width and height of the final crop area.
     bb_width, bb_height = lar_xmax - sm_xmin, lar_ymax - sm_ymin
-    new_width, new_height = round(bb_width * factor, 0), round(bb_height * factor, 0)
+    new_width, new_height = round(
+        bb_width * factor, 0), round(bb_height * factor, 0)
+
+    if new_width * 1.5 < new_height or math.fabs(new_width - new_height) < new_height * .5:
+        new_width = new_height * 1.5
 
     # Calculate the amounts by which to adjust the face_box coordinates.
     width_diff, height_diff = new_width / 2, new_height / 2
 
-    # Set the new dimenstions for the final crop box.
-    final_xmin, final_xmax = central_face_x - width_diff, central_face_x + width_diff
-    final_ymin, final_ymax = central_face_y - height_diff, central_face_y + height_diff
+    # Set the new dimensions for the final crop box.
+    final_xmin, final_xmax = central_face_x - \
+        width_diff, central_face_x + width_diff
+    final_ymin, final_ymax = central_face_y - \
+        height_diff, central_face_y + height_diff
 
     # Edge case handling.
     if final_xmin < 0: final_xmin = 0

@@ -77,5 +77,6 @@ def reset():
     boxes.clear()
 
     # clear numpy texture
-    canvas.clear()
+    if canvas is not None:
+        canvas.clear()
     canvas = None

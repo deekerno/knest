@@ -16,6 +16,7 @@ from PIL import Image
 import cv2
 import gc
 import math
+import numpy as np
 import os
 import utils.blur as blur
 import utils.compare as compare
@@ -279,7 +280,8 @@ class ProcessScreen(Screen):
                 gv.blur_step = 1
 
         # if bird classification has not been implemented
-        elif not gv.bird_step:
+        # and if there are images to be processed
+        elif not gv.bird_step and len(gv.images) is not 0:
             # preventive measure: avoid out-of-index error
             if gv.index < len(gv.files):
                 file_path = os.path.join(gv.dir_path, gv.files[gv.index])
@@ -314,7 +316,9 @@ class ProcessScreen(Screen):
                 gv.files = list(gv.images.keys())
                 gv.bird_step = 1
 
-        elif not gv.birdbb_step:
+        # if bird localization has not been implemented
+        # and if there are images to be processed
+        elif not gv.birdbb_step and len(gv.images) is not 0:
             # preventive measure : avoid out-of-index error
             if gv.index < len(gv.files):
                 file_path = os.path.join(gv.dir_path, gv.files[gv.index])
@@ -346,6 +350,16 @@ class ProcessScreen(Screen):
                 width = self.ids.image.width
                 height = self.ids.image.height
 
+                # preventive measure for proportional image scaling
+                # for numpy array to texture conversion
+                img_width = np.shape(gv.images[gv.files[gv.index]])[1]
+                img_height = np.shape(gv.images[gv.files[gv.index]])[0]
+
+                if img_height > img_width:
+                    # calculate scaling
+                    scale = height / img_height
+                    width = img_width * scale
+
                 # call object detection on image
                 # a Clock event is scheduled to display images before
                 # processing (required)
@@ -357,6 +371,7 @@ class ProcessScreen(Screen):
 
             # implemented bird/face detection on all images
             else:
+                self.ids.image.opacity = 0
                 gv.index = 0
                 gv.files = list(gv.images.keys())
                 gv.birdbb_step = 1
@@ -364,7 +379,6 @@ class ProcessScreen(Screen):
         # all images have been processed successfully
         # update and move to next screen
         else:
-            self.ids.image.opacity = 0
             # the folder path where all accepted images will be written
             gv.des_path = os.path.join(gv.dir_path, DES_NAME)
 
@@ -375,12 +389,8 @@ class ProcessScreen(Screen):
             # update new list of images
             gv.files = list(gv.images.keys())
 
-            if len(gv.images) == 0:
-                # if there are no images to write, switch to 'end' screen
-                self.manager.current = 'black4'
-            else:
-                # switch to transition screen
-                self.manager.current = 'black3'
+            # switch to next screen after one second
+            Clock.schedule_once(self.switch, 1)
 
             # update texture location to remove detection results later
             gv.canvas = self.ids.detection.canvas
@@ -450,7 +460,7 @@ class ProcessScreen(Screen):
         image = bf.inference(filename, img)
 
         # clear any previous texture information as
-        # to avoid continuosly writing data on top of data
+        # to avoid continuously writing data on top of data
         self.ids.detection.canvas.clear()
 
         # create kivy texture from image ndarray
@@ -465,9 +475,13 @@ class ProcessScreen(Screen):
         # flip vertically to display upright
         texture.flip_vertical()
 
+        # calculate position to center on left side of window
+        x_pos = self.ids.image.parent.width * .25 - (width / 2)
+        y_pos = self.ids.image.parent.height * .5 - (height / 2)
+
         # display result to screen
         with self.ids.detection.canvas:
-            Rectangle(texture=texture, pos=(.25, self.ids.image.y),
+            Rectangle(texture=texture, pos=(x_pos, y_pos),
                       size=(width, height))
 
         # no bird/faces were detected
@@ -486,6 +500,20 @@ class ProcessScreen(Screen):
             # a bird or face
             self.ids.result.color = (0, 0, 0, 0)
             self.ids.result.source = ''
+
+    def switch(self, dt):
+        """
+        Switch to next appropriate screen
+            dt: (int) time in seconds
+        """
+        if len(gv.images) == 0:
+            # if there are no images to write, switch to 'end' screen
+            self.manager.current = 'black4'
+            # reset all global variables for future passes
+            gv.reset()
+        else:
+            # switch to transition screen
+            self.manager.current = 'black3'
 
 
 class BlackScreen3(Screen):
@@ -624,8 +652,8 @@ class WriteScreen(Screen):
             # reset all global variables for future passes
             gv.reset()
 
-            # switch to end screen
-            self.manager.current = 'black4'
+            # switch to end screen after one second
+            Clock.schedule_once(self.switch, 1)
 
             # unschedule kivy's Clock.schedule_interval() function
             return False
@@ -638,6 +666,13 @@ class WriteScreen(Screen):
         """
         img = Image.fromarray(cropped_img)
         img.save(os.path.join(gv.des_path, filename))
+
+    def switch(self, dt):
+        """
+        Switch to writing screen
+            dt: (int) time in seconds
+        """
+        self.manager.current = 'black4'
 
 
 class BlackScreen4(Screen):
@@ -667,7 +702,7 @@ class LoadDialog(FloatLayout):
 
 # config.kv should not implement any screen manager stuff as it
 # overrides any definitions in this file, and cause a lot of strife
-Builder.load_file("config.kv")
+Builder.load_file("/Users/ayylmao/Desktop/knest/assets/config.kv")
 
 # Create the screen manager
 sm = ScreenManager(transition=FadeTransition())
