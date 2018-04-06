@@ -47,6 +47,9 @@ std = ''
 std_hash = None
 count = 0
 
+# orientation variable
+landscape = 1
+
 canvas = None
 
 

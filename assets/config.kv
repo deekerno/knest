@@ -29,7 +29,7 @@
     on_leave: self.ids.path.text = "Please choose a directory"
 
     Label:
-        id: caption
+        id: caption1
         text: "REDUCE SIMILARITY"
         halign: 'center'
         valign: 'middle'
@@ -38,14 +38,34 @@
         pos_hint: {'center_x': .85, 'center_y': .91}
 
     Switch:
-        id: choice
+        id: compare
         size_hint_x: None
         size_hint_y: None
         # actual size of built-in kivy switch image
         size_x: dp(83)
         size_y: dp(32)
         pos_hint: {'center_x': .85, 'center_y': .87}
-        on_active: root.update_toggle()
+        on_active: root.update_compare()
+
+    Label:
+        id: caption2
+        text: "LANDSCAPE"
+        halign: 'center'
+        valign: 'middle'
+        font_name: 'assets/Montserrat-Regular'
+        font_size: dp(10)
+        pos_hint: {'center_x': .85, 'center_y': .82}
+
+    Switch:
+        id: landscape
+        active: True
+        size_hint_x: None
+        size_hint_y: None
+        # actual size of built-in kivy switch image
+        size_x: dp(83)
+        size_y: dp(32)
+        pos_hint: {'center_x': .85, 'center_y': .78}
+        on_active: root.update_orientation()
 
     Button:
         size_hint: (.03, .04)

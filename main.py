@@ -134,15 +134,25 @@ class FolderSelectScreen(Screen):
             # if no path was given, prompt user for one
             self.ids.path.text = "No directory path given"
 
-    def update_toggle(self):
+    def update_compare(self):
         """
         Update whether application will implement image comparison
         depending on state of toggle button
         """
-        if self.ids.choice.active:
+        if self.ids.compare.active:
             gv.comp = 1
         else:
             gv.comp = 0
+
+    def update_orientation(self):
+        """
+        Update whether application will crop images in landscape
+        orientation depending on state of toggle button
+        """
+        if self.ids.landscape.active:
+            gv.landscape = 1
+        else:
+            gv.landscape = 0
 
 
 class BlackScreen1(Screen):
@@ -619,7 +629,8 @@ class WriteScreen(Screen):
             # call crop method on image to calculate bounding box
             # information and determine expansion and range of crop
             final_image, success = im.man(
-                gv.boxes[gv.files[gv.index]], gv.images[gv.files[gv.index]])
+                gv.boxes[gv.files[gv.index]], gv.images[gv.files[gv.index]],
+                landscape=bool(gv.landscape))
 
             if success:
                 # preventive measure in the case that the subdirectory is
