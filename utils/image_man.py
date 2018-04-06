@@ -8,7 +8,7 @@ import numpy as np
 SCALING_FACTOR = 3
 
 
-def man(boxes, image_array, scaling_factor=SCALING_FACTOR):
+def man(boxes, image_array, landscape=True, scaling_factor=SCALING_FACTOR):
     """
         Crop and manipulate the iamge for final output.
             image_array:    (Array) array representation of the image
@@ -58,6 +58,10 @@ def man(boxes, image_array, scaling_factor=SCALING_FACTOR):
     # Calculate the width and height of the final crop area.
     bb_width, bb_height = lar_xmax - sm_xmin, lar_ymax - sm_ymin
     new_width, new_height = round(bb_width * factor, 0), round(bb_height * factor, 0)
+
+    if landscape:
+        if new_width * 1.5 < new_height or math.fabs(new_width - new_height) < new_height * .5:
+            new_width = new_height * 1.5
 
     # Calculate the amounts by which to adjust the face_box coordinates.
     width_diff, height_diff = new_width / 2, new_height / 2
