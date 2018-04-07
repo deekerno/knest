@@ -90,6 +90,7 @@ class FolderSelectScreen(Screen):
                             title_font='assets/Montserrat-Regular',
                             title_size='15sp',
                             content=content,
+                            auto_dismiss=False,
                             size_hint=(0.9, 0.9))
         self._popup.open()
 
@@ -134,25 +135,51 @@ class FolderSelectScreen(Screen):
             # if no path was given, prompt user for one
             self.ids.path.text = "No directory path given"
 
-    def update_compare(self):
+    def update_compare(self, popup_instance):
         """
         Update whether application will implement image comparison
         depending on state of toggle button
         """
-        if self.ids.compare.active:
-            gv.comp = 1
+        if popup_instance.ids.compare.active:
+            gv.comp = True
         else:
-            gv.comp = 0
+            gv.comp = False
 
-    def update_orientation(self):
+    def update_crop(self, popup_instance):
+        """
+        Update whether application will crop images depending on
+        state of toggle button
+        """
+        if popup_instance.ids.crop.active:
+            gv.crop = True
+            # enable landscape text
+            popup_instance.ids.caption3.opacity = 1
+            # enable landscape switch
+            popup_instance.ids.landscape.disabled = False
+            # set landscape switch to on
+            popup_instance.ids.landscape.active = True
+            # set landscape global bool to True
+            gv.landscape = True
+        else:
+            gv.crop = False
+            # reduce opacity of landscape text
+            popup_instance.ids.caption3.opacity = .5
+            # set landscape switch to off
+            popup_instance.ids.landscape.active = False
+            # disable landscape switch
+            popup_instance.ids.landscape.disabled = True
+            # set landscape global bool to False
+            gv.landscape = False
+
+    def update_orientation(self, popup_instance):
         """
         Update whether application will crop images in landscape
         orientation depending on state of toggle button
         """
-        if self.ids.landscape.active:
-            gv.landscape = 1
+        if popup_instance.ids.landscape.active:
+            gv.landscape = True
         else:
-            gv.landscape = 0
+            gv.landscape = False
 
 
 class BlackScreen1(Screen):
@@ -626,11 +653,16 @@ class WriteScreen(Screen):
 
         # preventive measure to avoid out-of-index error
         if gv.index < length:
-            # call crop method on image to calculate bounding box
-            # information and determine expansion and range of crop
-            final_image, success = im.man(
-                gv.boxes[gv.files[gv.index]], gv.images[gv.files[gv.index]],
-                landscape=bool(gv.landscape))
+            # if cropping option is enabled
+            if gv.crop:
+                # call crop method on image to calculate bounding box
+                # information and determine expansion and range of crop
+                final_image, success = im.man(
+                    gv.boxes[gv.files[gv.index]], gv.images[gv.files[gv.index]],
+                    gv.landscape)
+            # if user opts out of cropping
+            else:
+                final_image, success = gv.images[gv.files[gv.index]], 1
 
             if success:
                 # preventive measure in the case that the subdirectory is

@@ -41,14 +41,18 @@ images = {}
 # holds box coordinates for each image
 boxes = {}
 
+# hold folder_select screen class instance
+fs = None
+
 # image comparison variable
-comp = 0
+comp = True
 std = ''
 std_hash = None
 count = 0
 
-# orientation variable
-landscape = 1
+# image manipulation variables
+crop = True
+landscape = True
 
 canvas = None
 

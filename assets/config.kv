@@ -5,6 +5,8 @@
 #:import Clock kivy.clock.Clock
 #:import Window kivy.core.window.Window
 #:import ProgressBar kivy.uix.progressbar.ProgressBar
+#:import Factory kivy.factory.Factory
+#:import gv utils.global_var
 
 <LandingScreen>:
     Button:
@@ -26,46 +28,23 @@
         text: 'K N E S T'
 
 <FolderSelectScreen>:
+    on_enter: gv.fs = self
     on_leave: self.ids.path.text = "Please choose a directory"
 
-    Label:
-        id: caption1
-        text: "REDUCE SIMILARITY"
-        halign: 'center'
-        valign: 'middle'
-        font_name: 'assets/Montserrat-Regular'
-        font_size: dp(10)
-        pos_hint: {'center_x': .85, 'center_y': .91}
+    Button:
+        size_hint: (.025, .035)
+        pos_hint: {'center_x': .965, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: Factory.AdvancedSettings().open()
 
-    Switch:
-        id: compare
-        size_hint_x: None
-        size_hint_y: None
-        # actual size of built-in kivy switch image
-        size_x: dp(83)
-        size_y: dp(32)
-        pos_hint: {'center_x': .85, 'center_y': .87}
-        on_active: root.update_compare()
+        Image:
+            source: 'assets/settings.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
 
-    Label:
-        id: caption2
-        text: "LANDSCAPE"
-        halign: 'center'
-        valign: 'middle'
-        font_name: 'assets/Montserrat-Regular'
-        font_size: dp(10)
-        pos_hint: {'center_x': .85, 'center_y': .82}
-
-    Switch:
-        id: landscape
-        active: True
-        size_hint_x: None
-        size_hint_y: None
-        # actual size of built-in kivy switch image
-        size_x: dp(83)
-        size_y: dp(32)
-        pos_hint: {'center_x': .85, 'center_y': .78}
-        on_active: root.update_orientation()
 
     Button:
         size_hint: (.03, .04)
@@ -132,6 +111,103 @@
                 text: "Start"
                 font_name: 'assets/Montserrat-Regular'
                 on_release: root.check_path()
+
+<AdvancedSettings@Popup>:
+    auto_dismiss: False
+    title: 'Advanced Settings'
+    title_font: 'assets/Montserrat-Regular'
+    title_size: sp(16)
+    size_hint: (.4, .6)
+    comp: gv.comp
+    crop: gv.crop
+    landscape: gv.landscape
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        FloatLayout:
+            Label:
+                id: caption1
+                text: "REDUCE SIMILARITY"
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+                font_name: 'assets/Montserrat-Regular'
+                font_size: dp(10)
+                pos_hint: {'center_x': .6, 'center_y': .6}
+
+            Switch:
+                id: compare
+                active: True if gv.comp else False
+                size_hint_x: None
+                size_hint_y: None
+                # actual size of built-in kivy switch image
+                size_x: dp(83)
+                size_y: dp(32)
+                pos_hint: {'center_x': .75, 'center_y': .6}
+                on_active: gv.fs.update_compare(root)
+
+            Label:
+                id: caption2
+                text: "CROP IMAGES"
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+                font_name: 'assets/Montserrat-Regular'
+                font_size: dp(10)
+                pos_hint: {'center_x': .6, 'center_y': .3}
+
+            Switch:
+                id: crop
+                active: True if gv.crop else False
+                size_hint_x: None
+                size_hint_y: None
+                # actual size of built-in kivy switch image
+                size_x: dp(83)
+                size_y: dp(32)
+                pos_hint: {'center_x': .75, 'center_y': .3}
+                on_active: gv.fs.update_crop(root)
+
+            Label:
+                id: caption3
+                text: "LANDSCAPE STYLE"
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+                font_name: 'assets/Montserrat-Regular'
+                font_size: dp(10)
+                pos_hint: {'center_x': .6, 'center_y': 0}
+
+            Switch:
+                id: landscape
+                active: True if gv.crop and gv.landscape else False
+                size_hint_x: None
+                size_hint_y: None
+                # actual size of built-in kivy switch image
+                size_x: dp(83)
+                size_y: dp(32)
+                pos_hint: {'center_x': .75, 'center_y': 0}
+                on_active: gv.fs.update_orientation(root)
+
+        BoxLayout:
+            orientation: 'horizontal'
+
+            Button:
+                text: 'Cancel'
+                size_hint_y: None
+                height: dp(25)  
+                font_name: 'assets/Montserrat-Regular'
+                on_release: gv.comp = root.comp
+                on_release: gv.crop = root.crop
+                on_release: gv.landscape = root.landscape
+                on_release: root.dismiss()
+
+            Button:
+                text: 'OK'
+                size_hint_y: None
+                height: dp(25)  
+                font_name: 'assets/Montserrat-Regular'
+                on_release: root.dismiss()
 
 <PermissionDenied@Popup>:
     auto_dismiss: False
