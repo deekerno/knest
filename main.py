@@ -27,7 +27,7 @@ from kivy.config import Config
 # remove os-provided border
 Config.set('graphics', 'borderless', 'True')
 # set window icon from default kivy image to knest logo
-Config.set('kivy', 'window_icon', 'assets/color_bird.png')
+Config.set('kivy', 'window_icon', '/Users/ayylmao/Desktop/knest/assets/color_bird.png')
 
 # all accepted images will be written to a subdirectory
 # named 'processed'
@@ -87,7 +87,7 @@ class FolderSelectScreen(Screen):
         """
         content = LoadDialog(load=self.load, cancel=self.dismiss_popup)
         self._popup = Popup(title="Select a Folder",
-                            title_font='assets/Montserrat-Regular',
+                            title_font='/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular',
                             title_size='15sp',
                             content=content,
                             auto_dismiss=False,
@@ -448,7 +448,7 @@ class ProcessScreen(Screen):
         if result:
             # remove image transparency and display green check
             self.ids.result.color = (1, 1, 1, 1)
-            self.ids.result.source = 'assets/yes.png'
+            self.ids.result.source = '/Users/ayylmao/Desktop/knest/assets/yes.png'
 
             # add non-blurry image to image dictionary
             gv.images[filename] = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -457,7 +457,7 @@ class ProcessScreen(Screen):
         else:
             # remove image transparency and display red x
             self.ids.result.color = (1, 1, 1, 1)
-            self.ids.result.source = 'assets/no.png'
+            self.ids.result.source = '/Users/ayylmao/Desktop/knest/assets/no.png'
 
     def check_class(self, img, filename):
         """
@@ -473,13 +473,13 @@ class ProcessScreen(Screen):
         if result:
             # remove image transparency and display green check
             self.ids.result.color = (1, 1, 1, 1)
-            self.ids.result.source = 'assets/yes.png'
+            self.ids.result.source = '/Users/ayylmao/Desktop/knest/assets/yes.png'
 
         # image does not contain a bird
         else:
             # remove image transparency and display red x
             self.ids.result.color = (1, 1, 1, 1)
-            self.ids.result.source = 'assets/no.png'
+            self.ids.result.source = '/Users/ayylmao/Desktop/knest/assets/no.png'
 
             # remove image from dictionary
             gv.images.pop(filename)
@@ -525,7 +525,7 @@ class ProcessScreen(Screen):
         if not len(gv.boxes[filename]['birds']) or not len(gv.boxes[filename]['faces']):
             # remove image transparency and display red x
             self.ids.result.color = (1, 1, 1, 1)
-            self.ids.result.source = 'assets/no.png'
+            self.ids.result.source = '/Users/ayylmao/Desktop/knest/assets/no.png'
 
             # remove image from dictionary
             gv.images.pop(filename)
