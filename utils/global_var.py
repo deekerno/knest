@@ -26,7 +26,8 @@ tensor_dict = None
 image_tensor = None
 
 # path information variables
-dir_path = ''
+dir_paths = []
+path_index = 0
 des_path = ''
 num_files = 0
 

@@ -6,7 +6,10 @@
 #:import Window kivy.core.window.Window
 #:import ProgressBar kivy.uix.progressbar.ProgressBar
 #:import Factory kivy.factory.Factory
+#:import Utils kivy.utils
 #:import gv utils.global_var
+#:import os os
+#:import copy copy
 
 <LandingScreen>:
     Button:
@@ -725,25 +728,203 @@
             text: 'Click Anywhere to Continue'
 
 <LoadDialog>:
+    list: copy.copy(gv.dir_paths)
+
     BoxLayout:
 		size: root.size
         pos: root.pos
         orientation: 'vertical'
 
-        FileChooserIconView:
-            id: filechooser
-            dirselect: True
+        GridLayout:
+            cols: 2
 
-        BoxLayout:
-            size_hint_y: None
-            height: dp(35)
-            
-            Button:
-                text: 'Cancel'
-                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
-                on_release: root.cancel()
+            BoxLayout:
+                size: root.size
+                pos: root.pos
+                orientation: 'vertical'
 
-            Button:
-                text: 'Load'
-                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
-                on_release: root.load(filechooser.path)
+                FileChooserIconView:
+                    id: filechooser
+                    dirselect: True
+
+                BoxLayout:
+                    size_hint_y: None
+                    height: dp(35)
+                    
+                    Button:
+                        text: 'Cancel'
+                        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                        on_release: root.cancel()
+                        on_release: gv.dir_paths = root.list
+
+                    Button:
+                        id: add
+                        disabled: False if len(gv.dir_paths) < 8 else True
+                        text: 'Add'
+                        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                        on_release: gv.fs.add(filechooser.path, root)
+
+            BoxLayout:
+                size_hint_x: None
+                width: self.parent.width * .3
+                orientation: 'vertical'
+
+                StackLayout:
+                    orientation: 'tb-lr'
+                    padding: [dp(7.5), 0, 0, 0]
+                    id: paths
+
+                    FloatLayout:
+                        size_hint: (None, None)
+
+                        CheckBox:
+                            id: 0
+                            active: False if len(gv.dir_paths) == 0 else True
+                            disabled: True if len(gv.dir_paths) == 0 else False
+                            pos_hint: {'center_x': .3, 'center_y': .5}
+                            on_press: gv.fs.remove(0, root)
+
+                        Label:
+                            id: label0
+                            text: '' if len(gv.dir_paths) == 0 else os.path.normpath(os.path.basename(gv.dir_paths[0]))
+                            size_hint_x: None
+                            width: self.texture_size[0]
+                            text_size: (dp(160), None)
+                            pos_hint: {'x': .8, 'center_y': .5}
+
+                    FloatLayout:
+                        size_hint: (None, None)
+
+                        CheckBox:
+                            id: 1
+                            active: False if len(gv.dir_paths) < 2 else True
+                            disabled: True if len(gv.dir_paths) < 2 else False
+                            pos_hint: {'center_x': .3, 'center_y': .5}
+                            on_press: gv.fs.remove(1, root)
+
+                        Label:
+                            id: label1
+                            text: '' if len(gv.dir_paths) < 2 else os.path.normpath(os.path.basename(gv.dir_paths[1]))
+                            size_hint_x: None
+                            width: self.texture_size[0]
+                            text_size: (dp(160), None)
+                            pos_hint: {'x': .8, 'center_y': .5}
+
+                    FloatLayout:
+                        size_hint: (None, None)
+
+                        CheckBox:
+                            id: 2
+                            active: False if len(gv.dir_paths) < 3 else True
+                            disabled: True if len(gv.dir_paths) < 3 else False
+                            pos_hint: {'center_x': .3, 'center_y': .5}
+                            on_press: gv.fs.remove(2, root)
+
+                        Label:
+                            id: label2
+                            text: '' if len(gv.dir_paths) < 3 else os.path.normpath(os.path.basename(gv.dir_paths[2]))
+                            size_hint_x: None
+                            width: self.texture_size[0]
+                            text_size: (dp(160), None)
+                            pos_hint: {'x': .8, 'center_y': .5}
+
+                    FloatLayout:
+                        size_hint: (None, None)
+
+                        CheckBox:
+                            id: 3
+                            active: False if len(gv.dir_paths) < 4 else True
+                            disabled: True if len(gv.dir_paths) < 4 else False
+                            pos_hint: {'center_x': .3, 'center_y': .5}
+                            on_press: gv.fs.remove(3, root)
+
+                        Label:
+                            id: label3
+                            text: '' if len(gv.dir_paths) < 4 else os.path.normpath(os.path.basename(gv.dir_paths[3]))
+                            size_hint_x: None
+                            width: self.texture_size[0]
+                            text_size: (dp(160), None)
+                            pos_hint: {'x': .8, 'center_y': .5}
+
+                    FloatLayout:
+                        size_hint: (None, None)
+
+                        CheckBox:
+                            id: 4
+                            active: False if len(gv.dir_paths) < 5 else True
+                            disabled: True if len(gv.dir_paths) < 5 else False
+                            pos_hint: {'center_x': .3, 'center_y': .5}
+                            on_press: gv.fs.remove(4, root)
+
+                        Label:
+                            id: label4
+                            text: '' if len(gv.dir_paths) < 5 else os.path.normpath(os.path.basename(gv.dir_paths[4]))
+                            size_hint_x: None
+                            width: self.texture_size[0]
+                            text_size: (dp(160), None)
+                            pos_hint: {'x': .8, 'center_y': .5}
+
+                    FloatLayout:
+                        size_hint: (None, None)
+
+                        CheckBox:
+                            id: 5
+                            active: False if len(gv.dir_paths) < 6 else True
+                            disabled: True if len(gv.dir_paths) < 6 else False
+                            pos_hint: {'center_x': .3, 'center_y': .5}
+                            on_press: gv.fs.remove(5, root)
+
+                        Label:
+                            id: label5
+                            text: '' if len(gv.dir_paths) < 6 else os.path.normpath(os.path.basename(gv.dir_paths[5]))
+                            size_hint_x: None
+                            width: self.texture_size[0]
+                            text_size: (dp(160), None)
+                            pos_hint: {'x': .8, 'center_y': .5}
+
+                    FloatLayout:
+                        size_hint: (None, None)
+
+                        CheckBox:
+                            id: 6
+                            active: False if len(gv.dir_paths) < 7 else True
+                            disabled: True if len(gv.dir_paths) < 7 else False
+                            pos_hint: {'center_x': .3, 'center_y': .5}
+                            on_press: gv.fs.remove(6, root)
+
+                        Label:
+                            id: label6
+                            text: '' if len(gv.dir_paths) < 7 else os.path.normpath(os.path.basename(gv.dir_paths[6]))
+                            size_hint_x: None
+                            width: self.texture_size[0]
+                            text_size: (dp(160), None)
+                            pos_hint: {'x': .8, 'center_y': .5}
+
+                    FloatLayout:
+                        size_hint: (None, None)
+
+                        CheckBox:
+                            id: 7
+                            active: False if len(gv.dir_paths) < 8 else True
+                            disabled: True if len(gv.dir_paths) < 8 else False
+                            pos_hint: {'center_x': .3, 'center_y': .5}
+                            on_press: gv.fs.remove(7, root)
+
+                        Label:
+                            id: label7
+                            text: '' if len(gv.dir_paths) < 8 else os.path.normpath(os.path.basename(gv.dir_paths[7]))
+                            size_hint_x: None
+                            width: self.texture_size[0]
+                            text_size: (dp(160), None)
+                            pos_hint: {'x': .8, 'center_y': .5}
+
+                Button:
+                    id: load
+                    size_hint_y: None
+                    height: dp(35)
+                    background_color: (.53, 1.9, 2.41, 1)
+                    disabled: True if len(gv.dir_paths) == 0 else False
+                    text: 'Load'
+                    font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                    on_release: root.load(filechooser.path)
+                    

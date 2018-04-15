@@ -32,6 +32,7 @@ Config.set('kivy', 'window_icon', '/Users/ayylmao/Desktop/knest/assets/color_bir
 # all accepted images will be written to a subdirectory
 # named 'processed'
 DES_NAME = 'processed'
+PATH_MAX = 8
 
 
 def img_handler(img_path):
@@ -99,20 +100,88 @@ class FolderSelectScreen(Screen):
         Load the selected path
             path: (String) directory path chosen by user
         """
-        # store user-selected path
-        gv.dir_path = path
-
-        self.update_path(gv.dir_path)
+        self.update_path(gv.dir_paths)
         self.dismiss_popup()
 
-    def update_path(self, dir_path):
+    def add(self, path, popup_instance):
+        # ensure that path has not already been selected
+        if path not in gv.dir_paths:
+            # ensure that we are able to write to the path
+            if os.access(path, os.W_OK):
+                gv.dir_paths.append(path)
+                length = len(gv.dir_paths)
+
+                # ensure that we are able to write to the path
+                # and that we haven't reached the max amount of path
+                if length <= PATH_MAX:
+                    index = str(length - 1)
+                    name = 'label' + index
+
+                    # enable checkbox
+                    popup_instance.ids[index].disabled = False
+                    popup_instance.ids[index].active = True
+                    # add path to path list in display
+                    popup_instance.ids[name].text = os.path.normpath(os.path.basename(path))
+
+                    # disable add button if max number of paths reached
+                    if len(gv.dir_paths) == PATH_MAX:
+                        popup_instance.ids.add.disabled = True
+
+                # enable 'load' button
+                popup_instance.ids.load.disabled = False
+
+            # permission denied; display pop-up error message
+            else:
+                Factory.PermissionDenied().open()
+
+        print(gv.dir_paths)
+
+    def remove(self, index, popup_instance):
+        length = len(gv.dir_paths)
+
+        # remove path from list of directory paths
+        gv.dir_paths.pop(index)
+
+        # move all paths below the one to remove up the checklist
+        # if possible
+        for i in range(index, length):
+            if i == length - 1:
+                # disabled checkbox
+                popup_instance.ids[str(i)].active = False
+                popup_instance.ids[str(i)].disabled = True
+
+                # remove path at list index
+                popup_instance.ids['label' + str(i)].text = ''
+            else:
+                # enable checkbox
+                popup_instance.ids[str(i)].active = True
+                popup_instance.ids[str(i)].disabled = False
+
+                # set new path to next path
+                popup_instance.ids['label' + str(i)].text = popup_instance.ids['label' + str(i + 1)].text
+
+        # removing a path enables room to add a path,
+        # so enable 'add' button
+        popup_instance.ids.add.disabled = False
+
+        # if there are no more paths listed, disable
+        # 'load' button
+        popup_instance.ids.load.disabled = True
+
+    def update_path(self, dir_paths):
         """
         Display the selected path for user to see
             dir_path: (String) absolute path to user-selected folder
         """
+        new_text = "Directory Name(s): "
+
         # only display relative path
-        new_text = "Directory Name: " + \
-            os.path.normpath(os.path.basename(dir_path))
+        for i, path in enumerate(gv.dir_paths):
+            new_text = new_text + os.path.normpath(os.path.basename(path))
+
+            if i is not len(gv.dir_paths) - 1:
+                new_text = new_text + ", "
+
         # update the path to show to user
         self.ids.path.text = new_text
 
@@ -120,16 +189,8 @@ class FolderSelectScreen(Screen):
         """
         Check if the user has selected an input folder
         """
-        if not gv.dir_path == "":
-            # ensure that we are able to write to the path
-            if os.access(gv.dir_path, os.W_OK):
-                # begin processing images if a path is given
-                # switch to transition screen
-                self.manager.current = 'black1'
-            else:
-                # permission denied; display pop-up error message
-                # and prompt user to choose another directory
-                Factory.PermissionDenied().open()
+        if len(gv.dir_paths) is not 0:
+            self.manager.current = 'black1'
 
         else:
             # if no path was given, prompt user for one
