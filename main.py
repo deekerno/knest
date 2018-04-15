@@ -166,7 +166,8 @@ class FolderSelectScreen(Screen):
 
         # if there are no more paths listed, disable
         # 'load' button
-        popup_instance.ids.load.disabled = True
+        if len(gv.dir_paths) is 0:
+            popup_instance.ids.load.disabled = True
 
     def update_path(self, dir_paths):
         """
@@ -286,13 +287,33 @@ class ProgressScreen(Screen):
             # update that model has been loaded
             gv.load = 1
 
-        # determine how many files are in the path
-        gv.num_files = len(os.listdir(gv.dir_path))
         # switch to transition screen
         self.manager.current = 'black2'
 
 
 class BlackScreen2(Screen):
+    """
+    Transition screen
+    """
+
+    def switch(self, dt):
+        """
+        Switch to process screen to begin processing images
+            dt: (int) time in seconds
+        """
+        self.manager.current = 'info'
+
+
+class InfoScreen(Screen):
+
+    def switch(self, dt):
+        # determine how many files are in the path
+        gv.num_files = len(os.listdir(gv.dir_paths[gv.path_index]))
+
+        self.manager.current = 'black5'
+
+
+class BlackScreen5(Screen):
     """
     Transition screen
     """
@@ -328,7 +349,7 @@ class ProcessScreen(Screen):
             # preventive measure: avoid out-of-index error
             if gv.index < gv.num_files:
                 # ensure user did not alter working director mid-process
-                if not (gv.num_files == len(os.listdir(gv.dir_path))):
+                if not (gv.num_files == len(os.listdir(gv.dir_paths[gv.path_index]))):
                     # display error message
                     Factory.OutOfIndex().open()
                     # reset all global variables
@@ -342,7 +363,7 @@ class ProcessScreen(Screen):
                 # continue the process as usual
                 else:
                     file_path = os.path.join(
-                        gv.dir_path, os.listdir(gv.dir_path)[gv.index])
+                        gv.dir_paths[gv.path_index], os.listdir(gv.dir_paths[gv.path_index])[gv.index])
 
                     # avoid nonimages and hidden files
                     if img_handler(file_path):
@@ -364,7 +385,7 @@ class ProcessScreen(Screen):
 
                         # call blur detection on image
                         self.check_blur(file_path, os.listdir(
-                            gv.dir_path)[gv.index])
+                            gv.dir_paths[gv.path_index])[gv.index])
 
                     # continue to next image
                     gv.index += 1
@@ -382,7 +403,7 @@ class ProcessScreen(Screen):
         elif not gv.bird_step and len(gv.images) is not 0:
             # preventive measure: avoid out-of-index error
             if gv.index < len(gv.files):
-                file_path = os.path.join(gv.dir_path, gv.files[gv.index])
+                file_path = os.path.join(gv.dir_paths[gv.path_index], gv.files[gv.index])
 
                 # if this is the first pass into this step of the process,
                 # update the title of the process for user to see
@@ -419,7 +440,7 @@ class ProcessScreen(Screen):
         elif not gv.birdbb_step and len(gv.images) is not 0:
             # preventive measure : avoid out-of-index error
             if gv.index < len(gv.files):
-                file_path = os.path.join(gv.dir_path, gv.files[gv.index])
+                file_path = os.path.join(gv.dir_paths[gv.path_index], gv.files[gv.index])
 
                 # if this is the first pass into this step of the process,
                 # update the title of the process for user to see and
@@ -478,7 +499,7 @@ class ProcessScreen(Screen):
         # update and move to next screen
         else:
             # the folder path where all accepted images will be written
-            gv.des_path = os.path.join(gv.dir_path, DES_NAME)
+            gv.des_path = os.path.join(gv.dir_paths[gv.path_index], DES_NAME)
 
             # create the folder if it does not exist
             if not os.path.isdir(gv.des_path):
@@ -752,6 +773,7 @@ class WriteScreen(Screen):
             gv.index += 1
 
         # all images have been written; update and move on to next screen
+        # or folder, if applicable
         else:
             # reset all global variables for future passes
             gv.reset()
@@ -776,7 +798,18 @@ class WriteScreen(Screen):
         Switch to writing screen
             dt: (int) time in seconds
         """
-        self.manager.current = 'black4'
+        # if there are more folders to process, move
+        # to the processing screen
+        if gv.path_index < len(gv.dir_paths) - 1:
+            self.manager.current = 'black2'
+            gv.path_index += 1
+
+        else:
+            # reset the list of directory paths
+            # and the path index
+            gv.dir_paths = []
+            gv.path_index = 0
+            self.manager.current = 'black4'
 
 
 class BlackScreen4(Screen):
@@ -811,6 +844,8 @@ Builder.load_file("/Users/ayylmao/Desktop/knest/assets/config.kv")
 # Create the screen manager
 sm = ScreenManager(transition=FadeTransition())
 sm.add_widget(LandingScreen(name='landing'))
+sm.add_widget(InfoScreen(name='info'))
+sm.add_widget(BlackScreen5(name='black5'))
 sm.add_widget(FolderSelectScreen(name='folder_select'))
 sm.add_widget(BlackScreen1(name='black1'))
 sm.add_widget(BlackScreen2(name='black2'))

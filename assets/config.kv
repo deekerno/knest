@@ -281,6 +281,88 @@
             size: self.parent.size
             pos: self.parent.pos
 
+<InfoScreen>:
+    on_pre_enter: self.ids.path.text = 'Working on ' + os.path.normpath(os.path.basename(gv.dir_paths[gv.path_index]))
+    on_enter: Clock.schedule_once(root.switch, 2.5)
+
+    Button:
+        size_hint: (.03, .04)
+        pos_hint: {'center_x': .035, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: app.stop()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+    Button:
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: Window.minimize()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+
+    Label:
+        id: path
+        font_size: dp(35)
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+        text: ''
+
+    Image:
+        id: logo
+        source: '/Users/ayylmao/Desktop/knest/assets/color_bird.png'
+        allow_stretch: True
+        keep_ratio: True
+        size_hint: (None, None)
+        size: (dp(30), dp(30))
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+
+<BlackScreen5>:
+    on_enter: Clock.schedule_once(root.switch, 1.5)
+
+    Button:
+        size_hint: (.03, .04)
+        pos_hint: {'center_x': .035, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: app.stop()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+    Button:
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: Window.minimize()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+
 <ProgressScreen>:
     on_enter: Clock.schedule_once(root.switch, 3)
 
