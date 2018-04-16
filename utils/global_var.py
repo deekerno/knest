@@ -70,7 +70,7 @@ def reset():
 
     blur_step = bird_step = birdbb_step = 0
 
-    dir_path = des_path = ''
+    des_path = ''
     num_files = 0
 
     first_pass = index = 0

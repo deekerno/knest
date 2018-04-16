@@ -134,8 +134,6 @@ class FolderSelectScreen(Screen):
             else:
                 Factory.PermissionDenied().open()
 
-        print(gv.dir_paths)
-
     def remove(self, index, popup_instance):
         length = len(gv.dir_paths)
 
@@ -287,33 +285,13 @@ class ProgressScreen(Screen):
             # update that model has been loaded
             gv.load = 1
 
+        # determine how many files are in the path
+        gv.num_files = len(os.listdir(gv.dir_paths[gv.path_index]))
         # switch to transition screen
         self.manager.current = 'black2'
 
 
 class BlackScreen2(Screen):
-    """
-    Transition screen
-    """
-
-    def switch(self, dt):
-        """
-        Switch to process screen to begin processing images
-            dt: (int) time in seconds
-        """
-        self.manager.current = 'info'
-
-
-class InfoScreen(Screen):
-
-    def switch(self, dt):
-        # determine how many files are in the path
-        gv.num_files = len(os.listdir(gv.dir_paths[gv.path_index]))
-
-        self.manager.current = 'black5'
-
-
-class BlackScreen5(Screen):
     """
     Transition screen
     """
@@ -352,6 +330,10 @@ class ProcessScreen(Screen):
                 if not (gv.num_files == len(os.listdir(gv.dir_paths[gv.path_index]))):
                     # display error message
                     Factory.OutOfIndex().open()
+                    # reset the list of directory paths
+                    # and the path index
+                    gv.dir_paths = []
+                    gv.path_index = 0
                     # reset all global variables
                     gv.reset()
                     # return to the folder selection screen having
@@ -626,10 +608,23 @@ class ProcessScreen(Screen):
             dt: (int) time in seconds
         """
         if len(gv.images) == 0:
-            # if there are no images to write, switch to 'end' screen
-            self.manager.current = 'black4'
-            # reset all global variables for future passes
-            gv.reset()
+            if gv.path_index < len(gv.dir_paths) - 1:
+                # continue to next path if there are more
+                # directories to process
+                gv.path_index += 1
+                gv.reset()
+                self.manager.current = 'black1'
+
+            else:
+                # if there are no images to write and no more directories
+                # to process, switch to 'end' screen
+                self.manager.current = 'black4'
+                # reset the list of directory paths
+                # and the path index
+                gv.dir_paths = []
+                gv.path_index = 0
+                # reset all global variables for future passes
+                gv.reset()
         else:
             # switch to transition screen
             self.manager.current = 'black3'
@@ -752,6 +747,10 @@ class WriteScreen(Screen):
                 if not os.path.isdir(gv.des_path):
                     # display error message
                     Factory.NoDestination().open()
+                    # reset the list of directory paths
+                    # and the path index
+                    gv.dir_paths = []
+                    gv.path_index = 0
                     # reset all global variables
                     gv.reset()
                     # return to the folder selection screen having
@@ -801,12 +800,13 @@ class WriteScreen(Screen):
         # if there are more folders to process, move
         # to the processing screen
         if gv.path_index < len(gv.dir_paths) - 1:
-            self.manager.current = 'black2'
+            self.manager.current = 'black1'
             gv.path_index += 1
 
         else:
             # reset the list of directory paths
-            # and the path index
+            # and the path index and move to 'end'
+            # screen
             gv.dir_paths = []
             gv.path_index = 0
             self.manager.current = 'black4'
@@ -844,8 +844,6 @@ Builder.load_file("/Users/ayylmao/Desktop/knest/assets/config.kv")
 # Create the screen manager
 sm = ScreenManager(transition=FadeTransition())
 sm.add_widget(LandingScreen(name='landing'))
-sm.add_widget(InfoScreen(name='info'))
-sm.add_widget(BlackScreen5(name='black5'))
 sm.add_widget(FolderSelectScreen(name='folder_select'))
 sm.add_widget(BlackScreen1(name='black1'))
 sm.add_widget(BlackScreen2(name='black2'))
