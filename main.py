@@ -27,7 +27,8 @@ from kivy.config import Config
 # remove os-provided border
 Config.set('graphics', 'borderless', 'True')
 # set window icon from default kivy image to knest logo
-Config.set('kivy', 'window_icon', '/Users/ayylmao/Desktop/knest/assets/color_bird.png')
+Config.set('kivy', 'window_icon',
+           '/Users/ayylmao/Desktop/knest/assets/color_bird.png')
 
 # all accepted images will be written to a subdirectory
 # named 'processed'
@@ -121,7 +122,8 @@ class FolderSelectScreen(Screen):
                     popup_instance.ids[index].disabled = False
                     popup_instance.ids[index].active = True
                     # add path to path list in display
-                    popup_instance.ids[name].text = os.path.normpath(os.path.basename(path))
+                    popup_instance.ids[name].text = os.path.normpath(
+                        os.path.basename(path))
 
                     # disable add button if max number of paths reached
                     if len(gv.dir_paths) == PATH_MAX:
@@ -156,7 +158,8 @@ class FolderSelectScreen(Screen):
                 popup_instance.ids[str(i)].disabled = False
 
                 # set new path to next path
-                popup_instance.ids['label' + str(i)].text = popup_instance.ids['label' + str(i + 1)].text
+                popup_instance.ids[
+                    'label' + str(i)].text = popup_instance.ids['label' + str(i + 1)].text
 
         # removing a path enables room to add a path,
         # so enable 'add' button
@@ -278,7 +281,7 @@ class ProgressScreen(Screen):
 
             # load the model
             gv.model = cl.ClassificationModel(
-                (400, 400), 'output/squeezenet.tfl', 2)
+                (400, 400), 'output/squeezenet_BIG-40860', 2)
 
             # instantiate object detection variables
             bf.instantiate()
@@ -385,7 +388,8 @@ class ProcessScreen(Screen):
         elif not gv.bird_step and len(gv.images) is not 0:
             # preventive measure: avoid out-of-index error
             if gv.index < len(gv.files):
-                file_path = os.path.join(gv.dir_paths[gv.path_index], gv.files[gv.index])
+                file_path = os.path.join(
+                    gv.dir_paths[gv.path_index], gv.files[gv.index])
 
                 # if this is the first pass into this step of the process,
                 # update the title of the process for user to see
@@ -422,7 +426,8 @@ class ProcessScreen(Screen):
         elif not gv.birdbb_step and len(gv.images) is not 0:
             # preventive measure : avoid out-of-index error
             if gv.index < len(gv.files):
-                file_path = os.path.join(gv.dir_paths[gv.path_index], gv.files[gv.index])
+                file_path = os.path.join(
+                    gv.dir_paths[gv.path_index], gv.files[gv.index])
 
                 # if this is the first pass into this step of the process,
                 # update the title of the process for user to see and
@@ -538,12 +543,14 @@ class ProcessScreen(Screen):
             # remove image transparency and display green check
             self.ids.result.color = (1, 1, 1, 1)
             self.ids.result.source = '/Users/ayylmao/Desktop/knest/assets/yes.png'
+            print(filename + " contains a bird")
 
         # image does not contain a bird
         else:
             # remove image transparency and display red x
             self.ids.result.color = (1, 1, 1, 1)
             self.ids.result.source = '/Users/ayylmao/Desktop/knest/assets/no.png'
+            print(filename + " does not contain a bird")
 
             # remove image from dictionary
             gv.images.pop(filename)
@@ -735,7 +742,8 @@ class WriteScreen(Screen):
                 # call crop method on image to calculate bounding box
                 # information and determine expansion and range of crop
                 final_image, success = im.man(
-                    gv.boxes[gv.files[gv.index]], gv.images[gv.files[gv.index]],
+                    gv.boxes[gv.files[gv.index]], gv.images[
+                        gv.files[gv.index]],
                     gv.landscape)
             # if user opts out of cropping
             else:
