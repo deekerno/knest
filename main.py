@@ -543,14 +543,12 @@ class ProcessScreen(Screen):
             # remove image transparency and display green check
             self.ids.result.color = (1, 1, 1, 1)
             self.ids.result.source = '/Users/ayylmao/Desktop/knest/assets/yes.png'
-            print(filename + " contains a bird")
 
         # image does not contain a bird
         else:
             # remove image transparency and display red x
             self.ids.result.color = (1, 1, 1, 1)
             self.ids.result.source = '/Users/ayylmao/Desktop/knest/assets/no.png'
-            print(filename + " does not contain a bird")
 
             # remove image from dictionary
             gv.images.pop(filename)
