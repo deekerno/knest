@@ -22,12 +22,12 @@
         pos_hint: {'center_x': 0.5, 'center_y': 0.60}
         size_hint_y: None
         height: dp(350)
-        source: '/Users/ayylmao/Desktop/knest/assets/color_bird.png'
+        source: 'assets/color_bird.png'
 
     Label:
         pos_hint: {'center_x': 0.5, 'center_y': 0.2}
         font_size: dp(60)
-        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+        font_name: 'assets/Montserrat-Regular'
         text: 'K N E S T'
 
 <FolderSelectScreen>:
@@ -42,7 +42,7 @@
         on_press: Factory.AdvancedSettings().open()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/settings.png'
+            source: 'assets/settings.png'
             allow_stretch: False
             keep_ratio: True
             size: self.parent.size
@@ -57,7 +57,7 @@
         on_press: app.stop()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            source: 'assets/quit.png'
             allow_stretch: False
             keep_ratio: True
             size: self.parent.size
@@ -71,7 +71,7 @@
         on_press: Window.minimize()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            source: 'assets/minimize.png'
             allow_stretch: True
             keep_ratio: True
             size: self.parent.size
@@ -83,17 +83,17 @@
         Label:
         	id: title
             font_size: dp(50)
-            font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+            font_name: 'assets/Montserrat-Regular'
             text: "K N E S T"
 
         Image:
             size: self.size
-            source: '/Users/ayylmao/Desktop/knest/assets/color_bird.png'          
+            source: 'assets/color_bird.png'          
 
         Label:
         	id: path
         	font_size: dp(25)
-            font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+            font_name: 'assets/Montserrat-Regular'
         	text: 'Please choose a directory'
             text_size: self.size
             halign: 'center'
@@ -107,18 +107,18 @@
 
             Button:
                 text: "Choose Folder"
-                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                font_name: 'assets/Montserrat-Regular'
                 on_release: root.show_load()
 
             Button:
                 text: "Start"
-                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                font_name: 'assets/Montserrat-Regular'
                 on_release: root.check_path()
 
 <AdvancedSettings@Popup>:
     auto_dismiss: False
     title: 'Advanced Settings'
-    title_font: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+    title_font: 'assets/Montserrat-Regular'
     title_size: sp(16)
     size_hint: (.4, .6)
     comp: gv.comp
@@ -135,7 +135,7 @@
                 text_size: self.size
                 halign: 'left'
                 valign: 'middle'
-                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                font_name: 'assets/Montserrat-Regular'
                 font_size: dp(10)
                 pos_hint: {'center_x': .6, 'center_y': .6}
 
@@ -156,7 +156,7 @@
                 text_size: self.size
                 halign: 'left'
                 valign: 'middle'
-                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                font_name: 'assets/Montserrat-Regular'
                 font_size: dp(10)
                 pos_hint: {'center_x': .6, 'center_y': .3}
 
@@ -178,7 +178,7 @@
                 halign: 'left'
                 valign: 'middle'
                 opacity: 1 if gv.crop else .5
-                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                font_name: 'assets/Montserrat-Regular'
                 font_size: dp(10)
                 pos_hint: {'center_x': .6, 'center_y': 0}
 
@@ -201,7 +201,7 @@
                 text: 'Cancel'
                 size_hint_y: None
                 height: dp(25)  
-                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                font_name: 'assets/Montserrat-Regular'
                 on_release: gv.comp = root.comp
                 on_release: gv.crop = root.crop
                 on_release: gv.landscape = root.landscape
@@ -211,13 +211,13 @@
                 text: 'OK'
                 size_hint_y: None
                 height: dp(25)  
-                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                font_name: 'assets/Montserrat-Regular'
                 on_release: root.dismiss()
 
 <PermissionDenied@Popup>:
     auto_dismiss: False
     title: 'Error'
-    title_font: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+    title_font: 'assets/Montserrat-Regular'
     title_size: sp(16)
     size_hint: (.4, .4)
 
@@ -232,12 +232,12 @@
                 id: error
                 size_hint_x: None
                 width: dp(62.5)
-                source: '/Users/ayylmao/Desktop/knest/assets/error.png'
+                source: 'assets/error.png'
 
             Label:
                 id: message
                 text: 'User does not have write permission. Please choose another directory.'
-                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                font_name: 'assets/Montserrat-Regular'
                 font_size: dp(16)
                 text_size: self.size
                 halign: 'left'
@@ -247,7 +247,7 @@
             text: 'OK'
             size_hint_y: None
             height: dp(25)  
-            font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+            font_name: 'assets/Montserrat-Regular'
             on_release: root.dismiss()
 
 <BlackScreen1>:
@@ -261,7 +261,7 @@
         on_press: app.stop()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            source: 'assets/quit.png'
             allow_stretch: False
             keep_ratio: True
             size: self.parent.size
@@ -275,7 +275,7 @@
         on_press: Window.minimize()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            source: 'assets/minimize.png'
             allow_stretch: True
             keep_ratio: True
             size: self.parent.size
@@ -293,7 +293,7 @@
         on_press: app.stop()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            source: 'assets/quit.png'
             allow_stretch: False
             keep_ratio: True
             size: self.parent.size
@@ -307,7 +307,7 @@
         on_press: Window.minimize()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            source: 'assets/minimize.png'
             allow_stretch: True
             keep_ratio: True
             size: self.parent.size
@@ -317,7 +317,7 @@
         id: message
         font_size: dp(25)
         pos_hint: {'center_x': 0.5, 'center_y': 0.7}
-        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+        font_name: 'assets/Montserrat-Regular'
         text: 'I N I T I A L I Z I N G   M O D E L'
 
     Image:
@@ -325,7 +325,7 @@
         pos_hint: {'center_x': 0.5, 'center_y': 0.5}
         size_hint_y: None  # Tells the layout to ignore the size_hint in y dir
         height: dp(200)  # The fixed height you want
-        source: '/Users/ayylmao/Desktop/knest/assets/color_bird.png'
+        source: 'assets/color_bird.png'
 
 <BlackScreen2>:
     on_enter: Clock.schedule_once(root.switch, 2)
@@ -338,7 +338,7 @@
         on_press: app.stop()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            source: 'assets/quit.png'
             allow_stretch: False
             keep_ratio: True
             size: self.parent.size
@@ -352,7 +352,7 @@
         on_press: Window.minimize()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            source: 'assets/minimize.png'
             allow_stretch: True
             keep_ratio: True
             size: self.parent.size
@@ -379,7 +379,7 @@
         on_press: app.stop()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            source: 'assets/quit.png'
             allow_stretch: False
             keep_ratio: True
             size: self.parent.size
@@ -393,7 +393,7 @@
         on_press: Window.minimize()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            source: 'assets/minimize.png'
             allow_stretch: True
             keep_ratio: True
             size: self.parent.size
@@ -403,7 +403,7 @@
         id: message
         pos_hint: {'center_x': 0.5, 'center_y': 0.2}
         font_size: dp(25)
-        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+        font_name: 'assets/Montserrat-Regular'
         text: ''
 
     Image:
@@ -433,20 +433,20 @@
         id: previous
         pos_hint: {'center_x': 0.25, 'center_y': 0.775}
         font_size: dp(15)
-        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+        font_name: 'assets/Montserrat-Regular'
         text: ''
 
     Label:
         id: current
         pos_hint: {'center_x': 0.75, 'center_y': 0.775}
         font_size: dp(15)
-        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+        font_name: 'assets/Montserrat-Regular'
         text: ''
 
 <OutOfIndex@Popup>:
     auto_dismiss: False
     title: 'Error'
-    title_font: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+    title_font: 'assets/Montserrat-Regular'
     title_size: sp(16)
     size_hint: (.4, .4)
 
@@ -461,12 +461,12 @@
                 id: error
                 size_hint_x: None
                 width: dp(62.5)
-                source: '/Users/ayylmao/Desktop/knest/assets/error.png'
+                source: 'assets/error.png'
 
             Label:
                 id: message
                 text: 'Directory was altered during processing. Please try again.'
-                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                font_name: 'assets/Montserrat-Regular'
                 font_size: dp(16)
                 text_size: self.size
                 halign: 'left'
@@ -476,13 +476,13 @@
             text: 'OK'
             size_hint_y: None
             height: dp(25) 
-            font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+            font_name: 'assets/Montserrat-Regular'
             on_release: root.dismiss()
 
 <NoDestination@Popup>:
     auto_dismiss: False
     title: 'Error'
-    title_font: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+    title_font: 'assets/Montserrat-Regular'
     title_size: sp(16)
     size_hint: (.4, .4)
 
@@ -497,12 +497,12 @@
                 id: error
                 size_hint_x: None
                 width: dp(62.5)
-                source: '/Users/ayylmao/Desktop/knest/assets/error.png'
+                source: 'assets/error.png'
 
             Label:
                 id: message
                 text: 'Destination path was altered during processing. Please try again.'
-                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                font_name: 'assets/Montserrat-Regular'
                 font_size: dp(16)
                 text_size: self.size
                 halign: 'left'
@@ -512,7 +512,7 @@
             text: 'OK'
             size_hint_y: None
             height: dp(25) 
-            font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+            font_name: 'assets/Montserrat-Regular'
             on_release: root.dismiss()
 
 <BlackScreen3>:
@@ -526,7 +526,7 @@
         on_press: app.stop()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            source: 'assets/quit.png'
             allow_stretch: False
             keep_ratio: True
             size: self.parent.size
@@ -540,7 +540,7 @@
         on_press: Window.minimize()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            source: 'assets/minimize.png'
             allow_stretch: True
             keep_ratio: True
             size: self.parent.size
@@ -559,7 +559,7 @@
         on_press: app.stop()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            source: 'assets/quit.png'
             allow_stretch: False
             keep_ratio: True
             size: self.parent.size
@@ -573,7 +573,7 @@
         on_press: Window.minimize()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            source: 'assets/minimize.png'
             allow_stretch: True
             keep_ratio: True
             size: self.parent.size
@@ -583,7 +583,7 @@
         id: message
         font_size: dp(25)
         pos_hint: {'center_x': 0.5, 'center_y': 0.55}
-        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+        font_name: 'assets/Montserrat-Regular'
         text: 'R E D U C I N G   S I M I L A R   I M A G E S'
 
     ProgressBar:
@@ -594,7 +594,7 @@
         id: loading
         font_size: dp(22.5)
         pos_hint: {'center_x': 0.5, 'center_y': 0.45}
-        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+        font_name: 'assets/Montserrat-Regular'
         text: '0%   C O M P L E T E'
 
 <WriteScreen>:
@@ -610,7 +610,7 @@
         on_press: app.stop()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            source: 'assets/quit.png'
             allow_stretch: False
             keep_ratio: True
             size: self.parent.size
@@ -624,7 +624,7 @@
         on_press: Window.minimize()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            source: 'assets/minimize.png'
             allow_stretch: True
             keep_ratio: True
             size: self.parent.size
@@ -634,7 +634,7 @@
         id: message
         font_size: dp(25)
         pos_hint: {'center_x': 0.5, 'center_y': 0.55}
-        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+        font_name: 'assets/Montserrat-Regular'
         text: 'W R I T I N G   T O   S U B D I R E C T O R Y'
 
     ProgressBar:
@@ -645,7 +645,7 @@
         id: loading
         font_size: dp(22.5)
         pos_hint: {'center_x': 0.5, 'center_y': 0.45}
-        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+        font_name: 'assets/Montserrat-Regular'
         text: '0%   C O M P L E T E'
 
 
@@ -660,7 +660,7 @@
         on_press: app.stop()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            source: 'assets/quit.png'
             allow_stretch: False
             keep_ratio: True
             size: self.parent.size
@@ -674,7 +674,7 @@
         on_press: Window.minimize()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            source: 'assets/minimize.png'
             allow_stretch: True
             keep_ratio: True
             size: self.parent.size
@@ -693,7 +693,7 @@
         on_press: app.stop()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            source: 'assets/quit.png'
             allow_stretch: False
             keep_ratio: True
             size: self.parent.size
@@ -707,7 +707,7 @@
         on_press: Window.minimize()
 
         Image:
-            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            source: 'assets/minimize.png'
             allow_stretch: True
             keep_ratio: True
             size: self.parent.size
@@ -719,7 +719,7 @@
         Label:
             id: message
             font_size: dp(37.5)
-            font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+            font_name: 'assets/Montserrat-Regular'
             text: 'P R O C E S S   C O M P L E T E'
 
         Image:
@@ -727,12 +727,12 @@
             pos_hint: {'center_x': 0.5, 'center_y': 0.5}
             size_hint_y: None  # Tells the layout to ignore the size_hint in y dir
             height: dp(200)  # The fixed height you want
-            source: '/Users/ayylmao/Desktop/knest/assets/gray_bird.png'
+            source: 'assets/gray_bird.png'
 
         Label:
             id: continue
             font_size: dp(22.5)
-            font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+            font_name: 'assets/Montserrat-Regular'
             text: 'Click Anywhere to Continue'
 
 <LoadDialog>:
@@ -761,7 +761,7 @@
                     
                     Button:
                         text: 'Cancel'
-                        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                        font_name: 'assets/Montserrat-Regular'
                         on_release: root.cancel()
                         on_release: gv.dir_paths = root.list
 
@@ -769,7 +769,7 @@
                         id: add
                         disabled: False if len(gv.dir_paths) < 8 else True
                         text: 'Add'
-                        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                        font_name: 'assets/Montserrat-Regular'
                         on_release: gv.fs.add(filechooser.path, root)
 
             BoxLayout:
@@ -933,6 +933,6 @@
                     background_color: (.53, 1.9, 2.41, 1) if not self.disabled else (1, 1, 1, 1)
                     disabled: True if len(gv.dir_paths) == 0 else False
                     text: 'Load'
-                    font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                    font_name: 'assets/Montserrat-Regular'
                     on_release: root.load(filechooser.path)
                     

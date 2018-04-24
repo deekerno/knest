@@ -28,7 +28,7 @@ from kivy.config import Config
 Config.set('graphics', 'borderless', 'True')
 # set window icon from default kivy image to knest logo
 Config.set('kivy', 'window_icon',
-           '/Users/ayylmao/Desktop/knest/assets/color_bird.png')
+           'assets/color_bird.png')
 
 # all accepted images will be written to a subdirectory
 # named 'processed'
@@ -89,7 +89,7 @@ class FolderSelectScreen(Screen):
         """
         content = LoadDialog(load=self.load, cancel=self.dismiss_popup)
         self._popup = Popup(title="Select a Folder",
-                            title_font='/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular',
+                            title_font='assets/Montserrat-Regular',
                             title_size='15sp',
                             content=content,
                             auto_dismiss=False,
@@ -281,7 +281,7 @@ class ProgressScreen(Screen):
 
             # load the model
             gv.model = cl.ClassificationModel(
-                (400, 400), 'output/squeezenet_BIG-40860', 2)
+                (400, 400), 'output/squeezenet_BIG', 2)
 
             # instantiate object detection variables
             bf.instantiate()
@@ -517,7 +517,7 @@ class ProcessScreen(Screen):
         if result:
             # remove image transparency and display green check
             self.ids.result.color = (1, 1, 1, 1)
-            self.ids.result.source = '/Users/ayylmao/Desktop/knest/assets/yes.png'
+            self.ids.result.source = 'assets/yes.png'
 
             # add non-blurry image to image dictionary
             gv.images[filename] = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -526,7 +526,7 @@ class ProcessScreen(Screen):
         else:
             # remove image transparency and display red x
             self.ids.result.color = (1, 1, 1, 1)
-            self.ids.result.source = '/Users/ayylmao/Desktop/knest/assets/no.png'
+            self.ids.result.source = 'assets/no.png'
 
     def check_class(self, img, filename):
         """
@@ -542,13 +542,13 @@ class ProcessScreen(Screen):
         if result:
             # remove image transparency and display green check
             self.ids.result.color = (1, 1, 1, 1)
-            self.ids.result.source = '/Users/ayylmao/Desktop/knest/assets/yes.png'
+            self.ids.result.source = 'assets/yes.png'
 
         # image does not contain a bird
         else:
             # remove image transparency and display red x
             self.ids.result.color = (1, 1, 1, 1)
-            self.ids.result.source = '/Users/ayylmao/Desktop/knest/assets/no.png'
+            self.ids.result.source = 'assets/no.png'
 
             # remove image from dictionary
             gv.images.pop(filename)
@@ -594,7 +594,7 @@ class ProcessScreen(Screen):
         if not len(gv.boxes[filename]['birds']) or not len(gv.boxes[filename]['faces']):
             # remove image transparency and display red x
             self.ids.result.color = (1, 1, 1, 1)
-            self.ids.result.source = '/Users/ayylmao/Desktop/knest/assets/no.png'
+            self.ids.result.source = 'assets/no.png'
 
             # remove image from dictionary
             gv.images.pop(filename)
@@ -845,7 +845,7 @@ class LoadDialog(FloatLayout):
 
 # config.kv should not implement any screen manager stuff as it
 # overrides any definitions in this file, and cause a lot of strife
-Builder.load_file("/Users/ayylmao/Desktop/knest/assets/config.kv")
+Builder.load_file("assets/config.kv")
 
 # Create the screen manager
 sm = ScreenManager(transition=FadeTransition())
