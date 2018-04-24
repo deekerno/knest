@@ -191,6 +191,17 @@ def detect_blur(img_path):
     Method where final image and blur classification is returned
         img_path: (String) absolute path to image file
     """
+    # exception handling for OpenCV image conversion
+    try:
+        # convert image to numpy array
+        image = cv2.imread(img_path)
+        # convert to RGB
+        img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        pass
+
+    except Exception:
+        return img_path, False
+
     # convert image to numpy array
     image = cv2.imread(img_path)
     # convert to RGB

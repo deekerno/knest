@@ -16,6 +16,7 @@ from PIL import Image
 import cv2
 import gc
 import math
+import numpy as np
 import os
 import utils.blur as blur
 import utils.compare as compare
@@ -26,11 +27,13 @@ from kivy.config import Config
 # remove os-provided border
 Config.set('graphics', 'borderless', 'True')
 # set window icon from default kivy image to knest logo
-Config.set('kivy', 'window_icon', 'assets/color_bird.png')
+Config.set('kivy', 'window_icon',
+           '/Users/ayylmao/Desktop/knest/assets/color_bird.png')
 
 # all accepted images will be written to a subdirectory
 # named 'processed'
 DES_NAME = 'processed'
+PATH_MAX = 8
 
 
 def img_handler(img_path):
@@ -86,9 +89,10 @@ class FolderSelectScreen(Screen):
         """
         content = LoadDialog(load=self.load, cancel=self.dismiss_popup)
         self._popup = Popup(title="Select a Folder",
-                            title_font='assets/Montserrat-Regular',
+                            title_font='/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular',
                             title_size='15sp',
                             content=content,
+                            auto_dismiss=False,
                             size_hint=(0.9, 0.9))
         self._popup.open()
 
@@ -97,20 +101,89 @@ class FolderSelectScreen(Screen):
         Load the selected path
             path: (String) directory path chosen by user
         """
-        # store user-selected path
-        gv.dir_path = path
-
-        self.update_path(gv.dir_path)
+        self.update_path(gv.dir_paths)
         self.dismiss_popup()
 
-    def update_path(self, dir_path):
+    def add(self, path, popup_instance):
+        # ensure that path has not already been selected
+        if path not in gv.dir_paths:
+            # ensure that we are able to write to the path
+            if os.access(path, os.W_OK):
+                gv.dir_paths.append(path)
+                length = len(gv.dir_paths)
+
+                # ensure that we are able to write to the path
+                # and that we haven't reached the max amount of path
+                if length <= PATH_MAX:
+                    index = str(length - 1)
+                    name = 'label' + index
+
+                    # enable checkbox
+                    popup_instance.ids[index].disabled = False
+                    popup_instance.ids[index].active = True
+                    # add path to path list in display
+                    popup_instance.ids[name].text = os.path.normpath(
+                        os.path.basename(path))
+
+                    # disable add button if max number of paths reached
+                    if len(gv.dir_paths) == PATH_MAX:
+                        popup_instance.ids.add.disabled = True
+
+                # enable 'load' button
+                popup_instance.ids.load.disabled = False
+
+            # permission denied; display pop-up error message
+            else:
+                Factory.PermissionDenied().open()
+
+    def remove(self, index, popup_instance):
+        length = len(gv.dir_paths)
+
+        # remove path from list of directory paths
+        gv.dir_paths.pop(index)
+
+        # move all paths below the one to remove up the checklist
+        # if possible
+        for i in range(index, length):
+            if i == length - 1:
+                # disabled checkbox
+                popup_instance.ids[str(i)].active = False
+                popup_instance.ids[str(i)].disabled = True
+
+                # remove path at list index
+                popup_instance.ids['label' + str(i)].text = ''
+            else:
+                # enable checkbox
+                popup_instance.ids[str(i)].active = True
+                popup_instance.ids[str(i)].disabled = False
+
+                # set new path to next path
+                popup_instance.ids[
+                    'label' + str(i)].text = popup_instance.ids['label' + str(i + 1)].text
+
+        # removing a path enables room to add a path,
+        # so enable 'add' button
+        popup_instance.ids.add.disabled = False
+
+        # if there are no more paths listed, disable
+        # 'load' button
+        if len(gv.dir_paths) is 0:
+            popup_instance.ids.load.disabled = True
+
+    def update_path(self, dir_paths):
         """
         Display the selected path for user to see
             dir_path: (String) absolute path to user-selected folder
         """
+        new_text = "Directory Name(s): "
+
         # only display relative path
-        new_text = "Directory Name: " + \
-            os.path.normpath(os.path.basename(dir_path))
+        for i, path in enumerate(gv.dir_paths):
+            new_text = new_text + os.path.normpath(os.path.basename(path))
+
+            if i is not len(gv.dir_paths) - 1:
+                new_text = new_text + ", "
+
         # update the path to show to user
         self.ids.path.text = new_text
 
@@ -118,30 +191,58 @@ class FolderSelectScreen(Screen):
         """
         Check if the user has selected an input folder
         """
-        if not gv.dir_path == "":
-            # ensure that we are able to write to the path
-            if os.access(gv.dir_path, os.W_OK):
-                # begin processing images if a path is given
-                # switch to transition screen
-                self.manager.current = 'black1'
-            else:
-                # permission denied; display pop-up error message
-                # and prompt user to choose another directory
-                Factory.PermissionDenied().open()
+        if len(gv.dir_paths) is not 0:
+            self.manager.current = 'black1'
 
         else:
             # if no path was given, prompt user for one
             self.ids.path.text = "No directory path given"
 
-    def update_toggle(self):
+    def update_compare(self, popup_instance):
         """
         Update whether application will implement image comparison
         depending on state of toggle button
         """
-        if self.ids.choice.active:
-            gv.comp = 1
+        if popup_instance.ids.compare.active:
+            gv.comp = True
         else:
-            gv.comp = 0
+            gv.comp = False
+
+    def update_crop(self, popup_instance):
+        """
+        Update whether application will crop images depending on
+        state of toggle button
+        """
+        if popup_instance.ids.crop.active:
+            gv.crop = True
+            # enable landscape text
+            popup_instance.ids.caption3.opacity = 1
+            # enable landscape switch
+            popup_instance.ids.landscape.disabled = False
+            # set landscape switch to on
+            popup_instance.ids.landscape.active = True
+            # set landscape global bool to True
+            gv.landscape = True
+        else:
+            gv.crop = False
+            # reduce opacity of landscape text
+            popup_instance.ids.caption3.opacity = .5
+            # set landscape switch to off
+            popup_instance.ids.landscape.active = False
+            # disable landscape switch
+            popup_instance.ids.landscape.disabled = True
+            # set landscape global bool to False
+            gv.landscape = False
+
+    def update_orientation(self, popup_instance):
+        """
+        Update whether application will crop images in landscape
+        orientation depending on state of toggle button
+        """
+        if popup_instance.ids.landscape.active:
+            gv.landscape = True
+        else:
+            gv.landscape = False
 
 
 class BlackScreen1(Screen):
@@ -180,7 +281,7 @@ class ProgressScreen(Screen):
 
             # load the model
             gv.model = cl.ClassificationModel(
-                (400, 400), 'output/squeezenet.tfl', 2)
+                (400, 400), 'output/squeezenet_BIG-40860', 2)
 
             # instantiate object detection variables
             bf.instantiate()
@@ -188,7 +289,7 @@ class ProgressScreen(Screen):
             gv.load = 1
 
         # determine how many files are in the path
-        gv.num_files = len(os.listdir(gv.dir_path))
+        gv.num_files = len(os.listdir(gv.dir_paths[gv.path_index]))
         # switch to transition screen
         self.manager.current = 'black2'
 
@@ -229,9 +330,13 @@ class ProcessScreen(Screen):
             # preventive measure: avoid out-of-index error
             if gv.index < gv.num_files:
                 # ensure user did not alter working director mid-process
-                if not (gv.num_files == len(os.listdir(gv.dir_path))):
+                if not (gv.num_files == len(os.listdir(gv.dir_paths[gv.path_index]))):
                     # display error message
                     Factory.OutOfIndex().open()
+                    # reset the list of directory paths
+                    # and the path index
+                    gv.dir_paths = []
+                    gv.path_index = 0
                     # reset all global variables
                     gv.reset()
                     # return to the folder selection screen having
@@ -243,7 +348,7 @@ class ProcessScreen(Screen):
                 # continue the process as usual
                 else:
                     file_path = os.path.join(
-                        gv.dir_path, os.listdir(gv.dir_path)[gv.index])
+                        gv.dir_paths[gv.path_index], os.listdir(gv.dir_paths[gv.path_index])[gv.index])
 
                     # avoid nonimages and hidden files
                     if img_handler(file_path):
@@ -265,7 +370,7 @@ class ProcessScreen(Screen):
 
                         # call blur detection on image
                         self.check_blur(file_path, os.listdir(
-                            gv.dir_path)[gv.index])
+                            gv.dir_paths[gv.path_index])[gv.index])
 
                     # continue to next image
                     gv.index += 1
@@ -279,10 +384,12 @@ class ProcessScreen(Screen):
                 gv.blur_step = 1
 
         # if bird classification has not been implemented
-        elif not gv.bird_step:
+        # and if there are images to be processed
+        elif not gv.bird_step and len(gv.images) is not 0:
             # preventive measure: avoid out-of-index error
             if gv.index < len(gv.files):
-                file_path = os.path.join(gv.dir_path, gv.files[gv.index])
+                file_path = os.path.join(
+                    gv.dir_paths[gv.path_index], gv.files[gv.index])
 
                 # if this is the first pass into this step of the process,
                 # update the title of the process for user to see
@@ -314,10 +421,13 @@ class ProcessScreen(Screen):
                 gv.files = list(gv.images.keys())
                 gv.bird_step = 1
 
-        elif not gv.birdbb_step:
+        # if bird localization has not been implemented
+        # and if there are images to be processed
+        elif not gv.birdbb_step and len(gv.images) is not 0:
             # preventive measure : avoid out-of-index error
             if gv.index < len(gv.files):
-                file_path = os.path.join(gv.dir_path, gv.files[gv.index])
+                file_path = os.path.join(
+                    gv.dir_paths[gv.path_index], gv.files[gv.index])
 
                 # if this is the first pass into this step of the process,
                 # update the title of the process for user to see and
@@ -346,6 +456,16 @@ class ProcessScreen(Screen):
                 width = self.ids.image.width
                 height = self.ids.image.height
 
+                # preventive measure for proportional image scaling
+                # for numpy array to texture conversion
+                img_width = np.shape(gv.images[gv.files[gv.index]])[1]
+                img_height = np.shape(gv.images[gv.files[gv.index]])[0]
+
+                if img_height > img_width:
+                    # calculate scaling
+                    scale = height / img_height
+                    width = img_width * scale
+
                 # call object detection on image
                 # a Clock event is scheduled to display images before
                 # processing (required)
@@ -357,6 +477,7 @@ class ProcessScreen(Screen):
 
             # implemented bird/face detection on all images
             else:
+                self.ids.image.opacity = 0
                 gv.index = 0
                 gv.files = list(gv.images.keys())
                 gv.birdbb_step = 1
@@ -364,9 +485,8 @@ class ProcessScreen(Screen):
         # all images have been processed successfully
         # update and move to next screen
         else:
-            self.ids.image.opacity = 0
             # the folder path where all accepted images will be written
-            gv.des_path = os.path.join(gv.dir_path, DES_NAME)
+            gv.des_path = os.path.join(gv.dir_paths[gv.path_index], DES_NAME)
 
             # create the folder if it does not exist
             if not os.path.isdir(gv.des_path):
@@ -375,12 +495,8 @@ class ProcessScreen(Screen):
             # update new list of images
             gv.files = list(gv.images.keys())
 
-            if len(gv.images) == 0:
-                # if there are no images to write, switch to 'end' screen
-                self.manager.current = 'black4'
-            else:
-                # switch to transition screen
-                self.manager.current = 'black3'
+            # switch to next screen after one second
+            Clock.schedule_once(self.switch, 1)
 
             # update texture location to remove detection results later
             gv.canvas = self.ids.detection.canvas
@@ -401,7 +517,7 @@ class ProcessScreen(Screen):
         if result:
             # remove image transparency and display green check
             self.ids.result.color = (1, 1, 1, 1)
-            self.ids.result.source = 'assets/yes.png'
+            self.ids.result.source = '/Users/ayylmao/Desktop/knest/assets/yes.png'
 
             # add non-blurry image to image dictionary
             gv.images[filename] = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -410,7 +526,7 @@ class ProcessScreen(Screen):
         else:
             # remove image transparency and display red x
             self.ids.result.color = (1, 1, 1, 1)
-            self.ids.result.source = 'assets/no.png'
+            self.ids.result.source = '/Users/ayylmao/Desktop/knest/assets/no.png'
 
     def check_class(self, img, filename):
         """
@@ -426,13 +542,13 @@ class ProcessScreen(Screen):
         if result:
             # remove image transparency and display green check
             self.ids.result.color = (1, 1, 1, 1)
-            self.ids.result.source = 'assets/yes.png'
+            self.ids.result.source = '/Users/ayylmao/Desktop/knest/assets/yes.png'
 
         # image does not contain a bird
         else:
             # remove image transparency and display red x
             self.ids.result.color = (1, 1, 1, 1)
-            self.ids.result.source = 'assets/no.png'
+            self.ids.result.source = '/Users/ayylmao/Desktop/knest/assets/no.png'
 
             # remove image from dictionary
             gv.images.pop(filename)
@@ -450,7 +566,7 @@ class ProcessScreen(Screen):
         image = bf.inference(filename, img)
 
         # clear any previous texture information as
-        # to avoid continuosly writing data on top of data
+        # to avoid continuously writing data on top of data
         self.ids.detection.canvas.clear()
 
         # create kivy texture from image ndarray
@@ -465,16 +581,20 @@ class ProcessScreen(Screen):
         # flip vertically to display upright
         texture.flip_vertical()
 
+        # calculate position to center on left side of window
+        x_pos = self.ids.image.parent.width * .25 - (width / 2)
+        y_pos = self.ids.image.parent.height * .5 - (height / 2)
+
         # display result to screen
         with self.ids.detection.canvas:
-            Rectangle(texture=texture, pos=(.25, self.ids.image.y),
+            Rectangle(texture=texture, pos=(x_pos, y_pos),
                       size=(width, height))
 
         # no bird/faces were detected
         if not len(gv.boxes[filename]['birds']) or not len(gv.boxes[filename]['faces']):
             # remove image transparency and display red x
             self.ids.result.color = (1, 1, 1, 1)
-            self.ids.result.source = 'assets/no.png'
+            self.ids.result.source = '/Users/ayylmao/Desktop/knest/assets/no.png'
 
             # remove image from dictionary
             gv.images.pop(filename)
@@ -486,6 +606,33 @@ class ProcessScreen(Screen):
             # a bird or face
             self.ids.result.color = (0, 0, 0, 0)
             self.ids.result.source = ''
+
+    def switch(self, dt):
+        """
+        Switch to next appropriate screen
+            dt: (int) time in seconds
+        """
+        if len(gv.images) == 0:
+            if gv.path_index < len(gv.dir_paths) - 1:
+                # continue to next path if there are more
+                # directories to process
+                gv.path_index += 1
+                gv.reset()
+                self.manager.current = 'black1'
+
+            else:
+                # if there are no images to write and no more directories
+                # to process, switch to 'end' screen
+                self.manager.current = 'black4'
+                # reset the list of directory paths
+                # and the path index
+                gv.dir_paths = []
+                gv.path_index = 0
+                # reset all global variables for future passes
+                gv.reset()
+        else:
+            # switch to transition screen
+            self.manager.current = 'black3'
 
 
 class BlackScreen3(Screen):
@@ -588,10 +735,17 @@ class WriteScreen(Screen):
 
         # preventive measure to avoid out-of-index error
         if gv.index < length:
-            # call crop method on image to calculate bounding box
-            # information and determine expansion and range of crop
-            final_image, success = im.man(
-                gv.boxes[gv.files[gv.index]], gv.images[gv.files[gv.index]])
+            # if cropping option is enabled
+            if gv.crop:
+                # call crop method on image to calculate bounding box
+                # information and determine expansion and range of crop
+                final_image, success = im.man(
+                    gv.boxes[gv.files[gv.index]], gv.images[
+                        gv.files[gv.index]],
+                    gv.landscape)
+            # if user opts out of cropping
+            else:
+                final_image, success = gv.images[gv.files[gv.index]], 1
 
             if success:
                 # preventive measure in the case that the subdirectory is
@@ -599,6 +753,10 @@ class WriteScreen(Screen):
                 if not os.path.isdir(gv.des_path):
                     # display error message
                     Factory.NoDestination().open()
+                    # reset the list of directory paths
+                    # and the path index
+                    gv.dir_paths = []
+                    gv.path_index = 0
                     # reset all global variables
                     gv.reset()
                     # return to the folder selection screen having
@@ -620,12 +778,13 @@ class WriteScreen(Screen):
             gv.index += 1
 
         # all images have been written; update and move on to next screen
+        # or folder, if applicable
         else:
             # reset all global variables for future passes
             gv.reset()
 
-            # switch to end screen
-            self.manager.current = 'black4'
+            # switch to end screen after one second
+            Clock.schedule_once(self.switch, 1)
 
             # unschedule kivy's Clock.schedule_interval() function
             return False
@@ -638,6 +797,25 @@ class WriteScreen(Screen):
         """
         img = Image.fromarray(cropped_img)
         img.save(os.path.join(gv.des_path, filename))
+
+    def switch(self, dt):
+        """
+        Switch to writing screen
+            dt: (int) time in seconds
+        """
+        # if there are more folders to process, move
+        # to the processing screen
+        if gv.path_index < len(gv.dir_paths) - 1:
+            self.manager.current = 'black1'
+            gv.path_index += 1
+
+        else:
+            # reset the list of directory paths
+            # and the path index and move to 'end'
+            # screen
+            gv.dir_paths = []
+            gv.path_index = 0
+            self.manager.current = 'black4'
 
 
 class BlackScreen4(Screen):
@@ -667,7 +845,7 @@ class LoadDialog(FloatLayout):
 
 # config.kv should not implement any screen manager stuff as it
 # overrides any definitions in this file, and cause a lot of strife
-Builder.load_file("config.kv")
+Builder.load_file("/Users/ayylmao/Desktop/knest/assets/config.kv")
 
 # Create the screen manager
 sm = ScreenManager(transition=FadeTransition())

@@ -1,0 +1,938 @@
+# UCF Senior Design 2017-18
+# Group 38
+
+#:kivy 1.10.1
+#:import Clock kivy.clock.Clock
+#:import Window kivy.core.window.Window
+#:import ProgressBar kivy.uix.progressbar.ProgressBar
+#:import Factory kivy.factory.Factory
+#:import Utils kivy.utils
+#:import gv utils.global_var
+#:import os os
+#:import copy copy
+
+<LandingScreen>:
+    Button:
+        background_color: (0.0, 0.0, 0.0, 0.0)
+        on_release: app.root.current = 'folder_select'
+
+    Image:
+        allow_stretch: True
+        keep_ratio: True
+        pos_hint: {'center_x': 0.5, 'center_y': 0.60}
+        size_hint_y: None
+        height: dp(350)
+        source: '/Users/ayylmao/Desktop/knest/assets/color_bird.png'
+
+    Label:
+        pos_hint: {'center_x': 0.5, 'center_y': 0.2}
+        font_size: dp(60)
+        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+        text: 'K N E S T'
+
+<FolderSelectScreen>:
+    on_enter: gv.fs = self
+    on_leave: self.ids.path.text = "Please choose a directory"
+
+    Button:
+        size_hint: (.025, .035)
+        pos_hint: {'center_x': .965, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: Factory.AdvancedSettings().open()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/settings.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+
+    Button:
+        size_hint: (.03, .04)
+        pos_hint: {'center_x': .035, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: app.stop()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+    Button:
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: Window.minimize()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        Label:
+        	id: title
+            font_size: dp(50)
+            font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+            text: "K N E S T"
+
+        Image:
+            size: self.size
+            source: '/Users/ayylmao/Desktop/knest/assets/color_bird.png'          
+
+        Label:
+        	id: path
+        	font_size: dp(25)
+            font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+        	text: 'Please choose a directory'
+            text_size: self.size
+            halign: 'center'
+            valign: 'middle'
+
+        BoxLayout:
+            orientation: 'horizontal'
+            pos_hint: {'center_x': .5, 'bottom': 1}
+            size_hint_y: None
+            height: dp(60)
+
+            Button:
+                text: "Choose Folder"
+                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                on_release: root.show_load()
+
+            Button:
+                text: "Start"
+                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                on_release: root.check_path()
+
+<AdvancedSettings@Popup>:
+    auto_dismiss: False
+    title: 'Advanced Settings'
+    title_font: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+    title_size: sp(16)
+    size_hint: (.4, .6)
+    comp: gv.comp
+    crop: gv.crop
+    landscape: gv.landscape
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        FloatLayout:
+            Label:
+                id: caption1
+                text: "REDUCE SIMILARITY"
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                font_size: dp(10)
+                pos_hint: {'center_x': .6, 'center_y': .6}
+
+            Switch:
+                id: compare
+                active: True if gv.comp else False
+                size_hint_x: None
+                size_hint_y: None
+                # actual size of built-in kivy switch image
+                size_x: dp(83)
+                size_y: dp(32)
+                pos_hint: {'center_x': .75, 'center_y': .6}
+                on_active: gv.fs.update_compare(root)
+
+            Label:
+                id: caption2
+                text: "CROP IMAGES"
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                font_size: dp(10)
+                pos_hint: {'center_x': .6, 'center_y': .3}
+
+            Switch:
+                id: crop
+                active: True if gv.crop else False
+                size_hint_x: None
+                size_hint_y: None
+                # actual size of built-in kivy switch image
+                size_x: dp(83)
+                size_y: dp(32)
+                pos_hint: {'center_x': .75, 'center_y': .3}
+                on_active: gv.fs.update_crop(root)
+
+            Label:
+                id: caption3
+                text: "LANDSCAPE STYLE"
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+                opacity: 1 if gv.crop else .5
+                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                font_size: dp(10)
+                pos_hint: {'center_x': .6, 'center_y': 0}
+
+            Switch:
+                id: landscape
+                active: True if gv.crop and gv.landscape else False
+                disabled: False if gv.crop else True
+                size_hint_x: None
+                size_hint_y: None
+                # actual size of built-in kivy switch image
+                size_x: dp(83)
+                size_y: dp(32)
+                pos_hint: {'center_x': .75, 'center_y': 0}
+                on_active: gv.fs.update_orientation(root)
+
+        BoxLayout:
+            orientation: 'horizontal'
+
+            Button:
+                text: 'Cancel'
+                size_hint_y: None
+                height: dp(25)  
+                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                on_release: gv.comp = root.comp
+                on_release: gv.crop = root.crop
+                on_release: gv.landscape = root.landscape
+                on_release: root.dismiss()
+
+            Button:
+                text: 'OK'
+                size_hint_y: None
+                height: dp(25)  
+                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                on_release: root.dismiss()
+
+<PermissionDenied@Popup>:
+    auto_dismiss: False
+    title: 'Error'
+    title_font: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+    title_size: sp(16)
+    size_hint: (.4, .4)
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        GridLayout:
+            cols: 2
+            padding: 40
+
+            Image:
+                id: error
+                size_hint_x: None
+                width: dp(62.5)
+                source: '/Users/ayylmao/Desktop/knest/assets/error.png'
+
+            Label:
+                id: message
+                text: 'User does not have write permission. Please choose another directory.'
+                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                font_size: dp(16)
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+
+        Button:
+            text: 'OK'
+            size_hint_y: None
+            height: dp(25)  
+            font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+            on_release: root.dismiss()
+
+<BlackScreen1>:
+    on_enter: Clock.schedule_once(root.switch, 1.5)
+
+    Button:
+        size_hint: (.03, .04)
+        pos_hint: {'center_x': .035, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: app.stop()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+    Button:
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: Window.minimize()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+<ProgressScreen>:
+    on_enter: Clock.schedule_once(root.switch, 3)
+    on_leave: self.ids.message.text = ''
+
+    Button:
+        size_hint: (.03, .04)
+        pos_hint: {'center_x': .035, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: app.stop()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+    Button:
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: Window.minimize()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+    Label:
+        id: message
+        font_size: dp(25)
+        pos_hint: {'center_x': 0.5, 'center_y': 0.7}
+        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+        text: 'I N I T I A L I Z I N G   M O D E L'
+
+    Image:
+        id: image
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        size_hint_y: None  # Tells the layout to ignore the size_hint in y dir
+        height: dp(200)  # The fixed height you want
+        source: '/Users/ayylmao/Desktop/knest/assets/color_bird.png'
+
+<BlackScreen2>:
+    on_enter: Clock.schedule_once(root.switch, 2)
+
+    Button:
+        size_hint: (.03, .04)
+        pos_hint: {'center_x': .035, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: app.stop()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+    Button:
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: Window.minimize()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+<ProcessScreen>:
+    on_enter: Clock.schedule_interval(root.update, 0)
+    on_leave: self.ids.image.source = ''
+    on_leave: self.ids.image.color = (0.0, 0.0, 0.0, 0.0)
+    on_leave: self.ids.image.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+    on_leave: self.ids.image.opacity = 1
+    on_leave: self.ids.result.source = ''
+    on_leave: self.ids.result.color = (0.0, 0.0, 0.0, 0.0)
+    on_leave: self.ids.result.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+    on_leave: self.ids.message.text = ''
+    on_leave: self.ids.previous.text = ''
+    on_leave: self.ids.current.text = ''
+
+    Button:
+        size_hint: (.03, .04)
+        pos_hint: {'center_x': .035, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: app.stop()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+    Button:
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: Window.minimize()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+    Label:
+        id: message
+        pos_hint: {'center_x': 0.5, 'center_y': 0.2}
+        font_size: dp(25)
+        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+        text: ''
+
+    Image:
+        id: image
+        allow_stretch: True
+        keep_ratio: True
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        size_hint_x: None  # Tells the layout to ignore the size_hint in y dir
+        size_hint_y: None
+        width: self.parent.width / 2
+        height: ((self.parent.width / 2) / self.image_ratio) if self.image_ratio > 1 else (self.parent.height / 2)
+        color: (0.0, 0.0, 0.0, 0.0)
+        source: ''
+
+    Widget:
+        id: detection
+
+    Image:
+        id: result
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        size_hint_y: None  # Tells the layout to ignore the size_hint in y dir
+        height: dp(200)  # The fixed height you want
+        color: (0.0, 0.0, 0.0, 0.0)
+        source: ''
+
+    Label:
+        id: previous
+        pos_hint: {'center_x': 0.25, 'center_y': 0.775}
+        font_size: dp(15)
+        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+        text: ''
+
+    Label:
+        id: current
+        pos_hint: {'center_x': 0.75, 'center_y': 0.775}
+        font_size: dp(15)
+        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+        text: ''
+
+<OutOfIndex@Popup>:
+    auto_dismiss: False
+    title: 'Error'
+    title_font: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+    title_size: sp(16)
+    size_hint: (.4, .4)
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        GridLayout:
+            cols: 2
+            padding: 40
+
+            Image:
+                id: error
+                size_hint_x: None
+                width: dp(62.5)
+                source: '/Users/ayylmao/Desktop/knest/assets/error.png'
+
+            Label:
+                id: message
+                text: 'Directory was altered during processing. Please try again.'
+                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                font_size: dp(16)
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+
+        Button:
+            text: 'OK'
+            size_hint_y: None
+            height: dp(25) 
+            font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+            on_release: root.dismiss()
+
+<NoDestination@Popup>:
+    auto_dismiss: False
+    title: 'Error'
+    title_font: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+    title_size: sp(16)
+    size_hint: (.4, .4)
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        GridLayout:
+            cols: 2
+            padding: 40
+
+            Image:
+                id: error
+                size_hint_x: None
+                width: dp(62.5)
+                source: '/Users/ayylmao/Desktop/knest/assets/error.png'
+
+            Label:
+                id: message
+                text: 'Destination path was altered during processing. Please try again.'
+                font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                font_size: dp(16)
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+
+        Button:
+            text: 'OK'
+            size_hint_y: None
+            height: dp(25) 
+            font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+            on_release: root.dismiss()
+
+<BlackScreen3>:
+    on_enter: Clock.schedule_once(root.switch, 1)
+
+    Button:
+        size_hint: (.03, .04)
+        pos_hint: {'center_x': .035, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: app.stop()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+    Button:
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: Window.minimize()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+<CompareScreen>:
+    on_enter: Clock.schedule_interval(root.compare, 0)
+    on_leave: self.ids.progress.value = 0
+    on_leave: self.ids.loading.text = '0%   C O M P L E T E'
+
+    Button:
+        size_hint: (.03, .04)
+        pos_hint: {'center_x': .035, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: app.stop()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+    Button:
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: Window.minimize()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+    Label:
+        id: message
+        font_size: dp(25)
+        pos_hint: {'center_x': 0.5, 'center_y': 0.55}
+        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+        text: 'R E D U C I N G   S I M I L A R   I M A G E S'
+
+    ProgressBar:
+        id: progress
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+    Label:
+        id: loading
+        font_size: dp(22.5)
+        pos_hint: {'center_x': 0.5, 'center_y': 0.45}
+        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+        text: '0%   C O M P L E T E'
+
+<WriteScreen>:
+    on_enter: Clock.schedule_interval(root.begin, 0)
+    on_leave: self.ids.progress.value = 0
+    on_leave: self.ids.loading.text = '0%   C O M P L E T E'
+
+    Button:
+        size_hint: (.03, .04)
+        pos_hint: {'center_x': .035, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: app.stop()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+    Button:
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: Window.minimize()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+    Label:
+        id: message
+        font_size: dp(25)
+        pos_hint: {'center_x': 0.5, 'center_y': 0.55}
+        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+        text: 'W R I T I N G   T O   S U B D I R E C T O R Y'
+
+    ProgressBar:
+        id: progress
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+    Label:
+        id: loading
+        font_size: dp(22.5)
+        pos_hint: {'center_x': 0.5, 'center_y': 0.45}
+        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+        text: '0%   C O M P L E T E'
+
+
+<BlackScreen4>:
+    on_enter: Clock.schedule_once(root.switch, 1)
+
+    Button:
+        size_hint: (.03, .04)
+        pos_hint: {'center_x': .035, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: app.stop()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+    Button:
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: Window.minimize()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+<EndScreen>:
+    Button:
+        background_color: (0.0, 0.0, 0.0, 0.0)
+        on_release: app.root.current = 'folder_select'
+
+    Button:
+        size_hint: (.03, .04)
+        pos_hint: {'center_x': .035, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: app.stop()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/quit.png'
+            allow_stretch: False
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+    Button:
+        size_hint: (.035, .045)
+        pos_hint: {'center_x': .065, 'center_y': .967}
+        background_normal: ''
+        background_color: (0, 0, 0, 0)
+        on_press: Window.minimize()
+
+        Image:
+            source: '/Users/ayylmao/Desktop/knest/assets/minimize.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: self.parent.size
+            pos: self.parent.pos
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        Label:
+            id: message
+            font_size: dp(37.5)
+            font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+            text: 'P R O C E S S   C O M P L E T E'
+
+        Image:
+            id: image
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            size_hint_y: None  # Tells the layout to ignore the size_hint in y dir
+            height: dp(200)  # The fixed height you want
+            source: '/Users/ayylmao/Desktop/knest/assets/gray_bird.png'
+
+        Label:
+            id: continue
+            font_size: dp(22.5)
+            font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+            text: 'Click Anywhere to Continue'
+
+<LoadDialog>:
+    list: copy.copy(gv.dir_paths)
+
+    BoxLayout:
+		size: root.size
+        pos: root.pos
+        orientation: 'vertical'
+
+        GridLayout:
+            cols: 2
+
+            BoxLayout:
+                size: root.size
+                pos: root.pos
+                orientation: 'vertical'
+
+                FileChooserIconView:
+                    id: filechooser
+                    dirselect: True
+
+                BoxLayout:
+                    size_hint_y: None
+                    height: dp(35)
+                    
+                    Button:
+                        text: 'Cancel'
+                        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                        on_release: root.cancel()
+                        on_release: gv.dir_paths = root.list
+
+                    Button:
+                        id: add
+                        disabled: False if len(gv.dir_paths) < 8 else True
+                        text: 'Add'
+                        font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                        on_release: gv.fs.add(filechooser.path, root)
+
+            BoxLayout:
+                size_hint_x: None
+                width: self.parent.width * .3
+                orientation: 'vertical'
+
+                StackLayout:
+                    orientation: 'tb-lr'
+                    padding: [dp(7.5), 0, 0, 0]
+                    id: paths
+
+                    FloatLayout:
+                        size_hint: (None, None)
+
+                        CheckBox:
+                            id: 0
+                            active: False if len(gv.dir_paths) == 0 else True
+                            disabled: True if len(gv.dir_paths) == 0 else False
+                            pos_hint: {'center_x': .3, 'center_y': .5}
+                            on_press: gv.fs.remove(0, root)
+
+                        Label:
+                            id: label0
+                            text: '' if len(gv.dir_paths) == 0 else os.path.normpath(os.path.basename(gv.dir_paths[0]))
+                            size_hint_x: None
+                            width: self.texture_size[0]
+                            text_size: (dp(160), None)
+                            pos_hint: {'x': .8, 'center_y': .5}
+
+                    FloatLayout:
+                        size_hint: (None, None)
+
+                        CheckBox:
+                            id: 1
+                            active: False if len(gv.dir_paths) < 2 else True
+                            disabled: True if len(gv.dir_paths) < 2 else False
+                            pos_hint: {'center_x': .3, 'center_y': .5}
+                            on_press: gv.fs.remove(1, root)
+
+                        Label:
+                            id: label1
+                            text: '' if len(gv.dir_paths) < 2 else os.path.normpath(os.path.basename(gv.dir_paths[1]))
+                            size_hint_x: None
+                            width: self.texture_size[0]
+                            text_size: (dp(160), None)
+                            pos_hint: {'x': .8, 'center_y': .5}
+
+                    FloatLayout:
+                        size_hint: (None, None)
+
+                        CheckBox:
+                            id: 2
+                            active: False if len(gv.dir_paths) < 3 else True
+                            disabled: True if len(gv.dir_paths) < 3 else False
+                            pos_hint: {'center_x': .3, 'center_y': .5}
+                            on_press: gv.fs.remove(2, root)
+
+                        Label:
+                            id: label2
+                            text: '' if len(gv.dir_paths) < 3 else os.path.normpath(os.path.basename(gv.dir_paths[2]))
+                            size_hint_x: None
+                            width: self.texture_size[0]
+                            text_size: (dp(160), None)
+                            pos_hint: {'x': .8, 'center_y': .5}
+
+                    FloatLayout:
+                        size_hint: (None, None)
+
+                        CheckBox:
+                            id: 3
+                            active: False if len(gv.dir_paths) < 4 else True
+                            disabled: True if len(gv.dir_paths) < 4 else False
+                            pos_hint: {'center_x': .3, 'center_y': .5}
+                            on_press: gv.fs.remove(3, root)
+
+                        Label:
+                            id: label3
+                            text: '' if len(gv.dir_paths) < 4 else os.path.normpath(os.path.basename(gv.dir_paths[3]))
+                            size_hint_x: None
+                            width: self.texture_size[0]
+                            text_size: (dp(160), None)
+                            pos_hint: {'x': .8, 'center_y': .5}
+
+                    FloatLayout:
+                        size_hint: (None, None)
+
+                        CheckBox:
+                            id: 4
+                            active: False if len(gv.dir_paths) < 5 else True
+                            disabled: True if len(gv.dir_paths) < 5 else False
+                            pos_hint: {'center_x': .3, 'center_y': .5}
+                            on_press: gv.fs.remove(4, root)
+
+                        Label:
+                            id: label4
+                            text: '' if len(gv.dir_paths) < 5 else os.path.normpath(os.path.basename(gv.dir_paths[4]))
+                            size_hint_x: None
+                            width: self.texture_size[0]
+                            text_size: (dp(160), None)
+                            pos_hint: {'x': .8, 'center_y': .5}
+
+                    FloatLayout:
+                        size_hint: (None, None)
+
+                        CheckBox:
+                            id: 5
+                            active: False if len(gv.dir_paths) < 6 else True
+                            disabled: True if len(gv.dir_paths) < 6 else False
+                            pos_hint: {'center_x': .3, 'center_y': .5}
+                            on_press: gv.fs.remove(5, root)
+
+                        Label:
+                            id: label5
+                            text: '' if len(gv.dir_paths) < 6 else os.path.normpath(os.path.basename(gv.dir_paths[5]))
+                            size_hint_x: None
+                            width: self.texture_size[0]
+                            text_size: (dp(160), None)
+                            pos_hint: {'x': .8, 'center_y': .5}
+
+                    FloatLayout:
+                        size_hint: (None, None)
+
+                        CheckBox:
+                            id: 6
+                            active: False if len(gv.dir_paths) < 7 else True
+                            disabled: True if len(gv.dir_paths) < 7 else False
+                            pos_hint: {'center_x': .3, 'center_y': .5}
+                            on_press: gv.fs.remove(6, root)
+
+                        Label:
+                            id: label6
+                            text: '' if len(gv.dir_paths) < 7 else os.path.normpath(os.path.basename(gv.dir_paths[6]))
+                            size_hint_x: None
+                            width: self.texture_size[0]
+                            text_size: (dp(160), None)
+                            pos_hint: {'x': .8, 'center_y': .5}
+
+                    FloatLayout:
+                        size_hint: (None, None)
+
+                        CheckBox:
+                            id: 7
+                            active: False if len(gv.dir_paths) < 8 else True
+                            disabled: True if len(gv.dir_paths) < 8 else False
+                            pos_hint: {'center_x': .3, 'center_y': .5}
+                            on_press: gv.fs.remove(7, root)
+
+                        Label:
+                            id: label7
+                            text: '' if len(gv.dir_paths) < 8 else os.path.normpath(os.path.basename(gv.dir_paths[7]))
+                            size_hint_x: None
+                            width: self.texture_size[0]
+                            text_size: (dp(160), None)
+                            pos_hint: {'x': .8, 'center_y': .5}
+
+                Button:
+                    id: load
+                    size_hint_y: None
+                    height: dp(35)
+                    background_color: (.53, 1.9, 2.41, 1) if not self.disabled else (1, 1, 1, 1)
+                    disabled: True if len(gv.dir_paths) == 0 else False
+                    text: 'Load'
+                    font_name: '/Users/ayylmao/Desktop/knest/assets/Montserrat-Regular'
+                    on_release: root.load(filechooser.path)
+                    
