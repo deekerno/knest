@@ -99,12 +99,12 @@ def instantiate():
     gv.category_index = label_map_utils.create_category_index(gv.categories)
 
     with gv.graph.as_default():
-        with tf.Session() as gv.sess:
-            # get handles to input and output tensors
-            gv.ops = tf.get_default_graph().get_operations()
-            gv.tensor_names = {
-                output.name for op in gv.ops for output in op.outputs}
-            gv.tensor_dict = {}
+        gv.sess = tf.Session()
+        # get handles to input and output tensors
+        gv.ops = tf.get_default_graph().get_operations()
+        gv.tensor_names = {
+            output.name for op in gv.ops for output in op.outputs}
+        gv.tensor_dict = {}
 
         for key in [
             'num_detections', 'detection_boxes', 'detection_scores',
