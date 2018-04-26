@@ -29,7 +29,7 @@ image_tensor = None
 dir_paths = []
 path_index = 0
 des_path = ''
-rootpath = ''
+startpath = ''
 num_files = 0
 
 # reusuable variables for use in real-time display
