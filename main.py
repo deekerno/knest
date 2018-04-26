@@ -15,9 +15,11 @@ from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from PIL import Image
 import cv2
 import gc
+import getpass
 import math
 import numpy as np
 import os
+import platform
 import utils.blur as blur
 import utils.compare as compare
 import utils.global_var as gv
@@ -34,6 +36,12 @@ Config.set('kivy', 'window_icon',
 # named 'processed'
 DES_NAME = 'processed'
 PATH_MAX = 8
+
+systype = platform.system()
+if systype[:3].lower() == 'cyg':
+    gv.rootpath = os.path.join('/', 'cygdrive', 'c', 'Users', getpass.getuser())
+else:
+    gv.rootpath = os.path.expanduser('~')
 
 
 def img_handler(img_path):

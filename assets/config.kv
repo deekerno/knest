@@ -10,7 +10,6 @@
 #:import gv utils.global_var
 #:import os os
 #:import copy copy
-#:import Path pathlib.Path
 
 <LandingScreen>:
     Button:
@@ -738,9 +737,6 @@
 
 <LoadDialog>:
     list: copy.copy(gv.dir_paths)
-    cwd: os.getcwd()
-    fancy_path: Path(root.cwd)
-    start_path: os.path.join(root.fancy_path.parts[0], root.fancy_path.parts[1], root.fancy_path.parts[2])
 
     BoxLayout:
 		size: root.size
@@ -758,7 +754,7 @@
                 FileChooserIconView:
                     id: filechooser
                     dirselect: True
-                    rootpath: root.start_path
+                    rootpath: gv.rootpath
 
                 BoxLayout:
                     size_hint_y: None
