@@ -114,25 +114,32 @@ class FolderSelectScreen(Screen):
         self.dismiss_popup()
 
     def limit(self, path, selection):
-
         # remove enclosing folder as a selection
         if path in selection:
             selection.remove(path)
 
-        if not len(selection) <= 8:
-            # remove last index of selection
+        if not len(gv.dir_paths) < 8:
+            # we should not be able to select new folders
+            # if max folder count is reached
+            selection = []
+
+        if not len(selection) <= 8 - len(gv.dir_paths):
             selection.pop()
 
         return selection
 
-    def add(self, user_selection, popup_instance):
+    def add(self, user_path, user_selection, popup_instance):
+        # if nothing to add, return
+        if user_path in user_selection:
+            return
+
         # copy original list of selections
         selection = copy.copy(user_selection)
 
         # go through every selected file
         for i, path in enumerate(selection):
             # ensure selection is a directory
-            if os.path.isdir(path):
+            if os.path.isdir(path) and i < 8:
                 # ensure that path has not already been selected
                 if path not in gv.dir_paths:
                     # ensure that we are able to write to the path

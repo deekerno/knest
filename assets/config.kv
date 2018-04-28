@@ -756,7 +756,7 @@
                     dirselect: True
                     multiselect: True
                     path: gv.startpath
-                    on_selection: filechooser.selection = filechooser.selection if len(filechooser.selection) <= (8 - len(gv.dir_paths)) else gv.fs.limit(filechooser.path, filechooser.selection)
+                    on_selection: filechooser.selection = gv.fs.limit(filechooser.path, filechooser.selection)
 
                 BoxLayout:
                     size_hint_y: None
@@ -773,7 +773,7 @@
                         disabled: False if len(gv.dir_paths) < 8 else True
                         text: 'Add'
                         font_name: 'assets/Montserrat-Regular'
-                        on_release: gv.fs.add(filechooser.selection, root)
+                        on_release: gv.fs.add(filechooser.path, filechooser.selection, root)
 
             BoxLayout:
                 size_hint_x: None
