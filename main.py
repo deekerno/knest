@@ -40,9 +40,9 @@ PATH_MAX = 8
 
 systype = platform.system()
 if systype[:3].lower() == 'cyg':
-    gv.rootpath = os.path.join('/', 'cygdrive', 'c', 'Users', getpass.getuser())
+    gv.startpath = os.path.join('/', 'cygdrive', 'c', 'Users', getpass.getuser())
 else:
-    gv.rootpath = os.path.expanduser('~')
+    gv.startpath = os.path.expanduser('~')
 
 
 def img_handler(img_path):

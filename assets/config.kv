@@ -755,7 +755,7 @@
                     id: filechooser
                     dirselect: True
                     multiselect: True
-                    path: gv.rootpath
+                    path: gv.startpath
                     on_selection: filechooser.selection = filechooser.selection if len(filechooser.selection) <= (8 - len(gv.dir_paths)) else gv.fs.limit(filechooser.path, filechooser.selection)
 
                 BoxLayout:
