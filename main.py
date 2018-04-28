@@ -13,6 +13,7 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from PIL import Image
+import copy
 import cv2
 import gc
 import getpass
@@ -112,37 +113,58 @@ class FolderSelectScreen(Screen):
         self.update_path(gv.dir_paths)
         self.dismiss_popup()
 
-    def add(self, path, popup_instance):
-        # ensure that path has not already been selected
-        if path not in gv.dir_paths:
-            # ensure that we are able to write to the path
-            if os.access(path, os.W_OK):
-                gv.dir_paths.append(path)
-                length = len(gv.dir_paths)
+    def limit(self, path, selection):
 
-                # ensure that we are able to write to the path
-                # and that we haven't reached the max amount of path
-                if length <= PATH_MAX:
-                    index = str(length - 1)
-                    name = 'label' + index
+        # remove enclosing folder as a selection
+        if path in selection:
+            selection.remove(path)
 
-                    # enable checkbox
-                    popup_instance.ids[index].disabled = False
-                    popup_instance.ids[index].active = True
-                    # add path to path list in display
-                    popup_instance.ids[name].text = os.path.normpath(
-                        os.path.basename(path))
+        if not len(selection) <= 8:
+            # remove last index of selection
+            selection.pop()
 
-                    # disable add button if max number of paths reached
-                    if len(gv.dir_paths) == PATH_MAX:
-                        popup_instance.ids.add.disabled = True
+        return selection
 
-                # enable 'load' button
-                popup_instance.ids.load.disabled = False
+    def add(self, user_selection, popup_instance):
+        # copy original list of selections
+        selection = copy.copy(user_selection)
 
-            # permission denied; display pop-up error message
-            else:
-                Factory.PermissionDenied().open()
+        # go through every selected file
+        for i, path in enumerate(selection):
+            # ensure selection is a directory
+            if os.path.isdir(path):
+                # ensure that path has not already been selected
+                if path not in gv.dir_paths:
+                    # ensure that we are able to write to the path
+                    if os.access(path, os.W_OK):
+                        gv.dir_paths.append(path)
+                        length = len(gv.dir_paths)
+
+                        # ensure that we are able to write to the path
+                        # and that we haven't reached the max amount of path
+                        if length <= PATH_MAX:
+                            index = str(length - 1)
+                            name = 'label' + index
+
+                            # enable checkbox
+                            popup_instance.ids[index].disabled = False
+                            popup_instance.ids[index].active = True
+                            # add path to path list in display
+                            popup_instance.ids[name].text = os.path.normpath(
+                                os.path.basename(path))
+
+                            # disable add button if max number of paths reached
+                            if len(gv.dir_paths) == PATH_MAX:
+                                popup_instance.ids.add.disabled = True
+
+                        # enable 'load' button
+                        popup_instance.ids.load.disabled = False
+
+                    # permission denied; display pop-up error message
+                    else:
+                        Factory.PermissionDenied().open()
+
+            user_selection.pop(0)
 
     def remove(self, index, popup_instance):
         length = len(gv.dir_paths)
