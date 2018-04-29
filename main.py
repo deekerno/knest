@@ -123,7 +123,13 @@ class FolderSelectScreen(Screen):
             # if max folder count is reached
             selection = []
 
+        # amount of folders selected should not exceed
+        # the folder maximum
         if not len(selection) <= 8 - len(gv.dir_paths):
+            selection.pop()
+
+        # ensure selection is not a file
+        if not len(selection) == 0 and os.path.isfile(selection[-1]):
             selection.pop()
 
         return selection
