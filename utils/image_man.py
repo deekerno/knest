@@ -4,6 +4,7 @@
 from PIL import Image
 import math
 import numpy as np
+import piexif
 
 SCALING_FACTOR = 3
 
@@ -93,3 +94,30 @@ def man(boxes, image_array, landscape=True, scaling_factor=SCALING_FACTOR):
     except IOError:
         print("File could not be written properly.")
         return False
+
+
+def exif(filename, image_array):
+    """
+        Transfer the EXIF metadata from the original photograph to the
+        cropped version, along with some changes to a few values.
+            filename:    (String) filename from original photo
+            new_array:   (Array) array_representation of cropped image
+    """
+
+    # Get the EXIF metadata from the original image.
+    exif_dict = piexif.load(filename)
+
+    # Some photos mysteriously do not contain EXIF data, so
+    # check if it actually exists and then return properly.
+    if len(exif_dict["Exif"].items()) == 0:
+        exif_bytes = piexif.dump(exif_dict)
+
+    else:
+        # Set the image height and width of new EXIF to the new
+        # crop dimensions. Values come from the Piexif documentation.
+        exif_dict["Exif"][40962], exif_dict["Exif"][40963] = image_array.size()
+
+        # Convert EXIF dictionary to a bytes object for writing with PIL.
+        exif_bytes = piexif.dump(exif_dict)
+
+    return exif_bytes

@@ -8,3 +8,4 @@ kivy
 imagehash
 sklearn
 pyyaml
+piexif

@@ -828,12 +828,13 @@ class WriteScreen(Screen):
 
     def write_to(self, filename, cropped_img):
         """
-        Write image to 'processed' folder
+        Write image to 'processed' folder with EXIF data from original image
             filename: (String): name of the image
             cropped_img: (ndarray) array representation of an image
         """
         img = Image.fromarray(cropped_img)
-        img.save(os.path.join(gv.des_path, filename))
+        exif_data = im.exif(filename, cropped_img)
+        img.save(os.path.join(gv.des_path, filename), exif=exif_data)
 
     def switch(self, dt):
         """
