@@ -117,7 +117,7 @@ def exif(filename, image_array):
     else:
         # Set the image height and width of new EXIF to the new
         # crop dimensions. Values come from the Piexif documentation.
-        exif_dict["Exif"][40962], exif_dict["Exif"][40963] = image_array.size()
+        exif_dict["Exif"][40963], exif_dict["Exif"][40962] = image_array.shape
 
         # Convert EXIF dictionary to a bytes object for writing with PIL.
         exif_bytes = piexif.dump(exif_dict)
