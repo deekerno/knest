@@ -112,12 +112,12 @@ def exif(filename, image_array):
     # Some photos mysteriously do not contain EXIF data, so
     # check if it actually exists and then return properly.
     if len(exif_dict["Exif"].items()) == 0:
-        exif_bytes = piexif.dump(exif_dict)
+        return None
 
     else:
         # Set the image height and width of new EXIF to the new
         # crop dimensions. Values come from the Piexif documentation.
-        exif_dict["Exif"][40963], exif_dict["Exif"][40962] = image_array.shape
+        exif_dict["Exif"][40963], exif_dict["Exif"][40962], _ = image_array.shape
 
         # Convert EXIF dictionary to a bytes object for writing with PIL.
         exif_bytes = piexif.dump(exif_dict)

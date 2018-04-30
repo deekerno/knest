@@ -4,7 +4,7 @@
 import unittest
 import utils.blur as blur
 
-TEST_PHOTO = 'tests/test_blurry_photo.JPG'
+TEST_PHOTO = 'tests/images/test_blurry_photo.JPG'
 
 
 class BlurTestCase(unittest.TestCase):

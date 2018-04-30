@@ -5,9 +5,9 @@ import cv2
 import unittest
 import utils.compare as compare
 
-TEST_PHOTO = 'tests/test_photo.jpg'
-TEST_PHOTO2 = 'tests/test_photo2.jpg'
-DIFF = 34
+TEST_PHOTO = 'tests/images/test_photo.jpg'
+TEST_PHOTO2 = 'tests/images/test_photo2.jpg'
+DIFF = 36
 
 
 class CompareTestCase(unittest.TestCase):
@@ -35,7 +35,7 @@ class CompareTestCase(unittest.TestCase):
         img2 = cv2.imread(TEST_PHOTO2)
         hash1 = compare.calc_hash(img1)
         hash2 = compare.calc_hash(img2)
-        self.assertEqual(compare.compare(hash1, hash2), 36)
+        self.assertEqual(compare.compare(hash1, hash2), DIFF)
 
 
 if __name__ == '__main__':
