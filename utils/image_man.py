@@ -103,9 +103,11 @@ def exif(filename, image_array):
             filename:    (String) filename from original photo
             new_array:   (Array) array_representation of cropped image
     """
-
-    # Get the EXIF metadata from the original image.
-    exif_dict = piexif.load(filename)
+    try:
+        # Get the EXIF metadata from the original image.
+        exif_dict = piexif.load(filename)
+    except piexif._exceptions.InvalidImageDataError:
+        return None
 
     # Some photos mysteriously do not contain EXIF data, so
     # check if it actually exists and then return properly.

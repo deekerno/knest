@@ -839,8 +839,12 @@ class WriteScreen(Screen):
             cropped_img: (ndarray) array representation of an image
         """
         img = Image.fromarray(cropped_img)
-        exif_data = im.exif(filename, cropped_img)
-        img.save(os.path.join(gv.des_path, filename), exif=exif_data)
+        exif_data = im.exif(os.path.join(gv.dir_paths[gv.path_index], filename), cropped_img)
+
+        if exif_data is None:
+            img.save(os.path.join(gv.des_path, filename))
+        else:
+            img.save(os.path.join(gv.des_path, filename), exif=exif_data)
 
     def switch(self, dt):
         """
