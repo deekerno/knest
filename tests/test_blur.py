@@ -4,11 +4,11 @@
 import unittest
 import utils.blur as blur
 
-TEST_PHOTO = 'tests/test_photo.jpg'
+TEST_PHOTO = 'tests/test_blurry_photo.JPG'
 
 
 class BlurTestCase(unittest.TestCase):
-    """Tests for `pill.py`."""
+    """Tests for `blur.py`."""
 
     def setUp(self):
         pass
@@ -16,6 +16,11 @@ class BlurTestCase(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_check_sharpness(self):
-        """Does a sharp image successfully pass the sharpness check?"""
-        self.assertTrue(blur.check_sharpness(TEST_PHOTO))
+    def test_detect_blur(self):
+        """Does an objectively blurry image fail blur detection?"""
+        img, result = blur.detect_blur(TEST_PHOTO)
+        self.assertFalse(result)
+
+
+if __name__ == '__main__':
+    unittest.main()
